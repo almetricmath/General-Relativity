@@ -157,7 +157,7 @@ _u1_sp = _u0_sp + np.array([0, 0, du])
 _phi = [0]*10
 _theta = np.linspace(np.pi/4, np.pi/2, 10)
 #plt.xlim(np.pi/2-0.1, np.pi/2 + 0.1)
-plt.ylim(1.6, 0.7)
+#plt.ylim(np.pi/4 + 0.1, np.pi/2 - 0.1)
 
 pt = parallelTransport()
 
@@ -174,11 +174,12 @@ tmp_vec = []
 
 
 u0, u1 = pt.plotChunk(_u0_sp, _u1_sp, _phi, _theta, ax1)
+plt.show()
 
 v = []
 
 for i in range(len(u0)):
-    v.append(u1[i] - u0[1])
+    v.append(u1[i] - u0[i])
 
 v_an = []
 
@@ -188,5 +189,15 @@ for th in _theta:
     
 error = []
 for i in range(len(v_an)):
-    error.append(v_an[i] - v[1])
+    error.append(v_an[i] - v[i])
 
+# output table of values as a file
+    
+with open('results.dat','w') as f:
+    f.write('theta\t analytic v_phi\t analytic v_theta\t Schilds v_phi\t Schilds v_theta\t \
+            error_phi\t error_theta\n')
+    for i in range(len(_theta)):
+        f.write(str(_theta[i]) + '\t' + str(v_an[i][1]) + '\t' + str(v_an[i][0]) + '\t' + \
+              str(v[i][1]) + '\t' + str(v[i][0]) + '\t' + str(error[i][1]) + \
+              '\t' + str(error[i][0]) + '\n')
+    f.close()
