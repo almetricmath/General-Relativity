@@ -63,11 +63,12 @@ class draw:
         _u1_sp = self._cu.CartesianToSpherical(_u1_xyz)
         
         
-        _phi = [_u0_sp[2], _u1_sp[2]]
-        _theta = [_u0_sp[1], _u1_sp[1]]
+        #_phi = [_u0_sp[2], _u1_sp[2]]
+        #_theta = [_u0_sp[1], _u1_sp[1]]
         
-        #_axis.quiver(_u1_sp[2], _u1_sp[1], _u1_sp[2] - _u0_sp[2], _u1_sp[1] - _u0_sp[1], scale_units='xy', headwidth = 0.1, headlength = 0.1, color = 'black')
-        _axis.plot(_phi, _theta, color = 'black', linewidth = 3.5) 
+       # _axis.quiver(_u1_sp[2], _u1_sp[1], _u0_sp[2] - _u1_sp[2], _u0_sp[1] - _u1_sp[1], color = 'black')
+        #_axis.plot(_phi, _theta, color = 'black', linewidth = 3.5) 
+        _axis.annotate(s='', xy=(_u1_sp[2],_u1_sp[1]), xytext=(_u0_sp[2],_u0_sp[1]), arrowprops=dict(arrowstyle='-|>, head_width=0.5, head_length=1', lw = 5))
 
     def drawVecXYZ(self, _u0, _u1, _axis):
     

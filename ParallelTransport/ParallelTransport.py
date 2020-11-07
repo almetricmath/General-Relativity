@@ -154,10 +154,18 @@ _u0_sp = np.array([1, np.pi/4, 0])
 du = 0.05
 #_u1_sp = _u0_sp + np.array([0, -du, 0])
 _u1_sp = _u0_sp + np.array([0, 0, du])
-_phi = [0]*10
-_theta = np.linspace(np.pi/4, np.pi/2, 10)
-#plt.xlim(np.pi/2-0.1, np.pi/2 + 0.1)
-#plt.ylim(np.pi/4 + 0.1, np.pi/2 - 0.1)
+_phi = [0]*30
+_theta = np.linspace(np.pi/4, np.pi/2, 30)
+#plt.xlim(-0.01, 0.06)
+plt.ylim(1.6, 0.7)
+plt.xlabel(r'$\varphi$', fontsize=40, ha='left')
+ax1.set_ylabel(r'$\theta$', rotation=0, ha='left', fontsize=40, labelpad = 40)
+plt.rcParams['xtick.labelsize']=30
+plt.rcParams['ytick.labelsize']=30
+#plt.ylabel(r'$\theta$', fontsize=20)
+plt.title('Parallel Transport of a Contravariant Vector on a 0 Longitude Circle', fontsize = 40)
+txt = 'Figure 7'
+fig.text(.5, 0.01, txt, ha='center', fontsize = 40)
 
 pt = parallelTransport()
 
@@ -170,7 +178,7 @@ vec_length = []
 angle = []
 tmp_vec = []
 
-#ax1.quiver(_u0_sp[2], _u0_sp[1], _u1_sp[2] - _u0_sp[2], _u1_sp[1] - _u0_sp[1], linewidths = 0.1)
+#plt.annotate(s='', xy=(1,1), xytext=(0.5,0.5), arrowprops=dict(arrowstyle='->'))
 
 
 u0, u1 = pt.plotChunk(_u0_sp, _u1_sp, _phi, _theta, ax1)
