@@ -141,6 +141,19 @@ class parallelTransport:
         
         return ret
     
+    def analyticThetaLatitude(self, v0_theta, v0_phi, theta_0, phi):
+    
+        ret = 0
+        k = np.cos(theta_0)
+        
+        tmp_theta = v0_theta*np.cos(k*phi) +  np.sin(theta_0)*v0_phi*np.sin(k*phi)
+        tmp_phi = v0_phi*np.cos(k*phi) - np.sin(k*phi)*v0_theta/np.sin(theta_0)
+        tmp = np.array([tmp_theta, tmp_phi])
+        ret = tmp    
+        
+        return ret
+
+    
 # the metric for the 2-D sphere
         
 def g(_theta):
@@ -150,21 +163,21 @@ def g(_theta):
 
 fig = plt.figure()
 ax1 = fig.add_subplot(111)# initial vector
-_u0_sp = np.array([1, np.pi/4, 0])
+_u0_sp = np.array([1, np.pi/2, 0])
 du = 0.05
 #_u1_sp = _u0_sp + np.array([0, -du, 0])
-_u1_sp = _u0_sp + np.array([0, 0, du])
-_phi = [0]*30
-_theta = np.linspace(np.pi/4, np.pi/2, 30)
+_u1_sp = _u0_sp + np.array([0, -du, 0])
+_theta = [np.pi/2]*10
+_phi = np.linspace(0, np.pi/2, 10)
 #plt.xlim(-0.01, 0.06)
-plt.ylim(1.6, 0.7)
+plt.ylim(1.58, 1.51)
 plt.xlabel(r'$\varphi$', fontsize=40, ha='left')
 ax1.set_ylabel(r'$\theta$', rotation=0, ha='left', fontsize=40, labelpad = 40)
 plt.rcParams['xtick.labelsize']=30
 plt.rcParams['ytick.labelsize']=30
 #plt.ylabel(r'$\theta$', fontsize=20)
-plt.title('Parallel Transport of a Contravariant Vector on a 0 Longitude Circle', fontsize = 40)
-txt = 'Figure 7'
+plt.title('Parallel Transport of a Contravariant Vector on the Equator', fontsize = 40)
+txt = 'Figure 4'
 fig.text(.5, 0.01, txt, ha='center', fontsize = 40)
 
 pt = parallelTransport()
@@ -178,9 +191,6 @@ vec_length = []
 angle = []
 tmp_vec = []
 
-#plt.annotate(s='', xy=(1,1), xytext=(0.5,0.5), arrowprops=dict(arrowstyle='->'))
-
-
 u0, u1 = pt.plotChunk(_u0_sp, _u1_sp, _phi, _theta, ax1)
 plt.show()
 
@@ -191,8 +201,8 @@ for i in range(len(u0)):
 
 v_an = []
 
-for th in _theta:
-    tmp = pt.analyticThetaLongitude(0, du, np.pi/4, th)
+for th in _phi:
+    tmp = pt.analyticThetaLatitude(-du, 0, np.pi/2, th)
     v_an.append(tmp)
     
 error = []
