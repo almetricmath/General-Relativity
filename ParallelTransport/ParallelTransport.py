@@ -166,18 +166,18 @@ ax1 = fig.add_subplot(111)# initial vector
 _u0_sp = np.array([1, np.pi/2, 0])
 du = 0.05
 #_u1_sp = _u0_sp + np.array([0, -du, 0])
-_u1_sp = _u0_sp + np.array([0, -du, 0])
+_u1_sp = _u0_sp + np.array([0, 0, du])
 _theta = [np.pi/2]*10
-_phi = np.linspace(0, np.pi/2, 10)
+_phi = np.linspace(0, np.pi/4, 10)
 #plt.xlim(-0.01, 0.06)
-plt.ylim(1.58, 1.51)
+#plt.ylim(0.58, 0.47)
 plt.xlabel(r'$\varphi$', fontsize=40, ha='left')
 ax1.set_ylabel(r'$\theta$', rotation=0, ha='left', fontsize=40, labelpad = 40)
 plt.rcParams['xtick.labelsize']=30
 plt.rcParams['ytick.labelsize']=30
 #plt.ylabel(r'$\theta$', fontsize=20)
-plt.title('Parallel Transport of a Contravariant Vector on the Equator', fontsize = 40)
-txt = 'Figure 4'
+plt.title('Parallel Transport of a Contravariant Vector - $\phi$ direction - on the Equator', fontsize = 40)
+txt = 'Figure 5'
 fig.text(.5, 0.01, txt, ha='center', fontsize = 40)
 
 pt = parallelTransport()
@@ -212,10 +212,11 @@ for i in range(len(v_an)):
 # output table of values as a file
     
 with open('results.dat','w') as f:
-    f.write('theta\t analytic v_phi\t analytic v_theta\t Schilds v_phi\t Schilds v_theta\t \
+    f.write('phi\t analytic v_phi\t analytic v_theta\t Schilds v_phi\t Schilds v_theta\t \
             error_phi\t error_theta\n')
-    for i in range(len(_theta)):
-        f.write(str(_theta[i]) + '\t' + str(v_an[i][1]) + '\t' + str(v_an[i][0]) + '\t' + \
+    for i in range(len(_phi)):
+        f.write(str(_phi[i]) + '\t' + str(v_an[i][1]) + '\t' + str(v_an[i][0]) + '\t' + \
               str(v[i][1]) + '\t' + str(v[i][0]) + '\t' + str(error[i][1]) + \
               '\t' + str(error[i][0]) + '\n')
     f.close()
+
