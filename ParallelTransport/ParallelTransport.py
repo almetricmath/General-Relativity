@@ -163,21 +163,22 @@ def g(_theta):
 
 fig = plt.figure()
 ax1 = fig.add_subplot(111)# initial vector
-_u0_sp = np.array([1, np.pi/2, 0])
+_u0_sp = np.array([1, np.pi/6, 0])
 du = 0.05
-#_u1_sp = _u0_sp + np.array([0, -du, 0])
-_u1_sp = _u0_sp + np.array([0, 0, du])
-_theta = [np.pi/2]*10
-_phi = np.linspace(0, np.pi/4, 10)
+_u1_sp = _u0_sp + np.array([0, -du, 0])
+#_u1_sp = _u0_sp + np.array([0, 0, du])
+_theta = [np.pi/6]*30
+_phi = np.linspace(0, 2*np.pi-0.01, 30)
 #plt.xlim(-0.01, 0.06)
-#plt.ylim(0.58, 0.47)
+plt.ylim(0.58, 0.47)
 plt.xlabel(r'$\varphi$', fontsize=40, ha='left')
+ax1.xaxis.set_label_coords(1.0, 0.0)
 ax1.set_ylabel(r'$\theta$', rotation=0, ha='left', fontsize=40, labelpad = 40)
 plt.rcParams['xtick.labelsize']=30
 plt.rcParams['ytick.labelsize']=30
 #plt.ylabel(r'$\theta$', fontsize=20)
-plt.title('Parallel Transport of a Contravariant Vector - $\phi$ direction - on the Equator', fontsize = 40)
-txt = 'Figure 5'
+plt.title('Parallel Transport of a Contravariant Vector on a 30 Degree Latitude Circle', fontsize = 40)
+txt = 'Figure 8'
 fig.text(.5, 0.01, txt, ha='center', fontsize = 40)
 
 pt = parallelTransport()
