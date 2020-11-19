@@ -7,11 +7,11 @@ class draw:
         
         self._cu = cu.coordUtils()
 
-    def drawThetaPhiPoint(self, _v_xyz, _axis, _color):
+    def drawThetaPhiPoint(self, _v_sp, _axis, _color):
         
-        # _v_xyz in cartesian coordinates (x, y, z)
+        # _v_sp in spherical coordinates
         
-        _v_sp = self._cu.CartesianToSpherical(_v_xyz)
+        #_v_sp = self._cu.CartesianToSpherical(_v_xyz)
         
         _axis.scatter(_v_sp[2], _v_sp[1], c = _color, s = 75)
 
@@ -23,24 +23,23 @@ class draw:
         _axis.scatter(vec[0], vec[1], vec[2], c = _color, s = 75)
         
         
-    def drawThetaPhiArc(self, _vecs_xyz, _axis, _lwidth, _color):
+    def drawThetaPhiArc(self, _vecs_sp, _axis, _lwidth, _color):
     
-        # _vecs in xyz coordinates
-        # transform to spherical coordinates
-    
+        # _vecs in spherical coordinates
+        '''
         _vecs_sp = []
         for vec in _vecs_xyz:
             tmp = self._cu.CartesianToSpherical(vec)
             _vecs_sp.append(tmp)
-                
+        '''        
         vecs_t = np.transpose(_vecs_sp)
         
         # plot theta, phi points
         
         _axis.plot(vecs_t[2], vecs_t[1], color = _color, linewidth = _lwidth, linestyle='dotted')
         # plot endpoints
-        self.drawThetaPhiPoint(_vecs_xyz[0], _axis, _color)
-        self.drawThetaPhiPoint(_vecs_xyz[-1], _axis, _color)
+        self.drawThetaPhiPoint(_vecs_sp[0], _axis, _color)
+        self.drawThetaPhiPoint(_vecs_sp[-1], _axis, _color)
 
     def drawXYZArc(self, _vecs_sp, _axis, _lwidth, _color):
         
@@ -52,15 +51,15 @@ class draw:
         #plot xyz points
         
         _axis.plot(vecs_t[0], vecs_t[1], vecs_t[2], color = _color, linewidth = _lwidth, linestyle='dotted')
-        self.drawXYZPoint(_vecs_sp[0], _axis, _color)
-        self.drawXYZPoint(_vecs_sp[-1], _axis, _color)
+        #self.drawXYZPoint(_vecs_sp[0], _axis, _color)
+        #self.drawXYZPoint(_vecs_sp[-1], _axis, _color)
         
-    def drawVecThetaPhi(self, _u0_xyz, _u1_xyz, _axis):
+    def drawVecThetaPhi(self, _u0_sp, _u1_sp, _axis):
     
-        # _u0_xyz and _u1_xyz are in cartesian coordinates
+        # _u0_sp and _u1_sp are in spherical coordinates
         
-        _u0_sp = self._cu.CartesianToSpherical(_u0_xyz)
-        _u1_sp = self._cu.CartesianToSpherical(_u1_xyz)
+       # _u0_sp = self._cu.CartesianToSpherical(_u0_xyz)
+       # _u1_sp = self._cu.CartesianToSpherical(_u1_xyz)
          
         _axis.annotate(s='', xy=(_u1_sp[2],_u1_sp[1]), xytext=(_u0_sp[2],_u0_sp[1]), arrowprops=dict(arrowstyle='-|>, head_width=0.5, head_length=1', lw = 5))
 
@@ -75,7 +74,7 @@ class draw:
         y = [u0[1], u1[1]]
         z = [u0[2], u1[2]]
         
-        #_axis.annotate(s='', xy=(_u1_sp[2],_u1_sp[1]), xytext=(_u0_sp[2],_u0_sp[1]), arrowprops=dict(arrowstyle='-|>, head_width=0.5, head_length=1', lw = 5))
+        
         _axis.plot(x, y, z, color = 'black', linewidth = 5)
 
     # generate a piece of sphere or sphere centered at origin

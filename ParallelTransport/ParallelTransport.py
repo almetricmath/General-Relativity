@@ -1,6 +1,5 @@
 import numpy as np
 import draw as dw
-print(dw.__file__)
 import GreatCircle as gc
 import coordUtils as cu
 from matplotlib import pyplot as plt
@@ -24,22 +23,23 @@ class parallelTransport:
         self._gc = gc.greatCircle()
         self._cu = cu.coordUtils()
     
-    def stepXYZToThetaPhi(self, _u0_xyz, _u1_xyz, _u0_next_xyz, _ax):
+    def stepXYZToThetaPhi(self, _u0_sp, _u1_sp, _u0_next_sp, _ax):
         
-        # input vectors in cartesian coordinates (x, y, z)
+        # input vectors in spherical coordinates
         
         # draw next point on path 
-        self._dw.drawThetaPhiPoint(_u0_xyz, _ax, 'red')
+        self._dw.drawThetaPhiPoint(_u0_sp, _ax, 'red')
         
         # draw an arc between u0_next and u1
-        a_coords = self._gc.arc(_u0_next_xyz, _u1_xyz, 1.0, 7)
-        self._dw.drawThetaPhiArc(a_coords, _ax, 1, 'red')
+        a_coords = self._gc.arc(_u0_next_sp, _u1_sp, 1.0, 7)
+        # a_coords in spherical coordinates
+        self._dw.drawThetaPhiArc(a_coords[0], _ax, 1, 'red')
         
         # plot midpoint of arc between u0_next and u1
-        midpoint = a_coords[3]
+        midpoint = a_coords[1]
         self._dw.drawThetaPhiPoint(midpoint, _ax, 'blue')
         
-        a2_coords = self._gc.twice_arc(_u0_xyz, midpoint, 1.0, 14)
+        a2_coords = self._gc.twice_arc(_u0_sp, midpoint, 1.0, 14)
         
         self._dw.drawThetaPhiArc(a2_coords, _ax, 1, 'red')
         
@@ -47,7 +47,7 @@ class parallelTransport:
 
         u1_new =  a2_coords[-1]
         
-        self._dw.drawVecThetaPhi(_u0_next_xyz, u1_new, _ax)
+        self._dw.drawVecThetaPhi(_u0_next_sp, u1_new, _ax)
         
         return u1_new 
         
@@ -106,25 +106,25 @@ class parallelTransport:
         if len(_phi) != len(_theta):
             raise Exception("length not the same")
         
-        _u0 = self._cu.SphericalToCartesian(_u0_sp)
-        _u1 = self._cu.SphericalToCartesian(_u1_sp)
-        self._dw.drawVecThetaPhi(_u0, _u1, _ax)
+        #_u0 = self._cu.SphericalToCartesian(_u0_sp)
+        #_u1 = self._cu.SphericalToCartesian(_u1_sp)
+        self._dw.drawVecThetaPhi(_u0_sp, _u1_sp, _ax)
         
         u0 = [_u0_sp[1:]]
         u1 = [_u1_sp[1:]]
         
         for i in range(1, len(_phi)):
             u0_next_sp = np.array([1, _theta[i], _phi[i]])
-            u0_next = self._cu.SphericalToCartesian(u0_next_sp)
+            #u0_next = self._cu.SphericalToCartesian(u0_next_sp)
             
-            u1_new = self.stepXYZToThetaPhi(_u0, _u1, u0_next, _ax)
-            _u0 = u0_next
-            _u1 = u1_new
+            u1_new = self.stepXYZToThetaPhi(_u0_sp, _u1_sp, u0_next_sp, _ax)
+            _u0_sp = u0_next_sp
+            _u1_sp = u1_new
             
-            u0_sp = self._cu.CartesianToSpherical(_u0)
-            u1_sp = self._cu.CartesianToSpherical(_u1)
-            u0.append(u0_sp[1:])
-            u1.append(u1_sp[1:])
+            #u0_sp = self._cu.CartesianToSpherical(_u0)
+            #u1_sp = self._cu.CartesianToSpherical(_u1)
+            u0.append(_u0_sp[1:])
+            u1.append(_u1_sp[1:])
             
     
         return [u0, u1]
@@ -167,8 +167,8 @@ _u0_sp = np.array([1, np.pi/6, 0])
 du = 0.05
 _u1_sp = _u0_sp + np.array([0, -du, 0])
 #_u1_sp = _u0_sp + np.array([0, 0, du])
-_theta = [np.pi/6]*30
-_phi = np.linspace(0, 2*np.pi-0.01, 30)
+_theta = [np.pi/6]*50
+_phi = np.linspace(0, 2*np.pi-0.01, 50)
 #plt.xlim(-0.01, 0.06)
 plt.ylim(0.58, 0.47)
 plt.xlabel(r'$\varphi$', fontsize=40, ha='left')
@@ -203,7 +203,7 @@ for i in range(len(u0)):
 v_an = []
 
 for th in _phi:
-    tmp = pt.analyticThetaLatitude(-du, 0, np.pi/2, th)
+    tmp = pt.analyticThetaLatitude(-du, 0, np.pi/6, th)
     v_an.append(tmp)
     
 error = []

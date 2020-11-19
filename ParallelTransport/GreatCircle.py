@@ -34,6 +34,7 @@ class greatCircle:
     # cartesian vector great circle equation 
     
     def greatCircle(self, _u, _v, r, t):
+        #input in Cartesian coordinates
         return r * np.cos(t)*_u + r * np.sin(t)*_v
     
      
@@ -144,34 +145,51 @@ class greatCircle:
         return ret
     
     
-    def arc(self, _u, _v, r, num):
+    def arc(self, _u_sp, _v_sp, r, num):
 
+        # input in spherical coordinates
+        
+        _u = self._cu.SphericalToCartesian(_u_sp)
+        _v = self._cu.SphericalToCartesian(_v_sp)
+        
         u_v = self._cu.createOrthonormal(_u, _v)
         angle = self._cu.angleBetween(_u, _v)
+        
+        midpoint = self.greatCircle(u_v[0], u_v[1], r, angle/2)
+        midpointSP = self._cu.CartesianToSpherical(midpoint)
         
         ang = np.linspace(0, angle, num)
         
         ret = []
         
         for t in ang:
-            ret.append(self.greatCircle(u_v[0], u_v[1], r, t))
+            # convert back to spherical coordinates
+            tmpXYZ = self.greatCircle(u_v[0], u_v[1], r, t)
+            tmpSP = self._cu.CartesianToSpherical(tmpXYZ)
+            ret.append(tmpSP)
         
-        return ret
+        return [ret, midpointSP]
 
     # draw an arc 2x the length going through the midpoint
     
-    def twice_arc(self, _u, _v, r, num):
+    def twice_arc(self, _u_sp, _v_sp, r, num):
+        
+        #input is in spherical coordinates
                 
+        _u = self._cu.SphericalToCartesian(_u_sp)
+        _v = self._cu.SphericalToCartesian(_v_sp)
+        
         u_v = self._cu.createOrthonormal(_u, _v)
         angle = self._cu.angleBetween(_u, _v)
             
-        ang = np.linspace(0, angle, num)
-        ang = 2*ang
+        ang = np.linspace(0, 2*angle, num)
             
         ret = []
             
         for t in ang:
-            ret.append(self.greatCircle(u_v[0], u_v[1], r, t))
+            tmpXYZ = self.greatCircle(u_v[0], u_v[1], r, t)
+            tmpSP = self._cu.CartesianToSpherical(tmpXYZ)
+            ret.append(tmpSP)
                 
         return ret
         
