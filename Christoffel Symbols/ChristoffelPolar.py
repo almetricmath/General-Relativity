@@ -95,6 +95,8 @@ dAdr_r = sp.simplify(T_r*A)
 
 # check results
 
+print('check T_r')
+
 de1dr = T_r[0,0]*A[0,:]+T_r[0,1]*A[1,:]
 error1 = de1dr - dAdr[0,:]
 print('de1dr error = ',error1)
@@ -108,5 +110,17 @@ print('de2dr error = ', error2)
 dAdtheta = sp.diff(A, theta)
 T_theta = sp.simplify(dAdtheta*B_p.T)
 dAdtheta_r = sp.simplify(T_theta*A)
+
+# check result
+
+print('check T_theta')
+
+de1dtheta = T_theta[0,0]*A[0,:] + T_theta[0,1]*A[1,:]
+error1 = de1dtheta - dAdtheta[0,:]
+print('error1 = ', error1)
+
+de2dtheta = T_theta[1,0]*A[0,:] + T_theta[1,1]*A[1,:]
+error2 = de2dtheta - dAdtheta[1,:]
+print('error2 = ', error2)
 
 
