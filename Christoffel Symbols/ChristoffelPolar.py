@@ -99,11 +99,15 @@ print('check T_r')
 
 de1dr = T_r[0,0]*A[0,:]+T_r[0,1]*A[1,:]
 error1 = de1dr - dAdr[0,:]
-print('de1dr error = ',error1)
+print('de1dr error = \n')
+sp.pprint(error1)
+print('\n')
 
 de2dr = T_r[1,0]*A[0,:]+T_r[1,1]*A[1,:]
 error2 = de2dr - dAdr[1,:]
-print('de2dr error = ', error2)
+print('de2dr error = \n')
+sp.pprint(error2)
+print('\n')
 
 # Ti, _theta, k
 
@@ -117,10 +121,39 @@ print('check T_theta')
 
 de1dtheta = T_theta[0,0]*A[0,:] + T_theta[0,1]*A[1,:]
 error1 = de1dtheta - dAdtheta[0,:]
-print('error1 = ', error1)
+print('error1 = \n')
+sp.pprint(error1)
+print('\n')
 
 de2dtheta = T_theta[1,0]*A[0,:] + T_theta[1,1]*A[1,:]
 error2 = de2dtheta - dAdtheta[1,:]
-print('error2 = ', error2)
+print('error2 = \n')
+sp.pprint(error2)
+print('\n')
 
 
+# Covariant Derivative 
+
+# vector
+
+vr = sp.Symbol('v_r', real=True)
+v_theta = sp.Symbol('v_theta', real=True)
+
+v = sp.Matrix([r*(sp.cos(theta)**2),-r*sp.sin(theta)**2])
+#v = sp.Matrix([vr, v_theta])
+
+# r component
+
+dvdr = sp.diff(v, r)
+testr = sp.simplify(T_r.T*v)
+cov_r = sp.simplify(dvdr + testr)
+print('covariant derivative wrt r\n')
+sp.pprint(cov_r)
+
+# theta component
+
+dvdtheta = sp.diff(v,theta)
+testtheta = sp.simplify(T_theta.T*v)
+cov_theta = sp.simplify(dvdtheta + testtheta)
+print('covariant derivative wrt theta\n')
+sp.pprint(cov_theta)
