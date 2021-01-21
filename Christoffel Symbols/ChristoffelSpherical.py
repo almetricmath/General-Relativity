@@ -106,49 +106,48 @@ T_r = sp.simplify(dAdr*B_sp.T)
 
 #check T_r
 
-dAdr[0,:]
+dAdr_r = sp.simplify(T_r*A)
 
 
-dAdr_r = sp.simplify(A*T_r)
 
-'''
 # compute error
 
 error_r = dAdr_r - dAdr
-errorT_r = dAdrT_r - dAdr
+
 print('error in r derivative\n')
 print('error_r\n', error_r)
-print('error_r_T\n', errorT_r)
+
 
 # Ti_theta, k
 
 dAdtheta = sp.diff(A, theta)
 T_theta = sp.simplify(dAdtheta*B_sp.T)
 dAdtheta_r = sp.simplify(T_theta*A)
-dAdthetaT_r = sp.simplify(T_theta.T*A.T)
 
 # compute error
 
 error_theta = dAdtheta_r - dAdtheta
-errorT_theta = dAdthetaT_r - dAdtheta
 
 print('error in theta derivative\n')
 print('error_theta\n', error_theta)
-print('error_T\n', errorT_theta)
+
 
 # Ti_phi, k
 
 dAdphi = sp.diff(A, phi)
 T_phi = sp.simplify(dAdphi*B_sp.T)
 dAdphi_r = sp.simplify(T_phi*A)
-dAdphiT_r = sp.simplify(T_phi.T*A.T)
 
 # compute error
 
 error_phi = dAdphi_r - dAdphi
-errorT_phi = dAdphiT_r - dAdphi
 
 print('error in theta derivative\n')
 print('error_phi\n', error_phi)
-print('errorT_phi\n', errorT_phi)
-'''
+
+# Covariant Derivative
+
+
+
+
+

@@ -132,6 +132,15 @@ sp.pprint(error2)
 print('\n')
 
 
+# Convert Christoffel Symbols of the Second Kind, T_r
+# to Christoffel Symbols of the First Kind T1_r
+
+T1_r = T_r
+
+
+
+
+
 # Covariant Derivative 
 
 # vector
@@ -147,13 +156,54 @@ v = sp.Matrix([r*(sp.cos(theta)**2),-r*sp.sin(theta)**2])
 dvdr = sp.diff(v, r)
 testr = sp.simplify(T_r.T*v)
 cov_r = sp.simplify(dvdr + testr)
-print('covariant derivative wrt r\n')
-sp.pprint(cov_r)
+#print('covariant derivative wrt r\n')
+#sp.pprint(cov_r)
 
 # theta component
 
 dvdtheta = sp.diff(v,theta)
 testtheta = sp.simplify(T_theta.T*v)
 cov_theta = sp.simplify(dvdtheta + testtheta)
-print('covariant derivative wrt theta\n')
-sp.pprint(cov_theta)
+#print('covariant derivative wrt theta\n')
+#sp.pprint(cov_theta)
+
+# Christoffel Symbol of the First Kind - equation (49) - Curvilinear Calculus
+
+
+dG1a = dvec(G[:,0].T, p_coords).T
+dG2a = dvec(G[0,:], p_coords)
+dG3a = sp.diff(G, r)
+
+T1 = sp.simplify((1/2)*(dG1a+dG2a-dG3a))
+print('Christoffel Symbol of the First Kind, Tr\n')
+sp.pprint(T1)
+
+dG1b = dvec(G[:,1].T, p_coords).T
+dG2b = dvec(G[1,:], p_coords)
+dG3b = sp.diff(G, theta)
+
+T2 = sp.simplify((1/2)*(dG1b+dG2b-dG3b))
+print('Christoffel Symbol of the First Kind, Ttheta\n')
+sp.pprint(T2)
+
+
+
+'''
+print('dG1 = \n')
+sp.pprint(dG1)
+
+print('dG2 = \n')
+sp.pprint(dG2)
+
+print('dG3 = \n')
+sp.pprint(dG3)
+
+dG1 = dvec(G[:,1], p_coords).T
+dG2 = dvec(G[1,:], p_coords)
+dG3 = sp.diff(G, r)
+
+T2 = dG1+dG1-dG3
+
+print('Christoffel Symbol of the First Kind - p = 2\n')
+sp.pprint(T2)
+'''
