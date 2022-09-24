@@ -204,7 +204,13 @@ def computeFourthOrderWeightMatrix(_T, _Basis_1, _Basis_2, _n):
             ret.append(result)
     
     return np.array(ret)
-    
+  
+def allocateFourthOrderBasis(_n):
+    ret=np.array([[[[[[0.0]*_n]*_n]*_n]*_n]*_n]*_n)
+    return ret
+def allocateFourthOrderElement(_n):
+    ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
+    return ret_ij
 
 def computeFourthOrderTensorOuterProduct(_T, _Basis_1, _Basis_2, _Basis_3, _Basis_4, _n):
 
@@ -262,20 +268,20 @@ def computeFourthOrderMatrixOuterProduct(_T, _Basis_1, _Basis_2, _Basis_3, _Basi
 
     b_4 = np.array(b_4)
    
-
-    ret=np.array([[[[[[0.0]*_n]*_n]*_n]*_n]*_n]*_n)
-
+    ret = allocateFourthOrderBasis(_n)
+    
     for k in range(_n):
         for l in range(_n):
             index = k*_n + l
             tw = TW[index]
-            ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
+            ret_ij = allocateFourthOrderElement(_n)
             for i in range(_n):
                 for j in range(_n):
                     tmp = tw[i,j]
                     basis = np.einsum('i,j', b_3[k], b_4[l] )
                     ret_ij[i][j] = tmp*basis
             ret[k][l] = ret_ij
+            
     return ret 
 
 
@@ -284,18 +290,17 @@ def computeFourthOrderMatrixOuterProduct(_T, _Basis_1, _Basis_2, _Basis_3, _Basi
 def convertMatrixToLatex(_result, _n):
     
     ret = '\\bmatrix{'
-    tmp = ''
        
     for i in range(_n):
         for j in range(_n):
-            tmp += str("{:.8f}".format(_result[i][j]))
+            ret += str("{:.8f}".format(_result[i][j]))
             if j != _n - 1:
-                tmp += '&'
+                ret += '&'
                 
         if i != _n - 1:
-            tmp += '\\\\'
+            ret += '\\\\'
 
-    ret += tmp + '}'
+    ret += '}'
     return ret
         
 def createLatexBlockMatrix(_matrixLst, _n):
