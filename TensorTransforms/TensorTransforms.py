@@ -268,21 +268,30 @@ def computeFourthOrderMatrixOuterProduct(_T, _Basis_1, _Basis_2, _Basis_3, _Basi
 
     b_4 = np.array(b_4)
    
+    bases = []
+    coords = []
+    
     ret = allocateFourthOrderBasis(_n)
+    bases = allocateFourthOrderBasis(_n)
     
     for k in range(_n):
         for l in range(_n):
             index = k*_n + l
             tw = TW[index]
             ret_ij = allocateFourthOrderElement(_n)
+            basis_ij = allocateFourthOrderElement(_n)
+            coord_ij = np.array([[0.0, 0.0],[0.0, 0.0]])
             for i in range(_n):
                 for j in range(_n):
                     tmp = tw[i,j]
-                    basis = np.einsum('i,j', b_3[k], b_4[l] )
-                    ret_ij[i][j] = tmp*basis
+                    coord_ij[i][j] = tmp
+                    basis_ij[i][j] = np.einsum('i,j', b_3[k], b_4[l] )
+                    ret_ij[i][j] = tmp*basis_ij[i][j]
+            coords.append(coord_ij)
+            bases[k][l] = basis_ij
             ret[k][l] = ret_ij
             
-    return ret 
+    return ret, np.array(coords), np.array(bases)
 
 
 # convert a matrix to  Latex
@@ -303,13 +312,16 @@ def convertMatrixToLatex(_result, _n):
     ret += '}'
     return ret
         
-def createLatexBlockMatrix(_matrixLst, _n):
+def createLatexBlockMatrix(_matrixLst, _weights, _n):
+    
     
     ret = '\\bmatrix{'
     
     for i in range(_n):
         for j in range(_n):
             index = i*_n + j
+            if type(_weights) == np.ndarray:
+                ret += str("{:.8f}".format(_weights[i][j]))
             ret += convertMatrixToLatex(_matrixLst[index], _n)
             if j != _n - 1:
                 ret += '&'
@@ -319,21 +331,31 @@ def createLatexBlockMatrix(_matrixLst, _n):
     ret += '}'
     
     return ret
+
+
            
-def convertResultsToLatex(_result, _n):
+def convertResultsToLatex(_result, _weights, _n):
     
     ret = []
-    for i in range(2):
-        for j in range(2):
+    for i in range(_n):
+        for j in range(_n):
             matrixLst = []
-            for k in range(2):
-                for l in range(2):
-                    matrixLst.append(result12[i][j][k][l])
-            ret.append(createLatexBlockMatrix(matrixLst, 2))
+            for k in range(_n):
+                for l in range(_n):
+                    matrixLst.append(_result[i][j][k][l])
+                
+            if type(_weights) == np.ndarray:
+                index = i*_n + j
+                weights = _weights[index]
+            else:
+                weights = 0
+            ret.append(createLatexBlockMatrix(matrixLst, weights, _n))
     
     return ret
            
-            
+#def convertCoordsBasesToLatex(_coords, _bases, _n)
+
+
 # compute 2nd order tensor in polar coordinates 
 # using both outer product and inner product
 
@@ -464,12 +486,29 @@ TW = np.array(TW)
  
 result11 = computeFourthOrderTensorOuterProduct(TW, E, E, E, E, 2)
 
-result12 = computeFourthOrderMatrixOuterProduct(TW,E, E, E, E, 2)
-l_results = convertResultsToLatex(result12, 2)
+ 
+result12, coords, bases = computeFourthOrderMatrixOuterProduct(TW,E, E, E, E, 2)
+l_results = convertResultsToLatex(result12, 0, 2)
+i = 0
 for lm in l_results:
+    print('matrix ' + str(i))
     print('\n')
     print(lm)
     print('\n')
+    i += 1
+
+l_results = convertResultsToLatex(bases, coords, 2)
+print('weighting bases\n')
+i = 0
+for lm in l_results:
+    print('matrix ' + str(i))
+    print('\n')
+    print(lm)
+    print('\n')
+    i += 1
+
+
+
 
 
 
