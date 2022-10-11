@@ -24,9 +24,9 @@ T = np.array([[1,2],[3,4]])
 _vars = t.variables(r, theta)
 vari = _vars.getVars()
 
-secondOrder = t.secondOrderTensor()
-E = vari['E']
-result = secondOrder.computeTensorOuterProduct(T, E, E, 2)
+secondOrder = t.secondOrderTensor(r, theta)
+
+result = secondOrder.computeTensorOuterProduct(T, 'e', 'e', 2)
 
 print('Second Order Tensor Results\n')
 
@@ -42,11 +42,11 @@ print('Tensor computed by outer product\n')
 print(l_result)
 print('\n')
 
-_vars.printVars(['E','ET'],2)
+
 
 # compute tensor using transpose(E).T.E
 
-result1 = secondOrder.computeTensorInnerProduct(T, E, E)
+result1 = secondOrder.computeTensorInnerProduct(T, 'E', 'E', 2)
 l_result = latex.convertMatrixToLatex(result1, 2)
 print('Tensor computed by ET(T)E\n')
 print(l_result)
@@ -61,11 +61,13 @@ print('\n')
 
 print('Transform to polar sqrt coordinate system')
 
-_vars.printVars(['A','BT', 'B', 'E1', 'E1T'], 2)
+#_vars.printVars(['A','BT', 'B', 'E1', 'E1T'], 2)
 
-B = vari['B']
-tmp = np.dot(np.transpose(B),T)
-T1 = np.dot(tmp, B)
+#B = vari['B']
+#tmp = np.dot(np.transpose(B),T)
+#T1 = np.dot(tmp, B)
+
+T1 = secondOrder.computeTensorInnerProduct(T, 'B', 'B', 2)
 
 l_result = latex.convertMatrixToLatex(T1, 2)
 print('T1 = B(T)T \n')
@@ -73,10 +75,14 @@ print(l_result)
 print('\n')
 
 
-E1 = vari['E1']
-result3 = secondOrder.computeTensorOuterProduct(T1, E1, E1, 2)
-
+result3 = secondOrder.computeTensorOuterProduct(T1, 'e1', 'e1', 2)
 l_result = latex.convertMatrixToLatex(result3, 2)
 print('Tensor computed by outer product\n')
+print(l_result)
+print('\n')
+
+result4 = secondOrder.computeTensorInnerProduct(T1, 'E1', 'E1', 2)
+l_result = latex.convertMatrixToLatex(result3, 2)
+print('Tensor computed by inner product\n')
 print(l_result)
 print('\n')
