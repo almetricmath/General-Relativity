@@ -10,6 +10,7 @@ Created on Tue Sep  6 15:13:10 2022
 # second order contravariant tensor
 
 import numpy as np
+import copy
 
 class coordinateTransforms:
 
@@ -37,36 +38,40 @@ class secondOrderTensor:
 
     def computeTensorOuterProduct(self, _T, _labelBasis_1, _labelBasis_2, _n):
         
-        _Basis_1 = self._vars._vars[_labelBasis_1.upper()]
-        _Basis_2 = self._vars._vars[_labelBasis_2.upper()]
+        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        
+        _Basis_1 = self._vars._vars[_labelBasis_1.upper()].value
+        _Basis_2 = self._vars._vars[_labelBasis_2.upper()].value
         
         ret = 0
         for i in range(_n):
             for j in range(_n):
                 v_i = _Basis_1[i,:]
                 v_j =  _Basis_2[j,:]
-                self.printVector(v_i, True,_labelBasis_1 + '_' + str(i+1) + '^T', _n)
-                self.printVector(v_j, False,_labelBasis_2 + '_' + str(j+1), _n) 
-                coeff = _T[i,j]
-                print('T_' + str(i+1) + str(j+1) + '= ', coeff)
+                self.printVector(v_i, True, _labelBasis_1 + subscript_num[i+1] + 'ᵀ', _n)
+                self.printVector(v_j, False, _labelBasis_2 + subscript_num[j+1], _n) 
+                coeff = _T[i,j] 
+                print('T' + subscript_num[i+1] + subscript_num[j+1] + ' = ', coeff)
                 outer = np.einsum('i,j', v_i, v_j)
-                self.printMatrix(outer,'outer_' + str(i+1) + str(j+1), _n)
+                self.printMatrix(outer,'outer' + subscript_num[i+1] + subscript_num[j+1], _n)
                 ret += coeff*outer
         return ret
     
-    def computeTensorInnerProduct(self, _T, _labelBasis_1, _labelBasis_2, _n):
+    def computeTensorInnerProduct(self, _T, _indxBasis_1, _indxBasis_2, _n):
         
-        _Basis_1 = self._vars._vars[_labelBasis_1]
-        _Basis_2 = self._vars._vars[_labelBasis_2]
+        _Basis_1T = self._vars._vars[_indxBasis_1 + 'T'].value  # transpose of _Basis_1
+        _labelBasis_1T = self._vars._vars[_indxBasis_1 + 'T'].symbol
+        _Basis_2 = self._vars._vars[_indxBasis_2].value
+        _labelBasis_2 = self._vars._vars[_indxBasis_2].symbol
         l_result = self._latex.convertMatrixToLatex(_T, _n)
         print('T' + '\n', l_result, '\n')
-        l_result = self._latex.convertMatrixToLatex(np.transpose(_Basis_1), _n)
-        print('[' + _labelBasis_1 + ']' + 'T', l_result, '\n')
+        l_result = self._latex.convertMatrixToLatex(_Basis_1T, _n)
+        print(_labelBasis_1T, l_result, '\n')
         l_result = self._latex.convertMatrixToLatex(_Basis_2, _n)
-        print(_labelBasis_2 + ' ', l_result, '\n')
+        print(_labelBasis_2, l_result, '\n')
         
        
-        tmp = np.dot(np.transpose(_Basis_1),_T)
+        tmp = np.dot(_Basis_1T, _T)
         ret = np.dot(tmp, _Basis_2)
         return ret
 
@@ -137,7 +142,7 @@ class thirdOrderTensor:
         
         # put basis matrices into vectors
         
-        _Basis_1 = self._vars._vars[_labelBasis_1.upper()]
+        _Basis_1 = self._vars._vars[_labelBasis_1.upper().value]
        
         b_1 = []
         for i in _Basis_1:
@@ -186,31 +191,34 @@ class thirdOrderTensor:
         # Compute weight matrix
         
         _Basis_1 = self._vars._vars[_labelBasis_1]
+        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
         T_weight = []
         
         for i in range(_n):
             T_tmp = 0
+            print('T_' + str(i) + ' Calculation\n')
             for j in range(_n):
                 T_tmp += _T[j]*_Basis_1[j,i]
+                l_result = self._latex.convertMatrixToLatex(_T[j], _n)
+                print('T' + str(j) +'\n', l_result, '\n')
+                print(_labelBasis_1 + subscript_num[j+1] + subscript_num[i+1] + ' = ' + str(_Basis_1[j,i]) + '\n')
             T_weight.append(T_tmp)
+            l_result = self._latex.convertMatrixToLatex(T_tmp, _n)
+            print('T_' + str(i) +'\n', l_result, '\n')
+            
           
         T_weight = np.array(T_weight)
         
-        for i in range(len(T_weight)):
-            l_result = self._latex.convertMatrixToLatex(T_weight[i], _n)
-            print('T' + str(i) +'\n', l_result, '\n')
             
-        
-        # compute T for each element
+        # compute T1 for each element
         ret = []
         _Basis_2 = self._vars._vars[_labelBasis_2]
         _Basis_3 = self._vars._vars[_labelBasis_3]
         l_result = self._latex.convertMatrixToLatex(np.transpose(_Basis_2), _n)
-        print('[' + _labelBasis_2 + ']' + 'T', l_result, '\n')
+        print( _labelBasis_2  + 'ᵀ = ', l_result, '\n')
         l_result = self._latex.convertMatrixToLatex(_Basis_3, _n)
         print(_labelBasis_3 + ' = ', l_result, '\n')
        
-
         for i in range(_n):
             
             tmp = np.dot(np.transpose(_Basis_2), T_weight[i])
@@ -219,49 +227,7 @@ class thirdOrderTensor:
             
         return ret
      
-    def transformTensor(self, _T, _Matrix_1, _Matrix_2, _Matrix_3 ):
-       
-        n = np.shape(_Matrix_1)[0]
-      
-        # Compute weight matrix
-         
-        T_weight = []
-         
-        for i in range(n):
-            T_tmp = 0
-            for j in range(n):
-                T_tmp += _T[j]*_Matrix_1[j,i]
-            T_weight.append(T_tmp)
-            l_result = self._latex.convertMatrixToLatex(T_tmp, n)
-            print('T_weight_' + str(i) + ' = ', l_result, '\n')
-           
-        T_weight = np.array(T_weight) 
-              
-        # compute T for each element
-        ret = []
-        
-        for i in range(n):
-            tmp = np.dot(np.transpose(_Matrix_2), T_weight[i])
-            tmp = np.dot(tmp, _Matrix_3)
-            ret.append(tmp)
-            l_result = self._latex.convertMatrixToLatex(tmp, n)
-            print('T' + str(i) +'\n', l_result, '\n')
-            
-            
-            
-        return np.array(ret)
-    
-    def computeWeight(self, _TW, _b_1, _b_2, _n):
-        
-        ret = 0
-    
-        for i in range(_n):
-            for j in range(_n):
-                tmp = np.einsum('i,j',_b_1[i],_b_2[j])
-                ret += _TW[i,j]*tmp
-            
-        return np.array(ret)
-
+  
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, _n)
          print(_label + ' = ', l_result, '\n')
@@ -453,23 +419,61 @@ class convertToLatex:
         
         return ret
     
+class dictElement:
+    
+    value = []
+    symbol = ''
+    
+    
+    
 class variables:
 
     def __init__(self, _r, _theta):
         coords = coordinateTransforms()
         self._vars = {}
-        self._vars['E'] = coords.polarVectorBasis(_r, _theta)
-        self._vars['ET'] = np.transpose(self._vars['E'])
-        self._vars['W'] = coords.polarOneFormBasis(_r, _theta)
-        r1 = _r**2
+        tmpElement = dictElement()
+       
+        
+        tmpElement.symbol = 'E'
+        tmpElement.value = coords.polarVectorBasis(_r, _theta)
+        self._vars['E'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol = 'Eᵀ'
+        tmpElement.value =  np.transpose(self._vars['E'].value)
+        self._vars['ET'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol ='W'
+        tmpElement.value = coords.polarOneFormBasis(_r, _theta)
+        self._vars['W'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol ='Wᵀ'
+        tmpElement.value = np.transpose(self._vars['W'].value)
+        self._vars['WT'] = copy.deepcopy(tmpElement)
+        
+
+        r1 = _r**2  
         theta1 = _theta**2
-        self._vars['A'] = coords.polarSqrtAMatrix(r1, theta1)
-        self._vars['AT'] = np.transpose(self._vars['A'])
-        self._vars['B'] = coords.polarSqrtBMatrix(r1, theta1) 
-        self._vars['BT'] = np.transpose(self._vars['B'])
-        self._vars['E1'] = np.dot(self._vars['A'],self._vars['E'])
-        self._vars['E1T'] = np.transpose(self._vars['E'])
-        self._vars['W1'] = np.dot(np.transpose(self._vars['B']), self._vars['W'])
+        tmpElement.symbol = 'A'
+        tmpElement.value = coords.polarSqrtAMatrix(r1, theta1)
+        self._vars['A'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol = 'Aᵀ'
+        tmpElement.value = np.transpose(self._vars['A'].value) 
+        self._vars['AT'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol = 'B'
+        tmpElement.value = coords.polarSqrtBMatrix(r1, theta1)
+        self._vars['B'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol = 'Bᵀ'
+        tmpElement.value = np.transpose(self._vars['B'].value)
+        self._vars['BT'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol = 'E̅'
+        tmpElement.value = np.dot(self._vars['A'].value,self._vars['E'].value)
+        self._vars['E1'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol = 'E̅ᵀ'
+        tmpElement.value = np.transpose(self._vars['E1'].value)
+        self._vars['E1T'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol = 'W̅'
+        tmpElement.value = np.dot(np.transpose(self._vars['B'].value), self._vars['W'].value)
+        self._vars['W1'] = copy.deepcopy(tmpElement)
+        tmpElement.symbol = 'W̅ᵀ'
+        tmpElement.value = np.transpose(self._vars['W1'].value)
+        self._vars['W1T'] = copy.deepcopy(tmpElement)
         self._latex = convertToLatex()
         
 

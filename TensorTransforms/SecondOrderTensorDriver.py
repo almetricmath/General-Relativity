@@ -48,7 +48,7 @@ print('\n')
 
 result1 = secondOrder.computeTensorInnerProduct(T, 'E', 'E', 2)
 l_result = latex.convertMatrixToLatex(result1, 2)
-print('Tensor computed by ET(T)E\n')
+print('Tensor computed by EᵀTE\n')
 print(l_result)
 print('\n')
 
@@ -61,16 +61,10 @@ print('\n')
 
 print('Transform to polar sqrt coordinate system')
 
-#_vars.printVars(['A','BT', 'B', 'E1', 'E1T'], 2)
-
-#B = vari['B']
-#tmp = np.dot(np.transpose(B),T)
-#T1 = np.dot(tmp, B)
-
 T1 = secondOrder.computeTensorInnerProduct(T, 'B', 'B', 2)
 
 l_result = latex.convertMatrixToLatex(T1, 2)
-print('T1 = B(T)T \n')
+print('T̅ = BᵀTB \n')
 print(l_result)
 print('\n')
 
