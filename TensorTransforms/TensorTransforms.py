@@ -36,20 +36,22 @@ class secondOrderTensor:
         self._latex = convertToLatex()
         self._vars = variables(_r, _theta)
 
-    def computeTensorOuterProduct(self, _T, _labelBasis_1, _labelBasis_2, _n):
+    def computeTensorOuterProduct(self, _T, _indxBasis_1, _indxBasis_2, _n):
         
         subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
         
-        _Basis_1 = self._vars._vars[_labelBasis_1.upper()].value
-        _Basis_2 = self._vars._vars[_labelBasis_2.upper()].value
+        _Basis_1 = self._vars._vars[_indxBasis_1].value
+        symbol_1 = self._vars._vars[_indxBasis_1].symbol
+        _Basis_2 = self._vars._vars[_indxBasis_2].value
+        symbol_2 = self._vars._vars[_indxBasis_2].symbol
         
         ret = 0
         for i in range(_n):
             for j in range(_n):
                 v_i = _Basis_1[i,:]
                 v_j =  _Basis_2[j,:]
-                self.printVector(v_i, True, _labelBasis_1 + subscript_num[i+1] + 'ᵀ', _n)
-                self.printVector(v_j, False, _labelBasis_2 + subscript_num[j+1], _n) 
+                self.printVector(v_i, True, symbol_1.lower() + subscript_num[i+1] + 'ᵀ', _n)
+                self.printVector(v_j, False, symbol_2.lower() + subscript_num[j+1], _n) 
                 coeff = _T[i,j] 
                 print('T' + subscript_num[i+1] + subscript_num[j+1] + ' = ', coeff)
                 outer = np.einsum('i,j', v_i, v_j)
@@ -423,6 +425,7 @@ class dictElement:
     
     value = []
     symbol = ''
+    lsymbol = ''
     
     
     

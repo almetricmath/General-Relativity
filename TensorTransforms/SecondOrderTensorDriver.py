@@ -26,9 +26,9 @@ vari = _vars.getVars()
 
 secondOrder = t.secondOrderTensor(r, theta)
 
-result = secondOrder.computeTensorOuterProduct(T, 'e', 'e', 2)
+result = secondOrder.computeTensorOuterProduct(T, 'E', 'E', 2)
 
-print('Second Order Tensor Results\n')
+print('Second Order Tensor Components\n')
 
 latex = t.convertToLatex()
 
@@ -38,17 +38,16 @@ print(l_result)
 print('\n')
 
 l_result = latex.convertMatrixToLatex(result, 2)
-print('Tensor computed by outer product\n')
+print('Full Tensor computed by outer products\n')
 print(l_result)
 print('\n')
-
 
 
 # compute tensor using transpose(E).T.E
 
 result1 = secondOrder.computeTensorInnerProduct(T, 'E', 'E', 2)
 l_result = latex.convertMatrixToLatex(result1, 2)
-print('Tensor computed by EᵀTE\n')
+print('Full Tensor computed by EᵀTE\n')
 print(l_result)
 print('\n')
 
@@ -69,14 +68,14 @@ print(l_result)
 print('\n')
 
 
-result3 = secondOrder.computeTensorOuterProduct(T1, 'e1', 'e1', 2)
+result3 = secondOrder.computeTensorOuterProduct(T1, 'E1', 'E1', 2)
 l_result = latex.convertMatrixToLatex(result3, 2)
-print('Tensor computed by outer product\n')
+print('Full Tensor computed by outer products\n')
 print(l_result)
 print('\n')
 
 result4 = secondOrder.computeTensorInnerProduct(T1, 'E1', 'E1', 2)
 l_result = latex.convertMatrixToLatex(result3, 2)
-print('Tensor computed by inner product\n')
+print('Full Tensor computed by inner products\n')
 print(l_result)
 print('\n')
