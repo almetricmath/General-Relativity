@@ -92,59 +92,15 @@ class thirdOrderTensor:
         self._latex = convertToLatex()
         self._vars = variables(_r, _theta)
     
-    def computeTensorCustom(self, _T, _labelBasis_1, _labelBasis_2, _labelBasis_3, _n):
-        
-        # put basis matrices into vectors
-        
-        _Basis_1 = self._vars[_labelBasis_1]
-        
-        b_1 = []
-        for i in _Basis_1:
-            b_1.append(i)
-    
-        b_1 = np.array(b_1)
-        
-        _Basis_2 = self._vars[_labelBasis_2]
-        
-        b_2 = []
-        for i in _Basis_2:
-            b_2.append(i)
-    
-        b_2 = np.array(b_2)
-        
-        _Basis_3 = self._vars[_labelBasis_3]
-        
-        # Combine weight matrix
-        
-        T_weight = []
-        
-        for j in range(_n):
-            T_tmp = 0
-            for i in range(_n):
-                T_tmp += _T[i]*_Basis_3[i,j]
-            T_weight.append(T_tmp)
-          
-        T_weight = np.array(T_weight) 
-       
-       # Perform outer product 
-       
-        T = [] 
-        
-        for k in range(_n):
-            T_tmp = 0
-            for i in range(_n):
-                for j in range(_n):
-                    T_tmp += T_weight[k,i,j]*np.einsum('i,j', b_1[i],b_2[j])
-            T.append(T_tmp)
-                    
-                 
-        return np.array(T)
       
     def computeTensorOuterProduct(self, _T, _labelBasis_1, _labelBasis_2, _labelBasis_3, _n):
         
         # put basis matrices into vectors
         
-        _Basis_1 = self._vars._vars[_labelBasis_1.upper().value]
+        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        
+        _Basis_1 = self._vars._vars[_labelBasis_1].value
+        symbol_1 = self._vars._vars[_labelBasis_1].symbol
        
         b_1 = []
         for i in _Basis_1:
@@ -152,7 +108,8 @@ class thirdOrderTensor:
     
         b_1 = np.array(b_1)
         
-        _Basis_2 = self._vars._vars[_labelBasis_2.upper()]
+        _Basis_2 = self._vars._vars[_labelBasis_2].value
+        symbol_2 = self._vars._vars[_labelBasis_2].symbol
        
         b_2 = []
         for i in _Basis_2:
@@ -160,7 +117,8 @@ class thirdOrderTensor:
     
         b_2 = np.array(b_2)
         
-        _Basis_3 = self._vars._vars[_labelBasis_3.upper()]
+        _Basis_3 = self._vars._vars[_labelBasis_3].value
+        symbol_3 = self._vars._vars[_labelBasis_3].symbol
        
         b_3 = []
         for i in _Basis_3:
@@ -175,13 +133,13 @@ class thirdOrderTensor:
             for j in range(_n):
                 for k in range(_n):
                     coeff = _T[i,j,k]
-                    print('Tijk = ', coeff)
-                    self.printVector(b_1[j], True,_labelBasis_1 + '_' + str(i+1), _n)
-                    self.printVector(b_2[k], False,_labelBasis_2 + '_' + str(j+1), _n) 
-                    self.printVector(b_3[i], False, _labelBasis_3 + '_' + str(k+1), _n)
+                    print('T' + subscript_num[i+1] + subscript_num[j+1] + subscript_num[k+1] + ' = ', coeff)
+                    self.printVector(b_1[i], False, symbol_1.lower() + subscript_num[i+1], _n)
+                    self.printVector(b_2[j], False, symbol_2.lower() + subscript_num[j+1], _n) 
+                    self.printVector(b_3[k], False, symbol_3.lower() + subscript_num[k+1], _n)
                     outer = np.einsum('i,j,k',b_1[i], b_2[j], b_3[k])
                     l_outer = self.convertToLatex(outer, _n)
-                    print('outer ' + str(i+1) + str(j+1) + str(k+1) + '\n')
+                    print('outer' + subscript_num[i+1] + subscript_num[j+1] + subscript_num[k+1] + '\n')
                     print(l_outer, '\n')
                     ret += coeff*outer
         return ret
@@ -192,21 +150,23 @@ class thirdOrderTensor:
         
         # Compute weight matrix
         
-        _Basis_1 = self._vars._vars[_labelBasis_1]
+        _Basis_1 = self._vars._vars[_labelBasis_1].value
+        symbol_1 = self._vars._vars[_labelBasis_1].symbol
         subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        
         T_weight = []
         
         for i in range(_n):
             T_tmp = 0
-            print('T_' + str(i) + ' Calculation\n')
+            print('[T]' + subscript_num[i+1] + ' Calculation\n')
             for j in range(_n):
                 T_tmp += _T[j]*_Basis_1[j,i]
                 l_result = self._latex.convertMatrixToLatex(_T[j], _n)
-                print('T' + str(j) +'\n', l_result, '\n')
-                print(_labelBasis_1 + subscript_num[j+1] + subscript_num[i+1] + ' = ' + str(_Basis_1[j,i]) + '\n')
+                print('T' + subscript_num[j+1] +'\n', l_result, '\n')
+                print(symbol_1 + subscript_num[j+1] + subscript_num[i+1] + ' = ' + str(_Basis_1[j,i]) + '\n')
             T_weight.append(T_tmp)
             l_result = self._latex.convertMatrixToLatex(T_tmp, _n)
-            print('T_' + str(i) +'\n', l_result, '\n')
+            print('[T]' + subscript_num[i+1] +'\n', l_result, '\n')
             
           
         T_weight = np.array(T_weight)
@@ -214,12 +174,14 @@ class thirdOrderTensor:
             
         # compute T1 for each element
         ret = []
-        _Basis_2 = self._vars._vars[_labelBasis_2]
-        _Basis_3 = self._vars._vars[_labelBasis_3]
+        _Basis_2 = self._vars._vars[_labelBasis_2].value
+        symbol_2 = self._vars._vars[_labelBasis_2].symbol
+        _Basis_3 = self._vars._vars[_labelBasis_3].value
+        symbol_3 = self._vars._vars[_labelBasis_3].symbol
         l_result = self._latex.convertMatrixToLatex(np.transpose(_Basis_2), _n)
-        print( _labelBasis_2  + 'ᵀ = ', l_result, '\n')
+        print( symbol_2  + 'ᵀ = ', l_result, '\n')
         l_result = self._latex.convertMatrixToLatex(_Basis_3, _n)
-        print(_labelBasis_3 + ' = ', l_result, '\n')
+        print(symbol_3 + ' = ', l_result, '\n')
        
         for i in range(_n):
             
