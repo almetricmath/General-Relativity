@@ -214,11 +214,22 @@ class thirdOrderTensor:
         return ret
              
 
-
 class fourthOrderTensor:
     
-    def computeFourthOrderWeightMatrix(self, _T, _Basis_1, _Basis_2, _n):
+    def __init__(self, _r, _theta):
+        self._latex = convertToLatex()
+        self._vars = variables(_r, _theta)
+    
+    
+    def computeFourthOrderWeightMatrix(self, _T, _indxBasis_1, _indxBasis_2, _n):
         
+        
+        _Basis_1 = self._vars._vars[_indxBasis_1].value
+        #symbol_1 = self._vars._vars[_indxBasis_1].symbol
+        _Basis_2 = self._vars._vars[_indxBasis_2].value
+        #symbol_2 = self._vars._vars[_indxBasis_2].symbol
+        
+       
         b_1 = []
         for i in _Basis_1:
             b_1.append(i)
@@ -236,7 +247,7 @@ class fourthOrderTensor:
         for i in range(_n):
             for j in range(_n):
                 TW = _T[i,j]
-                result = self.computeWeight(TW, b_1, b_2, _n)
+                result = self.computeFourthOrderWeightMatrix(TW, b_1, b_2, _n)
                 ret.append(result)
         
         return np.array(ret)
@@ -248,8 +259,20 @@ class fourthOrderTensor:
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
     
-    def computeFourthOrderTensorOuterProduct(self, _T, _Basis_1, _Basis_2, _Basis_3, _Basis_4, _n):
+    def computeFourthOrderTensorOuterProduct(self, _T, _indxBasis_1, _indxBasis_2, _indxBasis_3, _indxBasis_4, _n):
     
+        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+            
+        _Basis_1 = self._vars._vars[_indxBasis_1].value
+        symbol_1 = self._vars._vars[_indxBasis_1].symbol
+        _Basis_2 = self._vars._vars[_indxBasis_2].value
+        symbol_2 = self._vars._vars[_indxBasis_2].symbol
+        _Basis_3 = self._vars._vars[_indxBasis_3].value
+        symbol_3 = self._vars._vars[_indxBasis_3].symbol
+        _Basis_4 = self._vars._vars[_indxBasis_4].value
+        symbol_4 = self._vars._vars[_indxBasis_4].symbol
+        
+
         b_1 = []
         for i in _Basis_1:
             b_1.append(i)
@@ -274,7 +297,7 @@ class fourthOrderTensor:
     
         b_4 = np.array(b_4)
         
-        #ret=np.array([[[[[[0.0]*_n]*_n]*_n]*_n]*_n]*_n)
+        
         result = 0
     
         for i in range(_n):
@@ -282,9 +305,19 @@ class fourthOrderTensor:
                 #result = 0
                 for k in range(_n):
                     for l in range(_n):
-                        tmp = _T[i, j, k, l]
-                        result += tmp*np.einsum('i,j,k,l',b_1[k], b_2[l], b_3[i],b_4[j])
-                #ret[i][j] = result
+                        coeff = _T[i, j, k, l]
+                        print('T' + subscript_num[i+1] + subscript_num[j+1] + subscript_num[k+1] + subscript_num[l+1] + ' = ', coeff)
+                        self.printVector(b_1[i], False, symbol_1.lower() + subscript_num[i+1], _n)
+                        self.printVector(b_2[j], False, symbol_2.lower() + subscript_num[j+1], _n) 
+                        self.printVector(b_3[k], False, symbol_3.lower() + subscript_num[k+1], _n)
+                        self.printVector(b_4[l], False, symbol_4.lower() + subscript_num[l+1], _n)
+                        outer = np.einsum('i,j,k,l',b_1[i], b_2[j], b_3[k],b_4[l])
+                        l_outer = self.convertElementToLatex(outer, _n)
+                        print('outer' + subscript_num[i+1] + subscript_num[j+1] + subscript_num[k+1] + subscript_num[l+1],'\n')
+                        print(l_outer, '\n')
+                        
+                        
+                        result += coeff*outer
             
         return result
     
@@ -329,8 +362,52 @@ class fourthOrderTensor:
                 ret[k][l] = ret_ij
                 
         return ret, np.array(coords), np.array(bases)
+    
+    def printMatrix(self, _M, _label, _n):
+         l_result = self._latex.convertMatrixToLatex(_M, 2)
+         print(_label + ' = ', l_result, '\n')
+     
+    def printVector(self, _vec, _transpose, _label, _n):
+         l_result = self._latex.converVectorToLatex(_vec, _transpose, 2)
+         print(_label + ' = ', l_result, '\n')
+
+    def convertElementToLatex(self, _elem, _n):
+        
+        ret = '\\bmatrix{'     
+        
+        for i in range(_n):
+            for j in range(_n):
+                tmp = self._latex.convertMatrixToLatex(_elem[i][j], _n)
+                ret += tmp
+                if j != _n -1:
+                    ret += '&'
+            if i != _n - 1:            
+                ret += '\\\\' 
+        
+        ret += '\\\\}' 
+        return ret
 
 
+    def convertResultsToLatex(self, _result, _weights, _n):
+        
+        ret = []
+        for i in range(_n):
+            for j in range(_n):
+                matrixLst = []
+                for k in range(_n):
+                    for l in range(_n):
+                        matrixLst.append(_result[i][j][k][l])
+                    
+                if type(_weights) == np.ndarray:
+                    index = i*_n + j
+                    weights = _weights[index]
+                else:
+                    weights = 0
+                #ret.append(self.createLatexBlockMatrix(matrixLst, weights, _n))
+        
+        return ret
+    
+    
 class convertToLatex:
 
     def convertMatrixToLatex(self, _matrix, _n):
