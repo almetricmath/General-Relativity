@@ -339,7 +339,25 @@ class fourthOrderTensor:
             
         return result
     
+    def computeTensorElement(self, _E_ixj, _T_ij, _n):
+        
+        ret = self.allocateFourthOrderElement(_n)
+        
+        for i in range(_n):
+            for j in range(_n):
+                ret[i][j] = _E_ixj[i,j]*_T_ij
     
+        return ret
+        
+    def getBasisVector(self, _indxBasis, _i):
+        
+        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        
+        _Basis = self._vars._vars[_indxBasis].value
+        symbol = self._vars._vars[_indxBasis].symbol
+        ret = _Basis[_i,:], symbol.lower() + subscript_num[_i+1]
+        return ret
+        
     def computeFourthOrderMatrixOuterProduct(self, _T, _Basis_1, _Basis_2, _Basis_3, _Basis_4, _n):
         
         TW = self.computeFourthOrderWeightMatrix(_T, _Basis_1, _Basis_2, _n)
@@ -413,27 +431,7 @@ class fourthOrderTensor:
             for j in range(_n):
                 index = i*_n + j
                 self.printMatrix(_T[index], 'T' + subscript_num[i+1] + subscript_num[j+1], _n)
-
-    def convertResultsToLatex(self, _result, _weights, _n):
-        
-        ret = []
-        for i in range(_n):
-            for j in range(_n):
-                matrixLst = []
-                for k in range(_n):
-                    for l in range(_n):
-                        matrixLst.append(_result[i][j][k][l])
-                    
-                if type(_weights) == np.ndarray:
-                    index = i*_n + j
-                    weights = _weights[index]
-                else:
-                    weights = 0
-                #ret.append(self.createLatexBlockMatrix(matrixLst, weights, _n))
-        
-        return ret
-    
-    
+ 
 class convertToLatex:
 
     def convertMatrixToLatex(self, _matrix, _n):
