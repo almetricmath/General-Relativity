@@ -220,14 +220,32 @@ class fourthOrderTensor:
         self._latex = convertToLatex()
         self._vars = variables(_r, _theta)
     
+    def computeWeightElement(self, _T, _i, _j, _b_1, _symbol_1, _b_2, _symbol_2, _n):
+        
+        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        ret = 0
+        
+        for k in range(_n):
+            for l in range(_n):
+                coeff = _T[k,l]
+                print('T' + subscript_num[_i+1] + subscript_num[_j+1] + subscript_num[k+1] + subscript_num[l+1] + ' = ', coeff)
+                self.printVector(_b_1[k], False, _symbol_1.lower() + subscript_num[k+1], _n)
+                self.printVector(_b_2[l], False, _symbol_2.lower() + subscript_num[l+1], _n) 
+                outer = np.einsum('k,l', _b_1[k], _b_2[l])
+                l_outer = self._latex.convertMatrixToLatex(outer, _n)
+                print('outer' + subscript_num[k+1] + subscript_num[l+1] + '\n')
+                print(l_outer, '\n')
+                ret += coeff*outer
     
-    def computeFourthOrderWeightMatrix(self, _T, _indxBasis_1, _indxBasis_2, _n):
+        return ret
+                
+    def computeWeightMatrix(self, _T, _indxBasis_1, _indxBasis_2, _n):
         
         
         _Basis_1 = self._vars._vars[_indxBasis_1].value
-        #symbol_1 = self._vars._vars[_indxBasis_1].symbol
+        symbol_1 = self._vars._vars[_indxBasis_1].symbol
         _Basis_2 = self._vars._vars[_indxBasis_2].value
-        #symbol_2 = self._vars._vars[_indxBasis_2].symbol
+        symbol_2 = self._vars._vars[_indxBasis_2].symbol
         
        
         b_1 = []
@@ -247,7 +265,7 @@ class fourthOrderTensor:
         for i in range(_n):
             for j in range(_n):
                 TW = _T[i,j]
-                result = self.computeFourthOrderWeightMatrix(TW, b_1, b_2, _n)
+                result = self.computeWeightElement(TW, i, j, b_1, symbol_1, b_2, symbol_2, _n)
                 ret.append(result)
         
         return np.array(ret)
@@ -259,7 +277,7 @@ class fourthOrderTensor:
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
     
-    def computeFourthOrderTensorOuterProduct(self, _T, _indxBasis_1, _indxBasis_2, _indxBasis_3, _indxBasis_4, _n):
+    def computeTensorOuterProduct(self, _T, _indxBasis_1, _indxBasis_2, _indxBasis_3, _indxBasis_4, _n):
     
         subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
             
@@ -387,6 +405,14 @@ class fourthOrderTensor:
         ret += '\\\\}' 
         return ret
 
+    def printWeightMatricesToLatex(self, _T, _n):
+        
+        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        
+        for i in range(_n):
+            for j in range(_n):
+                index = i*_n + j
+                self.printMatrix(_T[index], 'T' + subscript_num[i+1] + subscript_num[j+1], _n)
 
     def convertResultsToLatex(self, _result, _weights, _n):
         
