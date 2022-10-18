@@ -356,13 +356,22 @@ class fourthOrderTensor:
          vecs_1 = [np.array([])]*_n
          vecs_2 = [np.array([])]*_n
         
+         # get the column vectors from each Basis Matrix
          
-         vecs_1[0] = np.array([_Basis_3[0,0], _Basis_3[1,0]])
-         vecs_1[1] = np.array([_Basis_3[0,1], _Basis_3[1,1]])
-         vecs_2[0] = np.array([_Basis_4[0,0], _Basis_4[1,0]]) 
-         vecs_2[1] = np.array([_Basis_4[0,1], _Basis_4[1,1]])
          
-        
+         for j in range(_n):
+            tmp = []
+            for i in range(_n):
+                tmp.append(_Basis_3[i,j])
+            vecs_1[j] = np.array(tmp)
+
+         for j in range(_n):
+            tmp = []
+            for i in range(_n):
+                tmp.append(_Basis_4[i,j])
+            vecs_2[j] = np.array(tmp)
+
+
         
          T_ij = self.computeWeightMatrix(_T, _indxBasis_1, _indxBasis_2, _n)
         
