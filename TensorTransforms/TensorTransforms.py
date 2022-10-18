@@ -339,6 +339,65 @@ class fourthOrderTensor:
             
         return result
     
+    def computeTensorInnerProduct(self, _T, _indxBasis_1, _indxBasis_2, _indxBasis_3, _indxBasis_4, _n):
+       
+         # implements streamlined calculation
+         # compute weight matrices
+         
+         ret = self.allocateFourthOrderElement(_n)
+         
+         _Basis_3 = self._vars._vars[_indxBasis_3].value
+         symbol_3 = self._vars._vars[_indxBasis_3].symbol
+         _Basis_4 = self._vars._vars[_indxBasis_4].value
+         symbol_4 = self._vars._vars[_indxBasis_4].symbol
+         
+         # set up matrix of vectors
+         
+         vecs_1 = [np.array([])]*_n
+         vecs_2 = [np.array([])]*_n
+        
+         
+         vecs_1[0] = np.array([_Basis_3[0,0], _Basis_3[1,0]])
+         vecs_1[1] = np.array([_Basis_3[0,1], _Basis_3[1,1]])
+         vecs_2[0] = np.array([_Basis_4[0,0], _Basis_4[1,0]]) 
+         vecs_2[1] = np.array([_Basis_4[0,1], _Basis_4[1,1]])
+         
+        
+        
+         T_ij = self.computeWeightMatrix(_T, _indxBasis_1, _indxBasis_2, _n)
+        
+         for i in range(_n):
+             for j in range(_n):
+                tmp = self.blockMatrixVectorMult(T_ij,vecs_2[j], _n)
+                ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, vecs_1[i], 2)
+        
+         return ret
+         
+    # multiply a block matrix with a vector
+    
+    def blockMatrixVectorMult(self, _T_ij, _vec, _n):
+        
+        ret = []
+        tmp =0
+        
+        for i in range(_n):
+            tmp = 0
+            for j in range(_n):
+                index = i*_n + j
+                tmp += _T_ij[index]*_vec[j]
+            ret.append(tmp)
+           
+        return ret
+       
+    def vectorTransposeBlockVectorMult(self, _b_vec, _vec, _n):
+        
+        ret = 0
+    
+        for i in range(_n):
+            ret += _vec[i]*_b_vec[i]
+           
+        return ret
+       
     def computeTensorElement(self, _E_ixj, _T_ij, _n):
         
         ret = self.allocateFourthOrderElement(_n)
@@ -358,46 +417,6 @@ class fourthOrderTensor:
         ret = _Basis[_i,:], symbol.lower() + subscript_num[_i+1]
         return ret
         
-    def computeFourthOrderMatrixOuterProduct(self, _T, _Basis_1, _Basis_2, _Basis_3, _Basis_4, _n):
-        
-        TW = self.computeFourthOrderWeightMatrix(_T, _Basis_1, _Basis_2, _n)
-        
-        b_3 = []
-        for i in _Basis_3:
-            b_3.append(i)
-    
-        b_3 = np.array(b_3)
-        
-        b_4 = []
-        for i in _Basis_4:
-            b_4.append(i)
-    
-        b_4 = np.array(b_4)
-       
-        bases = []
-        coords = []
-        
-        ret = self.allocateFourthOrderBasis(_n)
-        bases = self.allocateFourthOrderBasis(_n)
-        
-        for k in range(_n):
-            for l in range(_n):
-                index = k*_n + l
-                tw = TW[index]
-                ret_ij = self.allocateFourthOrderElement(_n)
-                basis_ij = self.allocateFourthOrderElement(_n)
-                coord_ij = np.array([[0.0, 0.0],[0.0, 0.0]])
-                for i in range(_n):
-                    for j in range(_n):
-                        tmp = tw[i,j]
-                        coord_ij[i][j] = tmp
-                        basis_ij[i][j] = np.einsum('i,j', b_3[k], b_4[l] )
-                        ret_ij[i][j] = tmp*basis_ij[i][j]
-                coords.append(coord_ij)
-                bases[k][l] = basis_ij
-                ret[k][l] = ret_ij
-                
-        return ret, np.array(coords), np.array(bases)
     
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, 2)

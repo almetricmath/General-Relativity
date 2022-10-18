@@ -64,7 +64,7 @@ for elem in elem_list:
 l_Tsum = t4.convertElementToLatex(Tsum, 2)
 print('Fourth Order Tensor using Matrices = ', l_Tsum + '\n')
 
-
+T_test = t4.computeTensorInnerProduct(TW, 'E', 'E', 'E', 'E', 2)
 
 
 
