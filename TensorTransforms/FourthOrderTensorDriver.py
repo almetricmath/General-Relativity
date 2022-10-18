@@ -34,7 +34,7 @@ print('Compute Using Matrix Operations\n')
 T_ij = t4.computeWeightMatrix(TW, 'E', 'E', 2)
 
 # print weight matrices
-t4.printWeightMatricesToLatex(T_ij, 2)
+t4.printWeightMatrices(T_ij, 2)
 
 elem_list = []
 subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
@@ -64,7 +64,9 @@ for elem in elem_list:
 l_Tsum = t4.convertElementToLatex(Tsum, 2)
 print('Fourth Order Tensor using Matrices = ', l_Tsum + '\n')
 
-T_test = t4.computeTensorInnerProduct(TW, 'E', 'E', 'E', 'E', 2)
+result = t4.computeTensorInnerProduct(TW, 'E', 'E', 'E', 'E', 2)
+l_result = t4.convertElementToLatex(result, 2)
+print('Streamlined Calculation Result\n', l_result)
 
 
 

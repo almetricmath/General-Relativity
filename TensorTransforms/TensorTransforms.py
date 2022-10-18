@@ -344,6 +344,8 @@ class fourthOrderTensor:
          # implements streamlined calculation
          # compute weight matrices
          
+         subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+         
          ret = self.allocateFourthOrderElement(_n)
          
          _Basis_3 = self._vars._vars[_indxBasis_3].value
@@ -357,8 +359,7 @@ class fourthOrderTensor:
          vecs_2 = [np.array([])]*_n
         
          # get the column vectors from each Basis Matrix
-         
-         
+          
          for j in range(_n):
             tmp = []
             for i in range(_n):
@@ -371,14 +372,20 @@ class fourthOrderTensor:
                 tmp.append(_Basis_4[i,j])
             vecs_2[j] = np.array(tmp)
 
-
+        # get weights for the T_ij matrix and compute submatrix
+        
+         print('Compute Tensor Inner Product\n')
         
          T_ij = self.computeWeightMatrix(_T, _indxBasis_1, _indxBasis_2, _n)
+         self.printWeightMatrices(T_ij, _n)
         
          for i in range(_n):
              for j in range(_n):
+                 # output latex for variables
+                self.printVector(vecs_1[i], True, symbol_3.lower() +  subscript_num[i+1], _n)
+                self.printVector(vecs_2[j], False, symbol_4.lower() + subscript_num[j+1], _n)
                 tmp = self.blockMatrixVectorMult(T_ij,vecs_2[j], _n)
-                ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, vecs_1[i], 2)
+                ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, vecs_1[i], 2) 
         
          return ret
          
@@ -432,8 +439,12 @@ class fourthOrderTensor:
          print(_label + ' = ', l_result, '\n')
      
     def printVector(self, _vec, _transpose, _label, _n):
-         l_result = self._latex.converVectorToLatex(_vec, _transpose, 2)
-         print(_label + ' = ', l_result, '\n')
+         l_result = self._latex.convertVectorToLatex(_vec, _transpose, 2)
+         if _transpose:
+             _label += 'ᵀ = '
+         else:
+             _label += ' = ' 
+         print(_label, l_result, '\n')
 
     def convertElementToLatex(self, _elem, _n):
         
@@ -451,7 +462,7 @@ class fourthOrderTensor:
         ret += '\\\\}' 
         return ret
 
-    def printWeightMatricesToLatex(self, _T, _n):
+    def printWeightMatrices(self, _T, _n):
         
         subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
         
@@ -478,7 +489,7 @@ class convertToLatex:
         ret += '}'
         return ret
     
-    def converVectorToLatex(self, _vec, transposeFlag, _n):
+    def convertVectorToLatex(self, _vec, transposeFlag, _n):
     
         ret = '\\bmatrix{'
         
