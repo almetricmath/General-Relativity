@@ -382,8 +382,8 @@ class fourthOrderTensor:
          for i in range(_n):
              for j in range(_n):
                  # output latex for variables
-                self.printVector(vecs_1[i], True, symbol_3.lower() +  subscript_num[i+1], _n)
-                self.printVector(vecs_2[j], False, symbol_4.lower() + subscript_num[j+1], _n)
+                self.printVector(vecs_1[i], False, symbol_3.lower() +  subscript_num[i+1], _n)
+                self.printVector(vecs_2[j], True, symbol_4.lower() + subscript_num[j+1], _n)
                 tmp = self.blockMatrixVectorMult(T_ij,vecs_2[j], _n)
                 ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, vecs_1[i], 2) 
         
