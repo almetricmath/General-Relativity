@@ -13,6 +13,11 @@ import numpy as np
 import copy
 
 class coordinateTransforms:
+    
+    def __init__(self):
+        self._transform = {}
+
+        
 
     def polarVectorBasis(self, _r, _theta):
         ret = np.array([[np.cos(_theta),np.sin(_theta)],[-_r*np.sin(_theta), _r*np.cos(_theta)]])
@@ -150,6 +155,7 @@ class thirdOrderTensor:
         
         # Compute weight matrix
         
+        
         _Basis_1 = self._vars._vars[_labelBasis_1].value
         symbol_1 = self._vars._vars[_labelBasis_1].symbol
         subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
@@ -217,7 +223,7 @@ class thirdOrderTensor:
 class fourthOrderTensor:
     
     def __init__(self, _r, _theta):
-        self._latex = convertToLatex()
+        self._latex = convertToLatex() 
         self._vars = variables(_r, _theta)
     
     def computeWeightElement(self, _T, _i, _j, _b_1, _symbol_1, _b_2, _symbol_2, _n):
@@ -260,15 +266,15 @@ class fourthOrderTensor:
     
         b_2 = np.array(b_2)
         
-        ret = []
+        ret = self.allocateFourthOrderElement(_n)
         
         for i in range(_n):
             for j in range(_n):
                 TW = _T[i,j]
                 result = self.computeWeightElement(TW, i, j, b_1, symbol_1, b_2, symbol_2, _n)
-                ret.append(result)
+                ret[i][j] = result
         
-        return np.array(ret)
+        return ret
       
     def allocateFourthOrderBasis(self, _n):
         ret=np.array([[[[[[0.0]*_n]*_n]*_n]*_n]*_n]*_n)
@@ -320,7 +326,6 @@ class fourthOrderTensor:
     
         for i in range(_n):
             for j in range(_n):
-                #result = 0
                 for k in range(_n):
                     for l in range(_n):
                         coeff = _T[i, j, k, l]
@@ -348,10 +353,10 @@ class fourthOrderTensor:
          
          ret = self.allocateFourthOrderElement(_n)
          
-         _Basis_3 = self._vars._vars[_indxBasis_3].value
-         symbol_3 = self._vars._vars[_indxBasis_3].symbol
-         _Basis_4 = self._vars._vars[_indxBasis_4].value
-         symbol_4 = self._vars._vars[_indxBasis_4].symbol
+         _Basis_1 = self._vars._vars[_indxBasis_1].value
+         symbol_1 = self._vars._vars[_indxBasis_1].symbol
+         _Basis_2 = self._vars._vars[_indxBasis_2].value
+         symbol_2 = self._vars._vars[_indxBasis_2].symbol
          
          # set up matrix of vectors
          
@@ -363,32 +368,57 @@ class fourthOrderTensor:
          for j in range(_n):
             tmp = []
             for i in range(_n):
-                tmp.append(_Basis_3[i,j])
+                tmp.append(_Basis_1[i,j])
             vecs_1[j] = np.array(tmp)
 
          for j in range(_n):
             tmp = []
             for i in range(_n):
-                tmp.append(_Basis_4[i,j])
+                tmp.append(_Basis_2[i,j])
             vecs_2[j] = np.array(tmp)
 
         # get weights for the T_ij matrix and compute submatrix
         
          print('Compute Tensor Inner Product\n')
         
-         T_ij = self.computeWeightMatrix(_T, _indxBasis_1, _indxBasis_2, _n)
+         T_ij = self.computeWeightMatrix(_T, _indxBasis_3, _indxBasis_4, _n)
          self.printWeightMatrices(T_ij, _n)
         
          for i in range(_n):
              for j in range(_n):
                  # output latex for variables
-                self.printVector(vecs_1[i], False, symbol_3.lower() +  subscript_num[i+1], _n)
-                self.printVector(vecs_2[j], True, symbol_4.lower() + subscript_num[j+1], _n)
+                self.printVector(vecs_1[i], False, symbol_1.lower() +  subscript_num[i+1], _n)
+                self.printVector(vecs_2[j], True, symbol_2.lower() + subscript_num[j+1], _n)
                 tmp = self.blockMatrixVectorMult(T_ij,vecs_2[j], _n)
                 ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, vecs_1[i], 2) 
         
          return ret
          
+    # transform tensor
+    
+    def transformTensor(self, _T, _indxBasis_1, _indxBasis_2, _indxBasis_3, _indxBasis_4, _n):
+        
+        T_ij = self.computeWeightMatrix(_T, _indxBasis_3, _indxBasis_4, _n)
+        self.printWeightMatrices(T_ij, _n)
+        
+        B = self._vars._vars['B'].value
+        
+        # put weight matrices into a fourth order element
+        
+        ret = self.allocateFourthOrderElement(_n)
+        
+        for i in range(_n):
+            for j in range(_n):
+                acc = 0
+                for k in range(_n):
+                    for l in range(_n):
+                        acc += B[l][i]*T_ij[l][k]*B[k][j]
+                ret[i][j] = acc
+                
+        return ret
+       
+        
+    
     # multiply a block matrix with a vector
     
     def blockMatrixVectorMult(self, _T_ij, _vec, _n):
@@ -399,12 +429,13 @@ class fourthOrderTensor:
         for i in range(_n):
             tmp = 0
             for j in range(_n):
-                index = i*_n + j
-                tmp += _T_ij[index]*_vec[j]
+                tmp += _T_ij[i][j]*_vec[j]
             ret.append(tmp)
            
         return ret
        
+    # multiply a transposed vector with a block matrix
+    
     def vectorTransposeBlockVectorMult(self, _b_vec, _vec, _n):
         
         ret = 0
@@ -414,6 +445,23 @@ class fourthOrderTensor:
            
         return ret
        
+    # multiply a block matrix by a matrix
+    
+    def blockMatrixMatrixMult(self, _T, _M, _n):
+        
+        # _T is a list of matrices
+        # multiply each element of _T y _M[i,j]
+        
+        ret = 0
+        
+        for i in range(_n):
+            for j in range(_n):
+                index = i*_n + j
+                ret += _T[index]
+                
+            
+    
+    
     def computeTensorElement(self, _E_ixj, _T_ij, _n):
         
         ret = self.allocateFourthOrderElement(_n)
@@ -468,8 +516,7 @@ class fourthOrderTensor:
         
         for i in range(_n):
             for j in range(_n):
-                index = i*_n + j
-                self.printMatrix(_T[index], 'T' + subscript_num[i+1] + subscript_num[j+1], _n)
+                self.printMatrix(_T[i][j], 'T' + subscript_num[i+1] + subscript_num[j+1], _n)
  
 class convertToLatex:
 
@@ -533,11 +580,11 @@ class dictElement:
     
 class variables:
 
-    def __init__(self, _r, _theta):
-        coords = coordinateTransforms()
+    def __init__(self, _r, _theta):    
+
         self._vars = {}
         tmpElement = dictElement()
-       
+        coords = coordinateTransforms()
         
         tmpElement.symbol = 'E'
         tmpElement.value = coords.polarVectorBasis(_r, _theta)
@@ -580,7 +627,6 @@ class variables:
         tmpElement.value = np.transpose(self._vars['W1'].value)
         self._vars['W1T'] = copy.deepcopy(tmpElement)
         self._latex = convertToLatex()
-        
 
     def getVars(self):
         return self._vars
