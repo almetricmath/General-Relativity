@@ -11,6 +11,7 @@ Created on Tue Sep  6 15:13:10 2022
 
 import numpy as np
 import copy
+from enum import Enum
 
 class coordinateTransforms:
     
@@ -225,6 +226,7 @@ class fourthOrderTensor:
     def __init__(self, _r, _theta):
         self._latex = convertToLatex() 
         self._vars = variables(_r, _theta)
+        self._posNum = posNum()
     
     def computeWeightElement(self, _T, _i, _j, _b_1, _symbol_1, _b_2, _symbol_2, _n):
         
@@ -283,40 +285,59 @@ class fourthOrderTensor:
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
     
-    def computeTensorOuterProduct(self, _T, _indxBasis_1, _indxBasis_2, _indxBasis_3, _indxBasis_4, _n):
-    
-        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
-            
-        _Basis_1 = self._vars._vars[_indxBasis_1].value
-        symbol_1 = self._vars._vars[_indxBasis_1].symbol
-        _Basis_2 = self._vars._vars[_indxBasis_2].value
-        symbol_2 = self._vars._vars[_indxBasis_2].symbol
-        _Basis_3 = self._vars._vars[_indxBasis_3].value
-        symbol_3 = self._vars._vars[_indxBasis_3].symbol
-        _Basis_4 = self._vars._vars[_indxBasis_4].value
-        symbol_4 = self._vars._vars[_indxBasis_4].symbol
+    def getBasisIndex(self, _pos):
         
-
+        ret = ''
+        
+        if _pos == pos.up:
+            ret = 'E' 
+        elif _pos == pos.down:
+            ret = 'W'
+        else:
+            print('Error - position needs to be specified')
+            ret = None
+        
+        return ret
+       
+    
+    def computeTensorOuterProduct(self, _T, _posLst, _n):
+    
+        #subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        #superscript_num = ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹']
+        
+        _basisLst = [0]*4
+        _symbolLst = [0]*4
+        
+        indx = 0
+        for p in _posLst:
+            bIndx = self.getBasisIndex(p)
+            if bIndx == None:
+                return None
+            _basisLst[indx] = self._vars._vars[bIndx].value
+            _symbolLst[indx] = self._vars._vars[bIndx].symbol
+            indx += 1
+        
+    
         b_1 = []
-        for i in _Basis_1:
+        for i in _basisLst[0]:
             b_1.append(i)
     
         b_1 = np.array(b_1)
         
         b_2 = []
-        for i in _Basis_2:
+        for i in _basisLst[1]:
             b_2.append(i)
     
         b_2 = np.array(b_2)
        
         b_3 = []
-        for i in _Basis_3:
+        for i in _basisLst[2]:
             b_3.append(i)
     
         b_3 = np.array(b_3)
         
         b_4 = []
-        for i in _Basis_4:
+        for i in _basisLst[3]:
             b_4.append(i)
     
         b_4 = np.array(b_4)
@@ -329,14 +350,14 @@ class fourthOrderTensor:
                 for k in range(_n):
                     for l in range(_n):
                         coeff = _T[i, j, k, l]
-                        print('T' + subscript_num[i+1] + subscript_num[j+1] + subscript_num[k+1] + subscript_num[l+1] + ' = ', coeff)
-                        self.printVector(b_1[i], False, symbol_1.lower() + subscript_num[i+1], _n)
-                        self.printVector(b_2[j], False, symbol_2.lower() + subscript_num[j+1], _n) 
-                        self.printVector(b_3[k], False, symbol_3.lower() + subscript_num[k+1], _n)
-                        self.printVector(b_4[l], False, symbol_4.lower() + subscript_num[l+1], _n)
+                        print('T' + self._posNum.indice(_posLst[0], i) +  self._posNum.indice(_posLst[1], j) + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l)  + ' = ', coeff)
+                        self.printVector(b_1[i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i), _n)
+                        self.printVector(b_2[j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j), _n) 
+                        self.printVector(b_3[k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k), _n)
+                        self.printVector(b_4[l], False, _symbolLst[3].lower() + self._posNum.indice(_posLst[3], l), _n)
                         outer = np.einsum('i,j,k,l',b_1[i], b_2[j], b_3[k],b_4[l])
                         l_outer = self.convertElementToLatex(outer, _n)
-                        print('outer' + subscript_num[i+1] + subscript_num[j+1] + subscript_num[k+1] + subscript_num[l+1],'\n')
+                        print('outer' + self._posNum.indice(_posLst[0], i) + self._posNum.indice(_posLst[1], j) + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l),'\n')
                         print(l_outer, '\n')
                         
                         
@@ -401,6 +422,7 @@ class fourthOrderTensor:
         T_ij = self.computeWeightMatrix(_T, _indxBasis_3, _indxBasis_4, _n)
         self.printWeightMatrices(T_ij, _n)
         
+        # make more general so B can be determined from the input
         B = self._vars._vars['B'].value
         
         # put weight matrices into a fourth order element
@@ -415,6 +437,8 @@ class fourthOrderTensor:
                         acc += B[l][i]*T_ij[l][k]*B[k][j]
                 ret[i][j] = acc
                 
+        # could transform T_ij -> T_ijkl
+        
         return ret
        
         
@@ -569,15 +593,33 @@ class convertToLatex:
         ret += '}'
         
         return ret
+  
+class pos(Enum):
+    init = None
+    up = 0
+    down = 1
     
+class posNum:
+    
+    def __init__(self):
+        self._sub = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        self._sup = ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹']
+    
+    def indice(self, _pos, _index):
+    
+        if _pos == pos.up:
+            return self._sup[_index + 1]
+        elif _pos == pos.down:
+           return self._sub[_index + 1] 
+        else:
+           return None
+        
+       
 class dictElement:
     
     value = []
     symbol = ''
-    lsymbol = ''
-    
-    
-    
+
 class variables:
 
     def __init__(self, _r, _theta):    
