@@ -27,14 +27,14 @@ TW = np.array(TW)
 
 posLst = [t.pos.up, t.pos.up, t.pos.up, t.pos.up]
 
-#result = t4.computeTensorOuterProduct(TW, posLst, 2)
-#l_result = t4.convertElementToLatex(result, 2)
-#print('Fourth Order Tensor by Outer Product')
-#print(l_result)
-#print('\n')
+result = t4.computeTensorOuterProduct(TW, posLst, True, 2)
+l_result = t4.convertElementToLatex(result, 2)
+print('Fourth Order Tensor by Outer Product')
+print(l_result)
+print('\n')
 
 
-result = t4.computeTensorInnerProduct(TW, posLst, 2)
+result = t4.computeTensorInnerProduct(TW, posLst, True, 2)
 l_result = t4.convertElementToLatex(result, 2)
 print('Streamlined Calculation Result\n', l_result)
 

@@ -266,21 +266,25 @@ class fourthOrderTensor:
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
     
-    def getBasisIndex(self, _pos):
+    def getBasisIndex(self, _pos, _unprimed):
         
         ret = ''
+        suffix = ''
         
+        if not _unprimed:
+            suffix = '1'
+            
         if _pos == pos.up:
-            ret = 'E' 
+            ret = 'E' + suffix
         elif _pos == pos.down:
-            ret = 'W'
+            ret = 'W' + suffix
         else:
             print('Error - position needs to be specified')
             ret = None
         
         return ret
     
-    def processTensorInput(self, _posLst, _col, _n):
+    def processTensorInput(self, _posLst, _col, _unprimed, _n):
         
         _basisLst = [0]*4
         _symbolLst = [0]*4
@@ -292,7 +296,7 @@ class fourthOrderTensor:
         
         indx = 0
         for p in _posLst:
-            bIndx = self.getBasisIndex(p)
+            bIndx = self.getBasisIndex(p, _unprimed)
             if bIndx == None:
                 return None
             _basisLst[indx] = self._vars._vars[bIndx].value
@@ -316,7 +320,7 @@ class fourthOrderTensor:
                    tmp.append(_basisLst[1][i,j])
                col_2[j] = np.array(tmp)
             
-            ret = _basisLst, _symbolLst, col_1, col_2
+        ret = _basisLst, _symbolLst, col_1, col_2
     
     
         return ret
@@ -324,9 +328,9 @@ class fourthOrderTensor:
       
     
     
-    def computeTensorOuterProduct(self, _T, _posLst, _n):
+    def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
      
-        _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, False, _n)
+        _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, False, _unprimed, _n)
         
         ret = 0
     
@@ -349,14 +353,14 @@ class fourthOrderTensor:
             
         return ret
     
-    def computeTensorInnerProduct(self, _T, _posLst, _n):
+    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
        
          # implements streamlined calculation
          # compute weight matrices
              
          ret = self.allocateFourthOrderElement(_n)
          
-         _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, True, _n)
+         _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, True, _unprimed, _n)
          
          
         # get weights for the T_ij matrix and compute submatrix
