@@ -228,52 +228,33 @@ class fourthOrderTensor:
         self._vars = variables(_r, _theta)
         self._posNum = posNum()
     
-    def computeWeightElement(self, _T, _i, _j, _b_1, _symbol_1, _b_2, _symbol_2, _n):
+    def computeWeightElement(self, _T, _i, _j,  _posLst, _basisLst, _symbolLst, _n):
         
-        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
         ret = 0
         
         for k in range(_n):
             for l in range(_n):
                 coeff = _T[k,l]
-                print('T' + subscript_num[_i+1] + subscript_num[_j+1] + subscript_num[k+1] + subscript_num[l+1] + ' = ', coeff)
-                self.printVector(_b_1[k], False, _symbol_1.lower() + subscript_num[k+1], _n)
-                self.printVector(_b_2[l], False, _symbol_2.lower() + subscript_num[l+1], _n) 
-                outer = np.einsum('k,l', _b_1[k], _b_2[l])
+                print('T' + self._posNum.indice(_posLst[0], _i) + self._posNum.indice(_posLst[1], _j) + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l) + ' = ', coeff)
+                self.printVector(_basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k), _n)
+                self.printVector(_basisLst[3][l], False, _symbolLst[3].lower() + self._posNum.indice(_posLst[3], l), _n) 
+                outer = np.einsum('k,l',_basisLst[2][k], _basisLst[3][l])
                 l_outer = self._latex.convertMatrixToLatex(outer, _n)
-                print('outer' + subscript_num[k+1] + subscript_num[l+1] + '\n')
+                print('outer' + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l) + '\n')
                 print(l_outer, '\n')
                 ret += coeff*outer
     
         return ret
                 
-    def computeWeightMatrix(self, _T, _indxBasis_1, _indxBasis_2, _n):
+    def computeWeightMatrix(self, _T, _posLst, _basisLst, _symbolLst, _n):
         
-        
-        _Basis_1 = self._vars._vars[_indxBasis_1].value
-        symbol_1 = self._vars._vars[_indxBasis_1].symbol
-        _Basis_2 = self._vars._vars[_indxBasis_2].value
-        symbol_2 = self._vars._vars[_indxBasis_2].symbol
-        
-       
-        b_1 = []
-        for i in _Basis_1:
-            b_1.append(i)
-    
-        b_1 = np.array(b_1)
-        
-        b_2 = []
-        for i in _Basis_2:
-            b_2.append(i)
-    
-        b_2 = np.array(b_2)
-        
+
         ret = self.allocateFourthOrderElement(_n)
         
         for i in range(_n):
             for j in range(_n):
                 TW = _T[i,j]
-                result = self.computeWeightElement(TW, i, j, b_1, symbol_1, b_2, symbol_2, _n)
+                result = self.computeWeightElement(TW, i, j, _posLst, _basisLst, _symbolLst, _n)
                 ret[i][j] = result
         
         return ret
@@ -299,30 +280,53 @@ class fourthOrderTensor:
         
         return ret
     
-    def processTensorInput(self, _posLst, _row):
+    def processTensorInput(self, _posLst, _col, _n):
         
         _basisLst = [0]*4
         _symbolLst = [0]*4
+        # set up matrix of vectors
         
-        if _row:
-            indx = 0
-            for p in _posLst:
-                bIndx = self.getBasisIndex(p)
-                if bIndx == None:
-                    return None
-                _basisLst[indx] = self._vars._vars[bIndx].value
-                _symbolLst[indx] = self._vars._vars[bIndx].symbol
-                indx += 1
-    
+        col_1 = [np.array([])]*_n
+        col_2 = [np.array([])]*_n
+       
+        
+        indx = 0
+        for p in _posLst:
+            bIndx = self.getBasisIndex(p)
+            if bIndx == None:
+                return None
+            _basisLst[indx] = self._vars._vars[bIndx].value
+            _symbolLst[indx] = self._vars._vars[bIndx].symbol
+            indx += 1
+        
+        if _col:
+        
+           
+            # get the column vectors from each Basis Matrix
+             
+            for j in range(_n):
+               tmp = []
+               for i in range(_n):
+                   tmp.append(_basisLst[0][i,j])
+               col_1[j] = np.array(tmp)
 
-        return _basisLst, _symbolLst
+            for j in range(_n):
+               tmp = []
+               for i in range(_n):
+                   tmp.append(_basisLst[1][i,j])
+               col_2[j] = np.array(tmp)
+            
+            ret = _basisLst, _symbolLst, col_1, col_2
+    
+    
+        return ret
           
       
     
     
     def computeTensorOuterProduct(self, _T, _posLst, _n):
      
-        _basisLst, _symbolLst = self.processTensorInput(_posLst, True)
+        _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, False, _n)
         
         ret = 0
     
@@ -352,44 +356,23 @@ class fourthOrderTensor:
              
          ret = self.allocateFourthOrderElement(_n)
          
-         _Basis_1 = self._vars._vars[_indxBasis_1].value
-         symbol_1 = self._vars._vars[_indxBasis_1].symbol
-         _Basis_2 = self._vars._vars[_indxBasis_2].value
-         symbol_2 = self._vars._vars[_indxBasis_2].symbol
+         _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, True, _n)
          
-         # set up matrix of vectors
          
-         vecs_1 = [np.array([])]*_n
-         vecs_2 = [np.array([])]*_n
-        
-         # get the column vectors from each Basis Matrix
-          
-         for j in range(_n):
-            tmp = []
-            for i in range(_n):
-                tmp.append(_Basis_1[i,j])
-            vecs_1[j] = np.array(tmp)
-
-         for j in range(_n):
-            tmp = []
-            for i in range(_n):
-                tmp.append(_Basis_2[i,j])
-            vecs_2[j] = np.array(tmp)
-
         # get weights for the T_ij matrix and compute submatrix
         
          print('Compute Tensor Inner Product\n')
         
-         T_ij = self.computeWeightMatrix(_T, _indxBasis_3, _indxBasis_4, _n)
+         T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, _symbolLst, _n)
          self.printWeightMatrices(T_ij, _n)
         
          for i in range(_n):
              for j in range(_n):
                  # output latex for variables
-                self.printVector(vecs_1[i], False, symbol_1.lower() +  subscript_num[i+1], _n)
-                self.printVector(vecs_2[j], True, symbol_2.lower() + subscript_num[j+1], _n)
-                tmp = self.blockMatrixVectorMult(T_ij,vecs_2[j], _n)
-                ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, vecs_1[i], 2) 
+                self.printVector(col_1[i], False, _symbolLst[0].lower() +  self._posNum.indice(_posLst[0], i), _n)
+                self.printVector(col_2[j], True, _symbolLst[1].lower() + self._posNum.indice(_posLst[0], j), _n)
+                tmp = self.blockMatrixVectorMult(T_ij,col_2[j], _n)
+                ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, col_1[i], 2) 
         
          return ret
          
