@@ -298,80 +298,58 @@ class fourthOrderTensor:
             ret = None
         
         return ret
-       
     
-    def computeTensorOuterProduct(self, _T, _posLst, _n):
-    
-        #subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
-        #superscript_num = ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹']
+    def processTensorInput(self, _posLst, _row):
         
         _basisLst = [0]*4
         _symbolLst = [0]*4
         
-        indx = 0
-        for p in _posLst:
-            bIndx = self.getBasisIndex(p)
-            if bIndx == None:
-                return None
-            _basisLst[indx] = self._vars._vars[bIndx].value
-            _symbolLst[indx] = self._vars._vars[bIndx].symbol
-            indx += 1
-        
+        if _row:
+            indx = 0
+            for p in _posLst:
+                bIndx = self.getBasisIndex(p)
+                if bIndx == None:
+                    return None
+                _basisLst[indx] = self._vars._vars[bIndx].value
+                _symbolLst[indx] = self._vars._vars[bIndx].symbol
+                indx += 1
     
-        b_1 = []
-        for i in _basisLst[0]:
-            b_1.append(i)
+
+        return _basisLst, _symbolLst
+          
+      
     
-        b_1 = np.array(b_1)
-        
-        b_2 = []
-        for i in _basisLst[1]:
-            b_2.append(i)
     
-        b_2 = np.array(b_2)
-       
-        b_3 = []
-        for i in _basisLst[2]:
-            b_3.append(i)
-    
-        b_3 = np.array(b_3)
+    def computeTensorOuterProduct(self, _T, _posLst, _n):
+     
+        _basisLst, _symbolLst = self.processTensorInput(_posLst, True)
         
-        b_4 = []
-        for i in _basisLst[3]:
-            b_4.append(i)
-    
-        b_4 = np.array(b_4)
-        
-        
-        result = 0
+        ret = 0
     
         for i in range(_n):
             for j in range(_n):
                 for k in range(_n):
                     for l in range(_n):
                         coeff = _T[i, j, k, l]
-                        print('T' + self._posNum.indice(_posLst[0], i) +  self._posNum.indice(_posLst[1], j) + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l)  + ' = ', coeff)
-                        self.printVector(b_1[i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i), _n)
-                        self.printVector(b_2[j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j), _n) 
-                        self.printVector(b_3[k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k), _n)
-                        self.printVector(b_4[l], False, _symbolLst[3].lower() + self._posNum.indice(_posLst[3], l), _n)
-                        outer = np.einsum('i,j,k,l',b_1[i], b_2[j], b_3[k],b_4[l])
+                        print('T' + self._posNum.indice(_posLst[0], i)  +  self._posNum.indice(_posLst[1], j) + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l)  + ' = ', coeff)
+                        self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i), _n)
+                        self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j), _n) 
+                        self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k), _n)
+                        self.printVector( _basisLst[3][l], False, _symbolLst[3].lower() + self._posNum.indice(_posLst[3], l), _n)
+                        outer = np.einsum('i,j,k,l',_basisLst[0][i], _basisLst[1][j], _basisLst[2][k],_basisLst[3][l])
                         l_outer = self.convertElementToLatex(outer, _n)
                         print('outer' + self._posNum.indice(_posLst[0], i) + self._posNum.indice(_posLst[1], j) + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l),'\n')
                         print(l_outer, '\n')
-                        
-                        
-                        result += coeff*outer
+                             
+                        ret += coeff*outer
             
-        return result
+        return ret
     
-    def computeTensorInnerProduct(self, _T, _indxBasis_1, _indxBasis_2, _indxBasis_3, _indxBasis_4, _n):
+    def computeTensorInnerProduct(self, _T, _posLst, _n):
        
          # implements streamlined calculation
          # compute weight matrices
-         
-         subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
-         
+             
          ret = self.allocateFourthOrderElement(_n)
          
          _Basis_1 = self._vars._vars[_indxBasis_1].value
