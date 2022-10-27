@@ -258,6 +258,32 @@ class fourthOrderTensor:
                 ret[i][j] = result
         
         return ret
+    
+    def computeWeightMatrix1(self, _T, _posLst, _basisLst, _symbolLst, _n):
+        
+        # computes weight matrix using matrix operations B3^T(T)B4
+        
+        l_B3T = self._latex.convertMatrixToLatex(np.transpose(_basisLst[2]), _n)
+        print(_symbolLst[2] + 'ᵀ' + ' = ', l_B3T, '\n')
+      
+        l_B4 = self._latex.convertMatrixToLatex(np.transpose(_basisLst[3]), _n)
+        print(_symbolLst[3] + ' = ', l_B4, '\n')
+       
+        
+        ret = self.allocateFourthOrderElement(_n)
+        for i in range(_n):
+            for j in range(_n):
+                TW = _T[i,j]
+                l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
+                print('T' + self._posNum.indice(_posLst[2], i) + self._posNum.indice(_posLst[3], j), l_t_matrix,'\n')
+                tmp = np.dot(TW, _basisLst[3])
+                result = np.dot(np.transpose(_basisLst[2]), tmp)
+                l_result = self._latex.convertMatrixToLatex(result, _n)
+                print('result' +self._posNum.indice(_posLst[2], i) + self._posNum.indice(_posLst[3], j), l_result,'\n') 
+                ret[i][j] = result
+            
+        return ret
+          
       
     def allocateFourthOrderBasis(self, _n):
         ret=np.array([[[[[[0.0]*_n]*_n]*_n]*_n]*_n]*_n)
@@ -265,6 +291,7 @@ class fourthOrderTensor:
     def allocateFourthOrderElement(self, _n):
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
+    
     
     def getBasisIndex(self, _pos, _unprimed):
         
@@ -284,6 +311,17 @@ class fourthOrderTensor:
         
         return ret
     
+    def getTransformIndex(self, _pos):
+        
+        if _pos == pos.up:
+            ret = 'B'
+        elif _pos == pos.down:
+            ret = 'A'
+        else:
+            print('Error - position needs to be specified')
+            ret = None
+        return ret
+       
     def processTensorInput(self, _posLst, _col, _unprimed, _n):
         
         _basisLst = [0]*4
@@ -300,7 +338,9 @@ class fourthOrderTensor:
             if bIndx == None:
                 return None
             _basisLst[indx] = self._vars._vars[bIndx].value
+            m_latex = self._latex.convertMatrixToLatex(_basisLst[indx], _n)
             _symbolLst[indx] = self._vars._vars[bIndx].symbol
+            print(_symbolLst[indx] + ' = ', m_latex)
             indx += 1
         
         if _col:
@@ -326,8 +366,6 @@ class fourthOrderTensor:
         return ret
           
       
-    
-    
     def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
      
         _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, False, _unprimed, _n)
@@ -366,9 +404,16 @@ class fourthOrderTensor:
         # get weights for the T_ij matrix and compute submatrix
         
          print('Compute Tensor Inner Product\n')
-        
+         
+         print('Weight Matrix Computed with Outer Products\n')
+         
          T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, _symbolLst, _n)
-         self.printWeightMatrices(T_ij, _n)
+         self.printWeightMatrices(T_ij, _posLst, _symbolLst, _n)
+        
+         print('Weight Matrix Computed with Matrix Product\n')
+        
+         T_ij1 = self.computeWeightMatrix1(_T, _posLst, _basisLst, _symbolLst, _n)
+         
         
          for i in range(_n):
              for j in range(_n):
@@ -379,31 +424,73 @@ class fourthOrderTensor:
                 ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, col_1[i], 2) 
         
          return ret
-         
+        
+
+    def processTransformInput(self, _posLst, _unprimed, _n):
+        
+        _transformLst = [0]*4
+        _transformSymbolLst = [0]*4
+      
+        indx = 0
+        for p in _posLst:
+            bIndx = self.getTransformIndex(p)
+            if bIndx == None:
+                return None
+            _transformLst[indx] = self._vars._vars[bIndx].value
+            _transformSymbolLst[indx] = self._vars._vars[bIndx].symbol
+            indx += 1
+       
+        return _transformLst, _transformSymbolLst
+      
+        
     # transform tensor
     
-    def transformTensor(self, _T, _indxBasis_1, _indxBasis_2, _indxBasis_3, _indxBasis_4, _n):
+    def transformTensor(self, _T, _posLst, _unprimed, _n):
         
-        T_ij = self.computeWeightMatrix(_T, _indxBasis_3, _indxBasis_4, _n)
+        # 1st work unprimed to primed system
+       
+        _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, False, True, _n)
+       
+        T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, _symbolLst, _n)
         self.printWeightMatrices(T_ij, _n)
         
-        # make more general so B can be determined from the input
-        B = self._vars._vars['B'].value
+        _transformLst, _transformSymbolLst = self.processTransformInput(_posLst, True, _n)
         
-        # put weight matrices into a fourth order element
+        # allocate return structure
         
-        ret = self.allocateFourthOrderElement(_n)
+        T1_ij = self.allocateFourthOrderElement(_n)
+        symbol_3 = _transformSymbolLst[2]
+        symbol_4 = _transformSymbolLst[3]
         
         for i in range(_n):
             for j in range(_n):
                 acc = 0
                 for k in range(_n):
                     for l in range(_n):
-                        acc += B[l][i]*T_ij[l][k]*B[k][j]
-                ret[i][j] = acc
+                        acc += _transformLst[2][l][i]*T_ij[l][k]*_transformLst[3][k][j]
+                T1_ij[i][j] = acc
                 
-        # could transform T_ij -> T_ijkl
+        # could transform T1_ij -> T1_ijkl
         
+        # T1_ij in the primed system
+        # need to do transform with primed coordinates
+        # get inverse bases in the primed system
+        # flip up/down values in the _posLst
+        
+        inversePosLst = []
+        for p in _posLst:
+            tmp = not p
+            inversePosLst.append(tmp)
+        
+        _inverseBasisLst, _inverseSymbolLst, col_1, col_2 = self.processTensorInput(inversePosLst, False, False, _n)
+        
+        ret = self.allocateFourthOrderElement(_n)
+        
+        for i in range(_n):
+            for j in range(_n):
+                tmp = np.dot(T1_ij[i][j],_inverseBasisLst[1])
+                ret[i][j] = np.dot(np.transpose(_inverseBasisLst[0]), tmp)
+            
         return ret
        
         
@@ -499,13 +586,12 @@ class fourthOrderTensor:
         ret += '\\\\}' 
         return ret
 
-    def printWeightMatrices(self, _T, _n):
+    def printWeightMatrices(self, _T, _posLst, _symbolLst, _n):
         
-        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
         
         for i in range(_n):
             for j in range(_n):
-                self.printMatrix(_T[i][j], 'T' + subscript_num[i+1] + subscript_num[j+1], _n)
+                self.printMatrix(_T[i][j], 'T' + self._posNum.indice(_posLst[2], i) + self._posNum.indice(_posLst[3], j), _n)
  
 class convertToLatex:
 
@@ -645,6 +731,28 @@ class variables:
             print(l_result)
             print('\n')
 
+class utils:
+    
+    # utility functions for showing partial results
+    
+    def allocateFourthOrderElement(self, _n):
+        ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
+        return ret_ij
+   
+    
+    def outer(self, _v1, _v2):
+       ret = np.einsum('i,j', _v1, _v2)  
+       return ret
+
+    # outer product of two matrices
+
+    def m_outer(self, _m1, _m2, _n):
+        ret = self.allocateFourthOrderElement(_n)
+        for i in range(_n):
+            for j in range(_n):
+                ret[i][j] = _m1[i][j]*_m2
+        
+        return ret
 
 
 
