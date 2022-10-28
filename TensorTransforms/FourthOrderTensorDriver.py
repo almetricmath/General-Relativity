@@ -15,15 +15,6 @@ r = 2
 theta = np.pi/3
 t4 = t.fourthOrderTensor(r, theta)
 
-
-# outer products of two vectors
-
-    
-    
-    
-
-# compute 4th order tensor using the outer product
-
 latex = t.convertToLatex()
 coords = t.coordinateTransforms()
 
@@ -37,6 +28,9 @@ TW = np.array(TW)
 posLst = [t.pos.up, t.pos.down, t.pos.down, t.pos.up]
 
 '''
+
+# compute 4th order tensor using the outer product
+
 result = t4.computeTensorOuterProduct(TW, posLst, True, 2)
 l_result = t4.convertElementToLatex(result, 2)
 print('Fourth Order Tensor by Outer Product')

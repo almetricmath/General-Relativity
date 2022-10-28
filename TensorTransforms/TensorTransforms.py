@@ -266,7 +266,7 @@ class fourthOrderTensor:
         l_B3T = self._latex.convertMatrixToLatex(np.transpose(_basisLst[2]), _n)
         print(_symbolLst[2] + 'ᵀ' + ' = ', l_B3T, '\n')
       
-        l_B4 = self._latex.convertMatrixToLatex(np.transpose(_basisLst[3]), _n)
+        l_B4 = self._latex.convertMatrixToLatex(_basisLst[3], _n)
         print(_symbolLst[3] + ' = ', l_B4, '\n')
        
         
@@ -275,11 +275,11 @@ class fourthOrderTensor:
             for j in range(_n):
                 TW = _T[i,j]
                 l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
-                print('T' + self._posNum.indice(_posLst[2], i) + self._posNum.indice(_posLst[3], j), l_t_matrix,'\n')
+                print('T' + self._posNum.indice(_posLst[0], i) + self._posNum.indice(_posLst[1], j), l_t_matrix,'\n')
                 tmp = np.dot(TW, _basisLst[3])
                 result = np.dot(np.transpose(_basisLst[2]), tmp)
                 l_result = self._latex.convertMatrixToLatex(result, _n)
-                print('result' +self._posNum.indice(_posLst[2], i) + self._posNum.indice(_posLst[3], j), l_result,'\n') 
+                print('result' +self._posNum.indice(_posLst[0], i) + self._posNum.indice(_posLst[1], j), l_result,'\n') 
                 ret[i][j] = result
             
         return ret
