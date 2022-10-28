@@ -275,11 +275,11 @@ class fourthOrderTensor:
             for j in range(_n):
                 TW = _T[i,j]
                 l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
-                print('T' + self._posNum.indice(_posLst[0], i) + self._posNum.indice(_posLst[1], j), l_t_matrix,'\n')
+                print('T' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], 2, True) + self._posNum.indice(_posLst[3], 3, True), l_t_matrix,'\n')
                 tmp = np.dot(TW, _basisLst[3])
                 result = np.dot(np.transpose(_basisLst[2]), tmp)
                 l_result = self._latex.convertMatrixToLatex(result, _n)
-                print('result' +self._posNum.indice(_posLst[0], i) + self._posNum.indice(_posLst[1], j), l_result,'\n') 
+                print('T' +self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False), l_result,'\n') 
                 ret[i][j] = result
             
         return ret
@@ -405,10 +405,10 @@ class fourthOrderTensor:
         
          print('Compute Tensor Inner Product\n')
          
-         print('Weight Matrix Computed with Outer Products\n')
+         #print('Weight Matrix Computed with Outer Products\n')
          
-         T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, _symbolLst, _n)
-         self.printWeightMatrices(T_ij, _posLst, _symbolLst, _n)
+         #T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, _symbolLst, _n)
+         #self.printWeightMatrices(T_ij, _posLst, _symbolLst, _n)
         
          print('Weight Matrix Computed with Matrix Product\n')
         
@@ -418,9 +418,10 @@ class fourthOrderTensor:
          for i in range(_n):
              for j in range(_n):
                  # output latex for variables
-                self.printVector(col_1[i], False, _symbolLst[0].lower() +  self._posNum.indice(_posLst[0], i), _n)
-                self.printVector(col_2[j], True, _symbolLst[1].lower() + self._posNum.indice(_posLst[0], j), _n)
-                tmp = self.blockMatrixVectorMult(T_ij,col_2[j], _n)
+                self.printVector(col_1[i], False, 'col(' + _symbolLst[0] + ', ' + str(i+1) + ')ᵀ', _n)
+                l_col = self._latex.convertVectorToLatex(col_2[j], True, 2)
+                print('col(' + _symbolLst[1] + ', ' + str(j+1) + ') = ', l_col )
+                tmp = self.blockMatrixVectorMult(T_ij1,col_2[j], _n)
                 ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, col_1[i], 2) 
         
          return ret
@@ -653,15 +654,24 @@ class pos(Enum):
 class posNum:
     
     def __init__(self):
-        self._sub = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
-        self._sup = ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹']
+        self._sub_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        self._sup_num = ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹']
+        self._sup_let = ['ᶦ','ʲ','ᵏ','ˡ']
+        self._sub_let = ['ᵢ','ⱼ','ₖ','ₗ']
     
-    def indice(self, _pos, _index):
+    def indice(self, _pos, _index, _letterFlag):
     
         if _pos == pos.up:
-            return self._sup[_index + 1]
+            if not _letterFlag:
+                return self._sup_num[_index + 1]
+            else:
+                return self._sup_let[_index]
+                
         elif _pos == pos.down:
-           return self._sub[_index + 1] 
+            if not _letterFlag:
+                return self._sub_num[_index + 1] 
+            else:
+                return self._sub_let[_index]
         else:
            return None
         
