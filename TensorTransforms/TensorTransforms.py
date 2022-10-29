@@ -422,6 +422,10 @@ class fourthOrderTensor:
                 l_col = self._latex.convertVectorToLatex(col_2[j], True, 2)
                 print('col(' + _symbolLst[1] + ', ' + str(j+1) + ') = ', l_col )
                 tmp = self.blockMatrixVectorMult(T_ij1,col_2[j], _n)
+                l_tmp_0 = self._latex.convertMatrixToLatex(tmp[0], 2)
+                l_tmp_1 = self._latex.convertMatrixToLatex(tmp[1], 2)
+                l_tmp = '\\bmatrix{' + l_tmp_0 + '\\\\' + l_tmp_1 + '\\\\}'
+                print('intermediate results = ',l_tmp, '\n')
                 ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, col_1[i], 2) 
         
          return ret
