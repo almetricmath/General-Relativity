@@ -227,48 +227,72 @@ class fourthOrderTensor:
         self._latex = convertToLatex() 
         self._vars = variables(_r, _theta)
         self._posNum = posNum()
-    
-    def computeWeightElement(self, _T, _i, _j,  _posLst, _basisLst, _symbolLst, _n):
         
-        ret = 0
+        # declare configuration tables
         
-        for k in range(_n):
-            for l in range(_n):
-                coeff = _T[k,l]
-                print('T' + self._posNum.indice(_posLst[0], _i) + self._posNum.indice(_posLst[1], _j) + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l) + ' = ', coeff)
-                self.printVector(_basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k), _n)
-                self.printVector(_basisLst[3][l], False, _symbolLst[3].lower() + self._posNum.indice(_posLst[3], l), _n) 
-                outer = np.einsum('k,l',_basisLst[2][k], _basisLst[3][l])
-                l_outer = self._latex.convertMatrixToLatex(outer, _n)
-                print('outer' + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l) + '\n')
-                print(l_outer, '\n')
-                ret += coeff*outer
-    
-        return ret
-                
-    def computeWeightMatrix(self, _T, _posLst, _basisLst, _symbolLst, _n):
+        self._forwardTransformTable = self.computeForwardTransformTable()
         
+    def forwardTransform(self, _tuple):
+        
+        # function to implement Table 2 and Table 5 from the writeup
+        
+        ret = computeElement()
+        
+        if _tuple[0][0] == pos.up:
+            transposeIndx = 'E'
+        else:
+            transposeIndx = 'W'
+            
+        if _tuple[0][1] == pos.up:
+            indx = 'E'
+        else:
+            indx = 'W'
 
-        ret = self.allocateFourthOrderElement(_n)
-        
-        for i in range(_n):
-            for j in range(_n):
-                TW = _T[i,j]
-                result = self.computeWeightElement(TW, i, j, _posLst, _basisLst, _symbolLst, _n)
-                ret[i][j] = result
+        ret._transposeBasis = self._vars._vars[transposeIndx].value
+        ret._transposeSymbol = self._vars._vars[transposeIndx].symbol
+        ret._basis = self._vars._vars[indx].value
+        ret._symbol = self._vars._vars[indx].symbol
         
         return ret
     
-    def computeWeightMatrix1(self, _T, _posLst, _basisLst, _symbolLst, _n):
+    
+    def computeForwardTransformTable(self):
+    
+        # mapping to transform T(i,j,k,l) -> T(i,j) 
+        # and mapping to transform T(i,j) -> Full Tensor
         
-        # computes weight matrix using matrix operations B3^T(T)B4
+        ret = {}
         
-        l_B3T = self._latex.convertMatrixToLatex(np.transpose(_basisLst[2]), _n)
-        print(_symbolLst[2] + 'ᵀ' + ' = ', l_B3T, '\n')
-      
-        l_B4 = self._latex.convertMatrixToLatex(_basisLst[3], _n)
-        print(_symbolLst[3] + ' = ', l_B4, '\n')
-       
+        indx = [(pos.up,pos.up),(pos.up, pos.down), (pos.down, pos.up), (pos.down, pos.down)]
+         
+        for i in indx:
+            ret[i] = self.forwardTransform(indx)  
+            
+        return ret
+    
+    def printComputeElement(self, _elem, _n):
+          l_transposeBasis = self._latex.convertMatrixToLatex(_elem._transposeBasis, _n)
+          print(_elem._transposeSymbol + ' = ' + l_transposeBasis, "\n")
+          l_basis = self._latex.convertMatrixToLatex(_elem._basis, _n)
+          print(_elem._symbol + ' = ' + l_basis, "\n")
+          return 
+
+
+    def computeWeightMatrix(self, _T, _tuple, _n):
+        
+        # computes weight matrix using matrix operations transpose(B3).T.B4
+        # _tuple = (k = (up/down), l = (up/down))
+        
+        # get Basis 3 and Basis 4
+        
+        bases = self._forwardTransformTable[_tuple]
+        B3 = bases._transpose.value
+        B4 = bases._basis.value
+        
+        # print Basis 3 and Basis 4
+        
+        self.printComputeElement(bases, _n)
+        
         
         ret = self.allocateFourthOrderElement(_n)
         for i in range(_n):
@@ -276,15 +300,61 @@ class fourthOrderTensor:
                 TW = _T[i,j]
                 l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
                 print('T' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], 2, True) + self._posNum.indice(_posLst[3], 3, True), l_t_matrix,'\n')
-                tmp = np.dot(TW, _basisLst[3])
-                result = np.dot(np.transpose(_basisLst[2]), tmp)
+                tmp = np.dot(TW, bases._basis.val)
+                result = np.dot(np.transpose(B3), tmp)
                 l_result = self._latex.convertMatrixToLatex(result, _n)
                 print('T' +self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False), l_result,'\n') 
                 ret[i][j] = result
             
         return ret
-          
+    
+    def getTransforms(self, _tuple):
+       
+        
+        
+        B4 = self._vars._vars[B4Indx].value
+        symbol_4 = self._vars._vars[B4Indx].symbol
+        
+        l_B3T = self._latex.convertMatrixToLatex(np.transpose(B3), _n)
+        print(symbol_3 + ' = ', l_B3T, '\n')
       
+        l_B4 = self._latex.convertMatrixToLatex(B4, _n)
+        print(symbol_4 + ' = ', l_B4, '\n')
+        
+        
+    
+    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
+       
+         # implements streamlined calculation
+         # compute weight matrices
+             
+         ret = self.allocateFourthOrderElement(_n)
+         
+         
+         print('Compute Tensor Inner Product\n')
+         
+         print('Weight Matrix Computed with Matrix Product\n')
+        
+         T_ij = self.computeWeightMatrix(_T, _posLst, _n)
+         
+         
+         for i in range(_n):
+             for j in range(_n):
+                 # output latex for variables
+                self.printVector(col_1[i], False, 'col(' + _symbolLst[0] + ', ' + str(i+1) + ')ᵀ', _n)
+                l_col = self._latex.convertVectorToLatex(col_2[j], True, 2)
+                print('col(' + _symbolLst[1] + ', ' + str(j+1) + ') = ', l_col )
+                tmp = self.blockMatrixVectorMult(T_ij,col_2[j], _n)
+                l_tmp_0 = self._latex.convertMatrixToLatex(tmp[0], 2)
+                l_tmp_1 = self._latex.convertMatrixToLatex(tmp[1], 2)
+                l_tmp = '\\bmatrix{' + l_tmp_0 + '\\\\' + l_tmp_1 + '\\\\}'
+                print('intermediate results = ',l_tmp, '\n')
+                ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, col_1[i], 2) 
+        
+         return ret
+        
+ 
+    
     def allocateFourthOrderBasis(self, _n):
         ret=np.array([[[[[[0.0]*_n]*_n]*_n]*_n]*_n]*_n)
         return ret
@@ -292,7 +362,7 @@ class fourthOrderTensor:
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
     
-    
+
     def getBasisIndex(self, _pos, _unprimed):
         
         ret = ''
@@ -391,46 +461,7 @@ class fourthOrderTensor:
             
         return ret
     
-    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
-       
-         # implements streamlined calculation
-         # compute weight matrices
-             
-         ret = self.allocateFourthOrderElement(_n)
-         
-         _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, True, _unprimed, _n)
-         
-         
-        # get weights for the T_ij matrix and compute submatrix
-        
-         print('Compute Tensor Inner Product\n')
-         
-         #print('Weight Matrix Computed with Outer Products\n')
-         
-         #T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, _symbolLst, _n)
-         #self.printWeightMatrices(T_ij, _posLst, _symbolLst, _n)
-        
-         print('Weight Matrix Computed with Matrix Product\n')
-        
-         T_ij1 = self.computeWeightMatrix1(_T, _posLst, _basisLst, _symbolLst, _n)
-         
-        
-         for i in range(_n):
-             for j in range(_n):
-                 # output latex for variables
-                self.printVector(col_1[i], False, 'col(' + _symbolLst[0] + ', ' + str(i+1) + ')ᵀ', _n)
-                l_col = self._latex.convertVectorToLatex(col_2[j], True, 2)
-                print('col(' + _symbolLst[1] + ', ' + str(j+1) + ') = ', l_col )
-                tmp = self.blockMatrixVectorMult(T_ij1,col_2[j], _n)
-                l_tmp_0 = self._latex.convertMatrixToLatex(tmp[0], 2)
-                l_tmp_1 = self._latex.convertMatrixToLatex(tmp[1], 2)
-                l_tmp = '\\bmatrix{' + l_tmp_0 + '\\\\' + l_tmp_1 + '\\\\}'
-                print('intermediate results = ',l_tmp, '\n')
-                ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, col_1[i], 2) 
-        
-         return ret
-        
-
+  
     def processTransformInput(self, _posLst, _unprimed, _n):
         
         _transformLst = [0]*4
@@ -456,23 +487,28 @@ class fourthOrderTensor:
        
         _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, False, True, _n)
        
-        T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, _symbolLst, _n)
-        self.printWeightMatrices(T_ij, _n)
+        T_ij = self.computeWeightMatrix1(_T, _posLst, _basisLst, _symbolLst, _n)
+        self.printWeightMatrices(T_ij, _posLst, _n)
+        
         
         _transformLst, _transformSymbolLst = self.processTransformInput(_posLst, True, _n)
         
         # allocate return structure
         
         T1_ij = self.allocateFourthOrderElement(_n)
-        symbol_3 = _transformSymbolLst[2]
-        symbol_4 = _transformSymbolLst[3]
+        symbol_1 = _transformSymbolLst[0]
+        symbol_2 = _transformSymbolLst[1]
+        
+        B = self._vars._vars['B'].value
+        AT = self._vars._vars['AT'].value
         
         for i in range(_n):
             for j in range(_n):
                 acc = 0
                 for k in range(_n):
                     for l in range(_n):
-                        acc += _transformLst[2][l][i]*T_ij[l][k]*_transformLst[3][k][j]
+                        #acc += _transformLst[0][l][i]*T_ij[l][k]*_transformLst[1][k][j]
+                        acc += B[l][i]*T_ij[l][k]*AT[k][j]
                 T1_ij[i][j] = acc
                 
         # could transform T1_ij -> T1_ijkl
@@ -484,17 +520,23 @@ class fourthOrderTensor:
         
         inversePosLst = []
         for p in _posLst:
-            tmp = not p
+            if p == pos.up:
+                tmp = pos.down
+            elif p == pos.down:
+                tmp = pos.up
             inversePosLst.append(tmp)
         
         _inverseBasisLst, _inverseSymbolLst, col_1, col_2 = self.processTensorInput(inversePosLst, False, False, _n)
         
         ret = self.allocateFourthOrderElement(_n)
+        W1 = self._vars._vars['W1'].value
+        E1 = self._vars._vars['E1'].value
+      
         
         for i in range(_n):
             for j in range(_n):
-                tmp = np.dot(T1_ij[i][j],_inverseBasisLst[1])
-                ret[i][j] = np.dot(np.transpose(_inverseBasisLst[0]), tmp)
+                tmp = np.dot(T1_ij[i][j],np.transpose(W1))
+                ret[i][j] = np.dot(E1, tmp)
             
         return ret
        
@@ -591,12 +633,12 @@ class fourthOrderTensor:
         ret += '\\\\}' 
         return ret
 
-    def printWeightMatrices(self, _T, _posLst, _symbolLst, _n):
+    def printWeightMatrices(self, _T, _posLst, _n):
         
         
         for i in range(_n):
             for j in range(_n):
-                self.printMatrix(_T[i][j], 'T' + self._posNum.indice(_posLst[2], i) + self._posNum.indice(_posLst[3], j), _n)
+                self.printMatrix(_T[i][j], 'T' + self._posNum.indice(_posLst[2], i, False) + self._posNum.indice(_posLst[3], j, False), _n)
  
 class convertToLatex:
 
@@ -685,6 +727,26 @@ class dictElement:
     value = []
     symbol = ''
 
+class transformElement:
+    
+    # This class holds the transforms corresponding to a table of transforms
+    # for use with an equation of the form M1^T(T)M2
+    # there is no need for an explicit transpose in the computation because the transpose 
+    # is taken into effect by revering the indices
+    # so for this reason, the transpose attribute holds the untransposed matrix
+    
+    def __init__(self):
+        self._transposeIndx = ''
+        self._transposeSymbol = ''
+        self._indx = ''
+        self._symbol = ''
+
+class computeElement:
+    
+    def __init__(self):
+        self._transposeBasis = dictElement()
+        self._basis = dictElement()
+    
 class variables:
 
     def __init__(self, _r, _theta):    
