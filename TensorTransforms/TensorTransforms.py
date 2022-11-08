@@ -238,12 +238,12 @@ class fourthOrderTensor:
         
         ret = computeElement()
         
-        if _tuple[0][0] == pos.up:
+        if _tuple[0] == pos.up:
             transposeIndx = 'E'
         else:
             transposeIndx = 'W'
             
-        if _tuple[0][1] == pos.up:
+        if _tuple[1] == pos.up:
             indx = 'E'
         else:
             indx = 'W'
@@ -266,63 +266,94 @@ class fourthOrderTensor:
         indx = [(pos.up,pos.up),(pos.up, pos.down), (pos.down, pos.up), (pos.down, pos.down)]
          
         for i in indx:
-            ret[i] = self.forwardTransform(indx)  
+            ret[i] = self.forwardTransform(i)  
             
         return ret
     
+    
+    
     def printComputeElement(self, _elem, _n):
-          l_transposeBasis = self._latex.convertMatrixToLatex(_elem._transposeBasis, _n)
-          print(_elem._transposeSymbol + ' = ' + l_transposeBasis, "\n")
+          l_transposeBasis = self._latex.convertMatrixToLatex(np.transpose(_elem._transposeBasis), _n)
+          print(_elem._transposeSymbol  + ' = ' + l_transposeBasis, "\n")
           l_basis = self._latex.convertMatrixToLatex(_elem._basis, _n)
           print(_elem._symbol + ' = ' + l_basis, "\n")
           return 
 
 
-    def computeWeightMatrix(self, _T, _tuple, _n):
+    def computeWeightMatrix(self, _T, _posLst, _n):
         
         # computes weight matrix using matrix operations transpose(B3).T.B4
         # _tuple = (k = (up/down), l = (up/down))
         
         # get Basis 3 and Basis 4
         
+        _tuple = (_posLst[2], _posLst[3])
         bases = self._forwardTransformTable[_tuple]
-        B3 = bases._transpose.value
-        B4 = bases._basis.value
+        B3 = bases._transposeBasis
+        B4 = bases._basis
         
         # print Basis 3 and Basis 4
         
         self.printComputeElement(bases, _n)
         
-        
         ret = self.allocateFourthOrderElement(_n)
+        
         for i in range(_n):
             for j in range(_n):
                 TW = _T[i,j]
                 l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
                 print('T' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], 2, True) + self._posNum.indice(_posLst[3], 3, True), l_t_matrix,'\n')
-                tmp = np.dot(TW, bases._basis.val)
-                result = np.dot(np.transpose(B3), tmp)
+                result = self.matrix_1T_TW_matrix2(B3, TW, B4, _n)
                 l_result = self._latex.convertMatrixToLatex(result, _n)
                 print('T' +self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False), l_result,'\n') 
                 ret[i][j] = result
             
         return ret
-    
-    def getTransforms(self, _tuple):
-       
-        
-        
-        B4 = self._vars._vars[B4Indx].value
-        symbol_4 = self._vars._vars[B4Indx].symbol
-        
-        l_B3T = self._latex.convertMatrixToLatex(np.transpose(B3), _n)
-        print(symbol_3 + ' = ', l_B3T, '\n')
+
+
+    def matrix_1T_TW_matrix2(self, _matrix_1, _TW, _matrix_2, _n):
+          
+        ret = np.zeros(_n*_n).reshape((_n, _n))
       
-        l_B4 = self._latex.convertMatrixToLatex(B4, _n)
-        print(symbol_4 + ' = ', l_B4, '\n')
-        
-        
+        for i in range(_n):
+            for j in range(_n):
+                acc = 0.0
+                for k in range(_n):
+                    for l in range(_n):
+                        acc += _matrix_1[k][i]*_TW[k][l]*_matrix_2[l][j] 
+                ret[i,j] = acc
+                 
+        return ret
+       
     
+    def getColumns(self, _basis, _n):
+        
+        # get the column vectors from each Basis Matrix
+        
+        ret = [np.array([])]*_n 
+        
+        for j in range(_n):
+           tmp = []
+           for i in range(_n):
+               tmp.append(_basis[i,j])
+           ret[j] = np.array(tmp)
+
+        return ret
+       
+    def colT_T_col(self, _col_1, _T, _col_2, _n):
+        
+        # compute transpose(col_1).T_ij.col_2
+        
+        ret = 0.0
+        
+        for k in range(_n):
+            for l in range(_n):
+                ret += _col_1[k]*_T[k,l]*_col_2[l]
+        
+        return ret
+                
+        
+
     def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
        
          # implements streamlined calculation
@@ -330,56 +361,50 @@ class fourthOrderTensor:
              
          ret = self.allocateFourthOrderElement(_n)
          
-         
          print('Compute Tensor Inner Product\n')
          
          print('Weight Matrix Computed with Matrix Product\n')
         
          T_ij = self.computeWeightMatrix(_T, _posLst, _n)
          
+         # _tuple = (k = (up/down), l = (up/down))
+         
+         # get Basis 1 and Basis 2
+         
+         _tuple = (_posLst[0], _posLst[1])
+         bases = self._forwardTransformTable[_tuple]
+         B1 = bases._transposeBasis
+         B2 = bases._basis
+         
+         # print Basis 1 and Basis 2
+         
+         self.printComputeElement(bases, _n)
+         
+         # get columns from B1 and B2
+         
+         colB1 = self.getColumns(B1, 2)
+         colB2 = self.getColumns(B2, 2)
+         
+         # compute transpose(col(B1, i)).T(i,j).col(B2, j)
          
          for i in range(_n):
              for j in range(_n):
-                 # output latex for variables
-                self.printVector(col_1[i], False, 'col(' + _symbolLst[0] + ', ' + str(i+1) + ')ᵀ', _n)
-                l_col = self._latex.convertVectorToLatex(col_2[j], True, 2)
-                print('col(' + _symbolLst[1] + ', ' + str(j+1) + ') = ', l_col )
-                tmp = self.blockMatrixVectorMult(T_ij,col_2[j], _n)
-                l_tmp_0 = self._latex.convertMatrixToLatex(tmp[0], 2)
-                l_tmp_1 = self._latex.convertMatrixToLatex(tmp[1], 2)
-                l_tmp = '\\bmatrix{' + l_tmp_0 + '\\\\' + l_tmp_1 + '\\\\}'
-                print('intermediate results = ',l_tmp, '\n')
-                ret[i][j] = self.vectorTransposeBlockVectorMult(tmp, col_1[i], 2) 
-        
+                 ret[i,j] = self.colT_T_col(colB1[i], T_ij, colB2[j], _n)
+                 
          return ret
-        
- 
-    
+         
+         
     def allocateFourthOrderBasis(self, _n):
+        
         ret=np.array([[[[[[0.0]*_n]*_n]*_n]*_n]*_n]*_n)
         return ret
+    
     def allocateFourthOrderElement(self, _n):
+        
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
     
 
-    def getBasisIndex(self, _pos, _unprimed):
-        
-        ret = ''
-        suffix = ''
-        
-        if not _unprimed:
-            suffix = '1'
-            
-        if _pos == pos.up:
-            ret = 'E' + suffix
-        elif _pos == pos.down:
-            ret = 'W' + suffix
-        else:
-            print('Error - position needs to be specified')
-            ret = None
-        
-        return ret
     
     def getTransformIndex(self, _pos):
         
@@ -391,54 +416,11 @@ class fourthOrderTensor:
             print('Error - position needs to be specified')
             ret = None
         return ret
-       
-    def processTensorInput(self, _posLst, _col, _unprimed, _n):
-        
-        _basisLst = [0]*4
-        _symbolLst = [0]*4
-        # set up matrix of vectors
-        
-        col_1 = [np.array([])]*_n
-        col_2 = [np.array([])]*_n
-       
-        
-        indx = 0
-        for p in _posLst:
-            bIndx = self.getBasisIndex(p, _unprimed)
-            if bIndx == None:
-                return None
-            _basisLst[indx] = self._vars._vars[bIndx].value
-            m_latex = self._latex.convertMatrixToLatex(_basisLst[indx], _n)
-            _symbolLst[indx] = self._vars._vars[bIndx].symbol
-            print(_symbolLst[indx] + ' = ', m_latex)
-            indx += 1
-        
-        if _col:
-        
-           
-            # get the column vectors from each Basis Matrix
-             
-            for j in range(_n):
-               tmp = []
-               for i in range(_n):
-                   tmp.append(_basisLst[0][i,j])
-               col_1[j] = np.array(tmp)
-
-            for j in range(_n):
-               tmp = []
-               for i in range(_n):
-                   tmp.append(_basisLst[1][i,j])
-               col_2[j] = np.array(tmp)
-            
-        ret = _basisLst, _symbolLst, col_1, col_2
     
-    
-        return ret
-          
-      
+         
     def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
      
-        _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, False, _unprimed, _n)
+        _basisLst, _symbolLst = self.processTensorInput(_posLst, _unprimed, _n)
         
         ret = 0
     
@@ -447,21 +429,88 @@ class fourthOrderTensor:
                 for k in range(_n):
                     for l in range(_n):
                         coeff = _T[i, j, k, l]
-                        print('T' + self._posNum.indice(_posLst[0], i)  +  self._posNum.indice(_posLst[1], j) + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l)  + ' = ', coeff)
-                        self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i), _n)
-                        self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j), _n) 
-                        self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k), _n)
-                        self.printVector( _basisLst[3][l], False, _symbolLst[3].lower() + self._posNum.indice(_posLst[3], l), _n)
+                        print('T' + self._posNum.indice(_posLst[0], i, False)  +  self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], k, False) + self._posNum.indice(_posLst[3], l, False)  + ' = ', coeff)
+                        self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i, False), _n)
+                        self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j, False), _n) 
+                        self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k, False), _n)
+                        self.printVector( _basisLst[3][l], False, _symbolLst[3].lower() + self._posNum.indice(_posLst[3], l, False), _n)
                         outer = np.einsum('i,j,k,l',_basisLst[0][i], _basisLst[1][j], _basisLst[2][k],_basisLst[3][l])
                         l_outer = self.convertElementToLatex(outer, _n)
-                        print('outer' + self._posNum.indice(_posLst[0], i) + self._posNum.indice(_posLst[1], j) + self._posNum.indice(_posLst[2], k) + self._posNum.indice(_posLst[3], l),'\n')
+                        print('outer' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], k, False) + self._posNum.indice(_posLst[3], l, False),'\n')
                         print(l_outer, '\n')
                              
                         ret += coeff*outer
             
         return ret
     
-  
+    def processTensorInput(self, _posLst, _unprimed, _n):
+               
+        # get bases in vector form 
+                
+        bases_vecs = []
+        
+        basesLst = self.getBases(_posLst, _n)
+        
+        for i in basesLst:
+            bases_vecs += self.getRows(i,_n)
+        
+        # get symbols in vector form
+        
+        symbol_vecs = []
+        
+        for i in basesLst:
+            tmp = self.getSymbols(i, _n)
+            symbol_vecs += tmp
+            
+        return bases_vecs, symbol_vecs
+   
+    
+    def getBases(self, _posLst, _n):
+    
+        basesLst = []
+        
+        _tuple = (_posLst[0], _posLst[1])
+        tmp = self._forwardTransformTable[_tuple]
+        basesLst.append(tmp)
+        _tuple = (_posLst[2], _posLst[3])
+        tmp = self._forwardTransformTable[_tuple]
+        basesLst.append(tmp)
+        
+        return basesLst
+        
+
+    def getRows(self, _basis, _n):
+        
+        ret = []
+        tmp_vec = []
+        
+        tmp = _basis._transposeBasis
+        for i in range(_n):
+            tmp_vec.append(tmp[i])
+        
+        ret.append(tmp_vec)
+        
+        tmp_vec = []
+        tmp = _basis._basis
+        for i in range(_n):
+            tmp_vec.append(tmp[i])
+        
+        ret.append(tmp_vec)
+        
+        return ret
+    
+    def getSymbols(self, _basis, _n):
+        
+        ret = []
+        
+        tmp = _basis._transposeSymbol
+        ret.append(tmp)
+        tmp = _basis._symbol
+        ret.append(tmp)
+        
+        return ret
+        
+
     def processTransformInput(self, _posLst, _unprimed, _n):
         
         _transformLst = [0]*4
@@ -540,60 +589,6 @@ class fourthOrderTensor:
             
         return ret
        
-        
-    
-    # multiply a block matrix with a vector
-    
-    def blockMatrixVectorMult(self, _T_ij, _vec, _n):
-        
-        ret = []
-        tmp =0
-        
-        for i in range(_n):
-            tmp = 0
-            for j in range(_n):
-                tmp += _T_ij[i][j]*_vec[j]
-            ret.append(tmp)
-           
-        return ret
-       
-    # multiply a transposed vector with a block matrix
-    
-    def vectorTransposeBlockVectorMult(self, _b_vec, _vec, _n):
-        
-        ret = 0
-    
-        for i in range(_n):
-            ret += _vec[i]*_b_vec[i]
-           
-        return ret
-       
-    # multiply a block matrix by a matrix
-    
-    def blockMatrixMatrixMult(self, _T, _M, _n):
-        
-        # _T is a list of matrices
-        # multiply each element of _T y _M[i,j]
-        
-        ret = 0
-        
-        for i in range(_n):
-            for j in range(_n):
-                index = i*_n + j
-                ret += _T[index]
-                
-            
-    
-    
-    def computeTensorElement(self, _E_ixj, _T_ij, _n):
-        
-        ret = self.allocateFourthOrderElement(_n)
-        
-        for i in range(_n):
-            for j in range(_n):
-                ret[i][j] = _E_ixj[i,j]*_T_ij
-    
-        return ret
         
     def getBasisVector(self, _indxBasis, _i):
         
@@ -707,17 +702,20 @@ class posNum:
     
     def indice(self, _pos, _index, _letterFlag):
     
+        # tensor coordinate down -> basis coordinate up 
+        # and visa versa
+    
         if _pos == pos.up:
             if not _letterFlag:
-                return self._sup_num[_index + 1]
+                return self._sub_num[_index + 1]
             else:
-                return self._sup_let[_index]
+                return self._sub_let[_index]
                 
         elif _pos == pos.down:
             if not _letterFlag:
-                return self._sub_num[_index + 1] 
+                return self._sup_num[_index + 1] 
             else:
-                return self._sub_let[_index]
+                return self._sup_let[_index]
         else:
            return None
         
