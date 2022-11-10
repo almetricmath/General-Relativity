@@ -9,8 +9,6 @@ import TensorTransforms as t
 import numpy as np
 import sys
 
-
-
 r = 2
 theta = np.pi/3
 t4 = t.fourthOrderTensor(r, theta)
@@ -44,25 +42,15 @@ print(l_result)
 print('\n')
 
 
-'''
 # tensor under coordinate change
 
 # transform tensor components
 
+T_test = t4.transformTensor(TW, posLst, False, 2)
+
 # compute tensor
 
-T_test = t4.transformTensor(TW, posLst, False, 2)
-result1 = t4.computeTensorInnerProduct(T_test, posLst, True, 2)
+result1 = t4.computeTensorInnerProduct(T_test, posLst, False, 2)
 l_result = t4.convertElementToLatex(result1, 2)
 print(l_result)
-print('\n')
-'''
-
-'''
-# Test transpose(B).T_ij.A pattern
-
-B = np.array([[1,2],[3,4]])
-T_ij = np.array([[5,6],[7,8]])
-A = np.array([[9,10],[11,12]])
-'''
-    
+print('\n')    

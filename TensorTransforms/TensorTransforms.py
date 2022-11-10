@@ -228,25 +228,37 @@ class fourthOrderTensor:
         self._vars = variables(_r, _theta)
         self._posNum = posNum()
         
-        # declare configuration tables
+        # declare configuration tables in unprimed system
         
-        self._forwardTransformTable = self.computeForwardTransformTable()
+        self._forwardTable = self.computeTable(self.forwardTable, True)
+        self._transformTable = self.computeTable(self.transformTable, True)
         
-    def forwardTransform(self, _tuple):
+        # declare configuration table in primed system
+        
+        self._forwardTablePrimed = self.computeTable(self.forwardTable, False)
+        
+    def forwardTable(self, _tuple, _unprimed):
         
         # function to implement Table 2 and Table 5 from the writeup
+        # note there is no need to compute the transposes, they are not needed 
+        # the way the algorithms are written, but need to be kept track of
         
         ret = computeElement()
+        suffix = ''
+        
+        if not _unprimed:  # prime coordinate system
+            suffix = '1'
         
         if _tuple[0] == pos.up:
-            transposeIndx = 'E'
+            transposeIndx = 'E' + suffix
         else:
-            transposeIndx = 'W'
-            
+            transposeIndx = 'W' + suffix
+        
+                
         if _tuple[1] == pos.up:
-            indx = 'E'
+            indx = 'E' + suffix
         else:
-            indx = 'W'
+            indx = 'W' + suffix
 
         ret._transposeBasis = self._vars._vars[transposeIndx].value
         ret._transposeSymbol = self._vars._vars[transposeIndx].symbol
@@ -256,7 +268,7 @@ class fourthOrderTensor:
         return ret
     
     
-    def computeForwardTransformTable(self):
+    def computeTable(self, tableFunc, _unprimed):
     
         # mapping to transform T(i,j,k,l) -> T(i,j) 
         # and mapping to transform T(i,j) -> Full Tensor
@@ -266,12 +278,32 @@ class fourthOrderTensor:
         indx = [(pos.up,pos.up),(pos.up, pos.down), (pos.down, pos.up), (pos.down, pos.down)]
          
         for i in indx:
-            ret[i] = self.forwardTransform(i)  
+            ret[i] = tableFunc(i, _unprimed)  
             
         return ret
     
-    
-    
+    def transformTable(self, _tuple, _unprimed):
+        
+        ret = computeElement()
+        
+        if _tuple[0] == pos.up:
+            transposeIndx = 'B'
+        else:
+            transposeIndx = 'A'
+            
+        if _tuple[1] == pos.up:
+            indx = 'B'
+        else:
+            indx = 'AT'
+            
+        ret._transposeBasis = self._vars._vars[transposeIndx].value
+        ret._transposeSymbol = self._vars._vars[transposeIndx].symbol
+        ret._basis = self._vars._vars[indx].value
+        ret._symbol = self._vars._vars[indx].symbol
+        
+        return ret
+        
+ 
     def printComputeElement(self, _elem, _n):
           l_transposeBasis = self._latex.convertMatrixToLatex(np.transpose(_elem._transposeBasis), _n)
           print(_elem._transposeSymbol  + ' = ' + l_transposeBasis, "\n")
@@ -280,7 +312,7 @@ class fourthOrderTensor:
           return 
 
 
-    def computeWeightMatrix(self, _T, _posLst, _n):
+    def computeWeightMatrix(self, _T, _posLst, _unprimed, _n):
         
         # computes weight matrix using matrix operations transpose(B3).T.B4
         # _tuple = (k = (up/down), l = (up/down))
@@ -288,7 +320,11 @@ class fourthOrderTensor:
         # get Basis 3 and Basis 4
         
         _tuple = (_posLst[2], _posLst[3])
-        bases = self._forwardTransformTable[_tuple]
+        if _unprimed:
+            bases = self._forwardTable[_tuple]
+        else:
+            bases = self._forwardTablePrimed[_tuple]
+            
         B3 = bases._transposeBasis
         B4 = bases._basis
         
@@ -303,7 +339,7 @@ class fourthOrderTensor:
                 TW = _T[i,j]
                 l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
                 print('T' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], 2, True) + self._posNum.indice(_posLst[3], 3, True), l_t_matrix,'\n')
-                result = self.matrix_1T_TW_matrix2(B3, TW, B4, _n)
+                result = self.matrix_1T_TW_matrix_2(B3, TW, B4, False, _n)
                 l_result = self._latex.convertMatrixToLatex(result, _n)
                 print('T' +self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False), l_result,'\n') 
                 ret[i][j] = result
@@ -311,9 +347,15 @@ class fourthOrderTensor:
         return ret
 
 
-    def matrix_1T_TW_matrix2(self, _matrix_1, _TW, _matrix_2, _n):
-          
-        ret = np.zeros(_n*_n).reshape((_n, _n))
+    def matrix_1T_TW_matrix_2(self, _matrix_1, _TW, _matrix_2, _block, _n):
+        
+        # computes transpose(_matrix_1)._TW._matrix_2
+        # _block specifies _TW as a block matrix and the return type as a block matrix
+        
+        if not _block:
+            ret = np.zeros(_n*_n).reshape((_n, _n))
+        else:
+            ret = self.allocateFourthOrderElement(_n)
       
         for i in range(_n):
             for j in range(_n):
@@ -352,8 +394,7 @@ class fourthOrderTensor:
         
         return ret
                 
-        
-
+    
     def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
        
          # implements streamlined calculation
@@ -364,15 +405,25 @@ class fourthOrderTensor:
          print('Compute Tensor Inner Product\n')
          
          print('Weight Matrix Computed with Matrix Product\n')
+         
+        # compute weight matrix in the unprimed system
         
-         T_ij = self.computeWeightMatrix(_T, _posLst, _n)
+         if _unprimed: 
+             T_ij = self.computeWeightMatrix(_T, _posLst, True, _n)
+         else:
+             # use weight that has been transformed to a primed coordinate system
+             T_ij = _T
          
          # _tuple = (k = (up/down), l = (up/down))
          
          # get Basis 1 and Basis 2
          
          _tuple = (_posLst[0], _posLst[1])
-         bases = self._forwardTransformTable[_tuple]
+         if _unprimed:
+             bases = self._forwardTable[_tuple]
+         else:
+             bases = self._forwardTablePrimed[_tuple]
+        
          B1 = bases._transposeBasis
          B2 = bases._basis
          
@@ -393,31 +444,12 @@ class fourthOrderTensor:
                  
          return ret
          
-         
-    def allocateFourthOrderBasis(self, _n):
-        
-        ret=np.array([[[[[[0.0]*_n]*_n]*_n]*_n]*_n]*_n)
-        return ret
-    
+           
     def allocateFourthOrderElement(self, _n):
         
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
-    
-
-    
-    def getTransformIndex(self, _pos):
-        
-        if _pos == pos.up:
-            ret = 'B'
-        elif _pos == pos.down:
-            ret = 'A'
-        else:
-            print('Error - position needs to be specified')
-            ret = None
-        return ret
-    
-         
+             
     def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
      
         _basisLst, _symbolLst = self.processTensorInput(_posLst, _unprimed, _n)
@@ -470,10 +502,10 @@ class fourthOrderTensor:
         basesLst = []
         
         _tuple = (_posLst[0], _posLst[1])
-        tmp = self._forwardTransformTable[_tuple]
+        tmp = self._forwardTable[_tuple]
         basesLst.append(tmp)
         _tuple = (_posLst[2], _posLst[3])
-        tmp = self._forwardTransformTable[_tuple]
+        tmp = self._forwardTable[_tuple]
         basesLst.append(tmp)
         
         return basesLst
@@ -513,53 +545,42 @@ class fourthOrderTensor:
 
     def processTransformInput(self, _posLst, _unprimed, _n):
         
-        _transformLst = [0]*4
-        _transformSymbolLst = [0]*4
-      
-        indx = 0
-        for p in _posLst:
-            bIndx = self.getTransformIndex(p)
-            if bIndx == None:
-                return None
-            _transformLst[indx] = self._vars._vars[bIndx].value
-            _transformSymbolLst[indx] = self._vars._vars[bIndx].symbol
-            indx += 1
-       
-        return _transformLst, _transformSymbolLst
-      
+        ret = computeElement()
+        
+        _tuple = (_posLst[0], _posLst[1])
+        ret = self._transformTable[_tuple]
+        
+        return ret
+        
         
     # transform tensor
     
     def transformTensor(self, _T, _posLst, _unprimed, _n):
         
         # 1st work unprimed to primed system
+        # compute tensor coordinate change using matrices
        
-        _basisLst, _symbolLst, col_1, col_2 = self.processTensorInput(_posLst, False, True, _n)
+        _basisLst, _symbolLst = self.processTensorInput(_posLst, True, _n)
        
-        T_ij = self.computeWeightMatrix1(_T, _posLst, _basisLst, _symbolLst, _n)
+        # Compute weight matrix in unprimed system
+        
+        T_ij = self.computeWeightMatrix(_T, _posLst, True, _n)
+      
         self.printWeightMatrices(T_ij, _posLst, _n)
         
+        # get transforms involved with coordinate change
         
-        _transformLst, _transformSymbolLst = self.processTransformInput(_posLst, True, _n)
+        _transform = self.processTransformInput(_posLst, True, _n)
         
         # allocate return structure
         
         T1_ij = self.allocateFourthOrderElement(_n)
-        symbol_1 = _transformSymbolLst[0]
-        symbol_2 = _transformSymbolLst[1]
+        symbol_1 = _transform._transposeSymbol
+        symbol_2 = _transform._symbol
         
-        B = self._vars._vars['B'].value
-        AT = self._vars._vars['AT'].value
-        
-        for i in range(_n):
-            for j in range(_n):
-                acc = 0
-                for k in range(_n):
-                    for l in range(_n):
-                        #acc += _transformLst[0][l][i]*T_ij[l][k]*_transformLst[1][k][j]
-                        acc += B[l][i]*T_ij[l][k]*AT[k][j]
-                T1_ij[i][j] = acc
-                
+        T1_ij = self.matrix_1T_TW_matrix_2(_transform._transposeBasis, T_ij, _transform._basis, True, _n)
+         
+        '''          
         # could transform T1_ij -> T1_ijkl
         
         # T1_ij in the primed system
@@ -586,20 +607,10 @@ class fourthOrderTensor:
             for j in range(_n):
                 tmp = np.dot(T1_ij[i][j],np.transpose(W1))
                 ret[i][j] = np.dot(E1, tmp)
-            
-        return ret
+        '''    
+        return T1_ij
        
         
-    def getBasisVector(self, _indxBasis, _i):
-        
-        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
-        
-        _Basis = self._vars._vars[_indxBasis].value
-        symbol = self._vars._vars[_indxBasis].symbol
-        ret = _Basis[_i,:], symbol.lower() + subscript_num[_i+1]
-        return ret
-        
-    
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, 2)
          print(_label + ' = ', l_result, '\n')
@@ -629,8 +640,7 @@ class fourthOrderTensor:
         return ret
 
     def printWeightMatrices(self, _T, _posLst, _n):
-        
-        
+    
         for i in range(_n):
             for j in range(_n):
                 self.printMatrix(_T[i][j], 'T' + self._posNum.indice(_posLst[2], i, False) + self._posNum.indice(_posLst[3], j, False), _n)
@@ -668,25 +678,7 @@ class convertToLatex:
         ret += '\\\\}'
         return ret
 
-    def convertResultToLatex(self, _result, _weights, _n):
-        
-        ret = '\\bmatrix{' 
-        
-        for i in range(_n):
-            for j in range(_n):
-                tmp = _result[i][j]
-                if type(_weights) == np.ndarray:
-                    ret +=  str('(' + "{:.6f}".format(_weights[i][j])) + ')'
-                ret += self.convertMatrixToLatex(tmp, _n)
-                if j != _n - 1:
-                    ret += '&'
-            if i != _n - 1:
-                ret += '\\\\' 
-            
-        ret += '}'
-        
-        return ret
-  
+   
 class pos(Enum):
     init = None
     up = 0
