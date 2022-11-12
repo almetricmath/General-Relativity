@@ -6,11 +6,14 @@ Created on Fri Oct 14 10:25:18 2022
 """
 
 import TensorTransforms as t
+print(t.__file__)
 import numpy as np
 import sys
 
+
 r = 2
 theta = np.pi/3
+
 t4 = t.fourthOrderTensor(r, theta)
 
 latex = t.convertToLatex()

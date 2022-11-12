@@ -18,7 +18,6 @@ class coordinateTransforms:
     def __init__(self):
         self._transform = {}
 
-        
 
     def polarVectorBasis(self, _r, _theta):
         ret = np.array([[np.cos(_theta),np.sin(_theta)],[-_r*np.sin(_theta), _r*np.cos(_theta)]])
@@ -41,19 +40,25 @@ class secondOrderTensor:
     def __init__(self, _r, _theta):
         self._latex = convertToLatex()
         self._vars = variables(_r, _theta)
-
-    def computeTensorOuterProduct(self, _T, _indxBasis_1, _indxBasis_2, _n):
+        self._utils = utils()
         
-        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
+        # declare configuration tables in unprimed system
         
-        _Basis_1 = self._vars._vars[_indxBasis_1].value
-        symbol_1 = self._vars._vars[_indxBasis_1].symbol
-        _Basis_2 = self._vars._vars[_indxBasis_2].value
-        symbol_2 = self._vars._vars[_indxBasis_2].symbol
+        self._forwardTable = self._utils.computeTable(self._utils.forwardTable, True, self)
+        self._transformTable = self._utils.computeTable(self._utils.transformTable, True)
+        
+        # declare configuration table in primed system
+        
+        self._forwardTablePrimed = self._utils.computeTable(self.forwardTable, False)
+       
+    def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
+        
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, _n)
         
         ret = 0
         for i in range(_n):
             for j in range(_n):
+                
                 v_i = _Basis_1[i,:]
                 v_j =  _Basis_2[j,:]
                 self.printVector(v_i, True, symbol_1.lower() + subscript_num[i+1] + 'ᵀ', _n)
@@ -227,83 +232,18 @@ class fourthOrderTensor:
         self._latex = convertToLatex() 
         self._vars = variables(_r, _theta)
         self._posNum = posNum()
+        self._utils = utils()
         
         # declare configuration tables in unprimed system
         
-        self._forwardTable = self.computeTable(self.forwardTable, True)
-        self._transformTable = self.computeTable(self.transformTable, True)
+        self._forwardTable = self._utils.computeTable(self._utils.forwardTable, True, self)
+        self._transformTable = self._utils.computeTable(self._utils.transformTable, True, self)
         
         # declare configuration table in primed system
         
-        self._forwardTablePrimed = self.computeTable(self.forwardTable, False)
+        self._forwardTablePrimed = self._utils.computeTable(self._utils.forwardTable, False, self)
         
-    def forwardTable(self, _tuple, _unprimed):
-        
-        # function to implement Table 2 and Table 5 from the writeup
-        # note there is no need to compute the transposes, they are not needed 
-        # the way the algorithms are written, but need to be kept track of
-        
-        ret = computeElement()
-        suffix = ''
-        
-        if not _unprimed:  # prime coordinate system
-            suffix = '1'
-        
-        if _tuple[0] == pos.up:
-            transposeIndx = 'E' + suffix
-        else:
-            transposeIndx = 'W' + suffix
-        
-                
-        if _tuple[1] == pos.up:
-            indx = 'E' + suffix
-        else:
-            indx = 'W' + suffix
-
-        ret._transposeBasis = self._vars._vars[transposeIndx].value
-        ret._transposeSymbol = self._vars._vars[transposeIndx].symbol
-        ret._basis = self._vars._vars[indx].value
-        ret._symbol = self._vars._vars[indx].symbol
-        
-        return ret
     
-    
-    def computeTable(self, tableFunc, _unprimed):
-    
-        # mapping to transform T(i,j,k,l) -> T(i,j) 
-        # and mapping to transform T(i,j) -> Full Tensor
-        
-        ret = {}
-        
-        indx = [(pos.up,pos.up),(pos.up, pos.down), (pos.down, pos.up), (pos.down, pos.down)]
-         
-        for i in indx:
-            ret[i] = tableFunc(i, _unprimed)  
-            
-        return ret
-    
-    def transformTable(self, _tuple, _unprimed):
-        
-        ret = computeElement()
-        
-        if _tuple[0] == pos.up:
-            transposeIndx = 'B'
-        else:
-            transposeIndx = 'A'
-            
-        if _tuple[1] == pos.up:
-            indx = 'B'
-        else:
-            indx = 'AT'
-            
-        ret._transposeBasis = self._vars._vars[transposeIndx].value
-        ret._transposeSymbol = self._vars._vars[transposeIndx].symbol
-        ret._basis = self._vars._vars[indx].value
-        ret._symbol = self._vars._vars[indx].symbol
-        
-        return ret
-        
- 
     def printComputeElement(self, _elem, _n):
           l_transposeBasis = self._latex.convertMatrixToLatex(np.transpose(_elem._transposeBasis), _n)
           print(_elem._transposeSymbol  + ' = ' + l_transposeBasis, "\n")
@@ -452,7 +392,7 @@ class fourthOrderTensor:
              
     def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
      
-        _basisLst, _symbolLst = self.processTensorInput(_posLst, _unprimed, _n)
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, _n)
         
         ret = 0
     
@@ -475,74 +415,7 @@ class fourthOrderTensor:
             
         return ret
     
-    def processTensorInput(self, _posLst, _unprimed, _n):
-               
-        # get bases in vector form 
-                
-        bases_vecs = []
         
-        basesLst = self.getBases(_posLst, _n)
-        
-        for i in basesLst:
-            bases_vecs += self.getRows(i,_n)
-        
-        # get symbols in vector form
-        
-        symbol_vecs = []
-        
-        for i in basesLst:
-            tmp = self.getSymbols(i, _n)
-            symbol_vecs += tmp
-            
-        return bases_vecs, symbol_vecs
-   
-    
-    def getBases(self, _posLst, _n):
-    
-        basesLst = []
-        
-        _tuple = (_posLst[0], _posLst[1])
-        tmp = self._forwardTable[_tuple]
-        basesLst.append(tmp)
-        _tuple = (_posLst[2], _posLst[3])
-        tmp = self._forwardTable[_tuple]
-        basesLst.append(tmp)
-        
-        return basesLst
-        
-
-    def getRows(self, _basis, _n):
-        
-        ret = []
-        tmp_vec = []
-        
-        tmp = _basis._transposeBasis
-        for i in range(_n):
-            tmp_vec.append(tmp[i])
-        
-        ret.append(tmp_vec)
-        
-        tmp_vec = []
-        tmp = _basis._basis
-        for i in range(_n):
-            tmp_vec.append(tmp[i])
-        
-        ret.append(tmp_vec)
-        
-        return ret
-    
-    def getSymbols(self, _basis, _n):
-        
-        ret = []
-        
-        tmp = _basis._transposeSymbol
-        ret.append(tmp)
-        tmp = _basis._symbol
-        ret.append(tmp)
-        
-        return ret
-        
-
     def processTransformInput(self, _posLst, _unprimed, _n):
         
         ret = computeElement()
@@ -552,7 +425,6 @@ class fourthOrderTensor:
         
         return ret
         
-        
     # transform tensor
     
     def transformTensor(self, _T, _posLst, _unprimed, _n):
@@ -560,7 +432,7 @@ class fourthOrderTensor:
         # 1st work unprimed to primed system
         # compute tensor coordinate change using matrices
        
-        _basisLst, _symbolLst = self.processTensorInput(_posLst, True, _n)
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, True, self, _n)
        
         # Compute weight matrix in unprimed system
         
@@ -819,9 +691,136 @@ class utils:
                 ret[i][j] = _m1[i][j]*_m2
         
         return ret
+    
+    def computeTable(self, tableFunc, _unprimed, _class):
+    
+        # mapping to transform T(i,j,k,l) -> T(i,j) 
+        # and mapping to transform T(i,j) -> Full Tensor
+        
+        ret = {}
+        
+        indx = [(pos.up,pos.up),(pos.up, pos.down), (pos.down, pos.up), (pos.down, pos.down)]
+         
+        for i in indx:
+            ret[i] = tableFunc(i, _unprimed, _class)  
+            
+        return ret
+    
+    def getRows(self, _basis, _n):
+        
+        ret = []
+        tmp_vec = []
+        
+        tmp = _basis._transposeBasis
+        for i in range(_n):
+            tmp_vec.append(tmp[i])
+        
+        ret.append(tmp_vec)
+        
+        tmp_vec = []
+        tmp = _basis._basis
+        for i in range(_n):
+            tmp_vec.append(tmp[i])
+        
+        ret.append(tmp_vec)
+        
+        return ret
+    
+    def getSymbols(self, _basis, _n):
+        
+        ret = []
+        
+        tmp = _basis._transposeSymbol
+        ret.append(tmp)
+        tmp = _basis._symbol
+        ret.append(tmp)
+        
+        return ret
+    
+    def processTensorInput(self, _posLst, _unprimed, _class, _n):
+               
+        # get bases in vector form 
+                
+        bases_vecs = []
+        
+        basesLst = self.getBases(_posLst, _class)
+        
+        for i in basesLst:
+            bases_vecs += self.getRows(i,_n)
+        
+        # get symbols in vector form
+        
+        symbol_vecs = []
+        
+        for i in basesLst:
+            tmp = self.getSymbols(i, _n)
+            symbol_vecs += tmp
+            
+        return bases_vecs, symbol_vecs
+   
+    
+    def getBases(self, _posLst, _class):
+    
+        basesLst = []
+        n = len(_posLst)
+        
+        for i in range(0, n, 2):
+            _tuple = (_posLst[i], _posLst[i+1])
+            tmp = _class._forwardTable[_tuple]
+            basesLst.append(tmp)
+            
+        return basesLst
+    
+    def forwardTable(self, _tuple, _unprimed, _class):
+        
+        # function to implement Table 2 and Table 5 from the writeup
+        # note there is no need to compute the transposes, they are not needed 
+        # the way the algorithms are written, but need to be kept track of
+        
+        ret = computeElement()
+        suffix = ''
+        
+        if not _unprimed:  # prime coordinate system
+            suffix = '1'
+        
+        if _tuple[0] == pos.up:
+            transposeIndx = 'E' + suffix
+        else:
+            transposeIndx = 'W' + suffix
+        
+                
+        if _tuple[1] == pos.up:
+            indx = 'E' + suffix
+        else:
+            indx = 'W' + suffix
 
+        ret._transposeBasis = _class._vars._vars[transposeIndx].value
+        ret._transposeSymbol = _class._vars._vars[transposeIndx].symbol
+        ret._basis = _class._vars._vars[indx].value
+        ret._symbol = _class._vars._vars[indx].symbol
+        
+        return ret
+   
+    
+    def transformTable(self, _tuple, _unprimed, _class):
+        
+        ret = computeElement()
+        
+        if _tuple[0] == pos.up:
+            transposeIndx = 'B'
+        else:
+            transposeIndx = 'A'
+            
+        if _tuple[1] == pos.up:
+            indx = 'B'
+        else:
+            indx = 'AT'
+            
+        ret._transposeBasis = _class._vars._vars[transposeIndx].value
+        ret._transposeSymbol = _class._vars._vars[transposeIndx].symbol
+        ret._basis = _class._vars._vars[indx].value
+        ret._symbol = _class._vars._vars[indx].symbol
+        
+        return ret
 
-
-
-
-
+     
