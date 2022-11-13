@@ -21,12 +21,11 @@ theta = np.pi/3
 
 # create tensor 
 T = np.array([[1,2],[3,4]])
-_vars = t.variables(r, theta)
-vari = _vars.getVars()
 
 secondOrder = t.secondOrderTensor(r, theta)
+_posLst = [t.pos.up, t.pos.up]
 
-result = secondOrder.computeTensorOuterProduct(T, 'E', 'E', 2)
+result = secondOrder.computeTensorOuterProduct(T,_posLst, True, 2)
 
 print('Second Order Tensor Components\n')
 
@@ -45,7 +44,8 @@ print('\n')
 
 # compute tensor using transpose(E).T.E
 
-result1 = secondOrder.computeTensorInnerProduct(T, 'E', 'E', 2)
+result1 = secondOrder.computeTensorInnerProduct(T, _posLst, True, secondOrder, 2)
+
 l_result = latex.convertMatrixToLatex(result1, 2)
 print('Full Tensor computed by EᵀTE\n')
 print(l_result)
@@ -60,7 +60,7 @@ print('\n')
 
 print('Transform to polar sqrt coordinate system')
 
-T1 = secondOrder.computeTensorInnerProduct(T, 'B', 'B', 2)
+T1 = secondOrder.computeTensorInnerProduct(T, _posLst, True, secondOrder, 2)
 
 l_result = latex.convertMatrixToLatex(T1, 2)
 print('T̅ = BᵀTB \n')

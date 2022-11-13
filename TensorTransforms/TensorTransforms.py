@@ -55,8 +55,8 @@ class secondOrderTensor:
     def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
         
         # get bases as vectors
-        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, True, self, _n)
-         
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
+     
         ret = 0
         for i in range(_n):
             for j in range(_n):
@@ -73,18 +73,19 @@ class secondOrderTensor:
         
         # get bases as matrices
         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, False, _n)
-        basesLst = self._utils.getBases(_posLst, _class)
+        #basesLst = self._utils.getBases(_posLst, _unprimed, _class)
+        
         
         l_result = self._latex.convertMatrixToLatex(_T, _n)
         print('T' + '\n', l_result, '\n')
-        l_result = self._latex.convertMatrixToLatex(_Basis_1T, _n)
-        print(_labelBasis_1T, l_result, '\n')
-        l_result = self._latex.convertMatrixToLatex(_Basis_2, _n)
-        print(_labelBasis_2, l_result, '\n')
+        l_result = self._latex.convertMatrixToLatex(np.transpose(_basisLst[0]._transposeBasis), _n)
+        print(_symbolLst[0], l_result, '\n')
+        l_result = self._latex.convertMatrixToLatex(_basisLst[0]._basis, _n)
+        print(_symbolLst[1], l_result, '\n')
         
        
-        tmp = np.dot(_Basis_1T, _T)
-        ret = np.dot(tmp, _Basis_2)
+        tmp = np.dot(np.transpose(_basisLst[0]._transposeBasis), _T)
+        ret = np.dot(tmp, _basisLst[0]._basis)
         return ret
 
     def printMatrix(self, _M, _label, _n):
