@@ -53,7 +53,7 @@ T_test = t4.transformTensor(TW, posLst, False, 2)
 
 # compute tensor
 
-result1 = t4.computeTensorInnerProduct(T_test, posLst, False, 2)
-l_result = t4.convertElementToLatex(result1, 2)
+result3 = t4.computeTensorInnerProduct(T_test, posLst, False, 2)
+l_result = t4.convertElementToLatex(result3, 2)
 print(l_result)
 print('\n')    

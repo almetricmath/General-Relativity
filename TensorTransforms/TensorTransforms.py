@@ -40,42 +40,41 @@ class secondOrderTensor:
     def __init__(self, _r, _theta):
         self._latex = convertToLatex()
         self._vars = variables(_r, _theta)
+        self._posNum = posNum()
         self._utils = utils()
         
         # declare configuration tables in unprimed system
         
         self._forwardTable = self._utils.computeTable(self._utils.forwardTable, True, self)
-        self._transformTable = self._utils.computeTable(self._utils.transformTable, True)
+        self._transformTable = self._utils.computeTable(self._utils.transformTable, True, self)
         
         # declare configuration table in primed system
         
-        self._forwardTablePrimed = self._utils.computeTable(self.forwardTable, False)
+        self._forwardTablePrimed = self._utils.computeTable(self._utils.forwardTable, False, self)
        
     def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
         
-        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, _n)
-        
+        # get bases as vectors
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, True, self, _n)
+         
         ret = 0
         for i in range(_n):
             for j in range(_n):
-                
-                v_i = _Basis_1[i,:]
-                v_j =  _Basis_2[j,:]
-                self.printVector(v_i, True, symbol_1.lower() + subscript_num[i+1] + 'ᵀ', _n)
-                self.printVector(v_j, False, symbol_2.lower() + subscript_num[j+1], _n) 
-                coeff = _T[i,j] 
-                print('T' + subscript_num[i+1] + subscript_num[j+1] + ' = ', coeff)
-                outer = np.einsum('i,j', v_i, v_j)
-                self.printMatrix(outer,'outer' + subscript_num[i+1] + subscript_num[j+1], _n)
+                coeff = _T[i, j]
+                print('T' + self._posNum.indice(_posLst[0], i, False)  +  self._posNum.indice(_posLst[1], j, False), coeff)
+                self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i, False), _n)
+                self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j, False), _n)
+                outer = np.einsum('i,j',_basisLst[0][i], _basisLst[1][j])
+                self.printMatrix(outer,'outer' + self._posNum.indice(_posLst[0],i, False) + self._posNum.indice(_posLst[1],j, False), _n)
                 ret += coeff*outer
         return ret
     
-    def computeTensorInnerProduct(self, _T, _indxBasis_1, _indxBasis_2, _n):
+    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _class, _n):
         
-        _Basis_1T = self._vars._vars[_indxBasis_1 + 'T'].value  # transpose of _Basis_1
-        _labelBasis_1T = self._vars._vars[_indxBasis_1 + 'T'].symbol
-        _Basis_2 = self._vars._vars[_indxBasis_2].value
-        _labelBasis_2 = self._vars._vars[_indxBasis_2].symbol
+        # get bases as matrices
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, False, _n)
+        basesLst = self._utils.getBases(_posLst, _class)
+        
         l_result = self._latex.convertMatrixToLatex(_T, _n)
         print('T' + '\n', l_result, '\n')
         l_result = self._latex.convertMatrixToLatex(_Basis_1T, _n)
@@ -93,9 +92,13 @@ class secondOrderTensor:
         print(_label + ' = ', l_result, '\n')
         
     def printVector(self, _vec, _transpose, _label, _n):
-        l_result = self._latex.converVectorToLatex(_vec, _transpose, _n)
-        print(_label + ' = ', l_result, '\n')
-        
+         l_result = self._latex.convertVectorToLatex(_vec, _transpose, 2)
+         if _transpose:
+             _label += 'ᵀ = '
+         else:
+             _label += ' = ' 
+         print(_label, l_result, '\n')
+    
  
 class thirdOrderTensor:
     
@@ -252,25 +255,19 @@ class fourthOrderTensor:
           return 
 
 
-    def computeWeightMatrix(self, _T, _posLst, _unprimed, _n):
+    def computeWeightMatrix(self, _T, _posLst, _basisLst, _unprimed, _n):
         
         # computes weight matrix using matrix operations transpose(B3).T.B4
         # _tuple = (k = (up/down), l = (up/down))
         
-        # get Basis 3 and Basis 4
+        # get Basis 3 and Basis 4 in matrix form
         
-        _tuple = (_posLst[2], _posLst[3])
-        if _unprimed:
-            bases = self._forwardTable[_tuple]
-        else:
-            bases = self._forwardTablePrimed[_tuple]
-            
-        B3 = bases._transposeBasis
-        B4 = bases._basis
+        B3 = _basisLst[1]._transposeBasis
+        B4 = _basisLst[1]._basis
         
         # print Basis 3 and Basis 4
         
-        self.printComputeElement(bases, _n)
+        self.printComputeElement(_basisLst[1], _n)
         
         ret = self.allocateFourthOrderElement(_n)
         
@@ -279,35 +276,13 @@ class fourthOrderTensor:
                 TW = _T[i,j]
                 l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
                 print('T' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], 2, True) + self._posNum.indice(_posLst[3], 3, True), l_t_matrix,'\n')
-                result = self.matrix_1T_TW_matrix_2(B3, TW, B4, False, _n)
+                result = self._utils.matrix_1T_TW_matrix_2(B3, TW, B4, False, _n)
                 l_result = self._latex.convertMatrixToLatex(result, _n)
                 print('T' +self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False), l_result,'\n') 
                 ret[i][j] = result
             
         return ret
 
-
-    def matrix_1T_TW_matrix_2(self, _matrix_1, _TW, _matrix_2, _block, _n):
-        
-        # computes transpose(_matrix_1)._TW._matrix_2
-        # _block specifies _TW as a block matrix and the return type as a block matrix
-        
-        if not _block:
-            ret = np.zeros(_n*_n).reshape((_n, _n))
-        else:
-            ret = self.allocateFourthOrderElement(_n)
-      
-        for i in range(_n):
-            for j in range(_n):
-                acc = 0.0
-                for k in range(_n):
-                    for l in range(_n):
-                        acc += _matrix_1[k][i]*_TW[k][l]*_matrix_2[l][j] 
-                ret[i,j] = acc
-                 
-        return ret
-       
-    
     def getColumns(self, _basis, _n):
         
         # get the column vectors from each Basis Matrix
@@ -348,8 +323,11 @@ class fourthOrderTensor:
          
         # compute weight matrix in the unprimed system
         
+         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, False, _n)
+       
+        
          if _unprimed: 
-             T_ij = self.computeWeightMatrix(_T, _posLst, True, _n)
+             T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, True, _n)
          else:
              # use weight that has been transformed to a primed coordinate system
              T_ij = _T
@@ -358,18 +336,12 @@ class fourthOrderTensor:
          
          # get Basis 1 and Basis 2
          
-         _tuple = (_posLst[0], _posLst[1])
-         if _unprimed:
-             bases = self._forwardTable[_tuple]
-         else:
-             bases = self._forwardTablePrimed[_tuple]
+         B1 = _basisLst[0]._transposeBasis
+         B2 = _basisLst[0]._basis
         
-         B1 = bases._transposeBasis
-         B2 = bases._basis
-         
          # print Basis 1 and Basis 2
          
-         self.printComputeElement(bases, _n)
+         self.printComputeElement(_basisLst[0], _n)
          
          # get columns from B1 and B2
          
@@ -392,7 +364,7 @@ class fourthOrderTensor:
              
     def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
      
-        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, _n)
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
         
         ret = 0
     
@@ -432,11 +404,11 @@ class fourthOrderTensor:
         # 1st work unprimed to primed system
         # compute tensor coordinate change using matrices
        
-        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, True, self, _n)
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, True, self, False, _n)
        
         # Compute weight matrix in unprimed system
         
-        T_ij = self.computeWeightMatrix(_T, _posLst, True, _n)
+        T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, True, _n)
       
         self.printWeightMatrices(T_ij, _posLst, _n)
         
@@ -450,7 +422,7 @@ class fourthOrderTensor:
         symbol_1 = _transform._transposeSymbol
         symbol_2 = _transform._symbol
         
-        T1_ij = self.matrix_1T_TW_matrix_2(_transform._transposeBasis, T_ij, _transform._basis, True, _n)
+        T1_ij = self._utils.matrix_1T_TW_matrix_2(_transform._transposeBasis, T_ij, _transform._basis, True, _n)
          
         '''          
         # could transform T1_ij -> T1_ijkl
@@ -692,6 +664,28 @@ class utils:
         
         return ret
     
+    def matrix_1T_TW_matrix_2(self, _matrix_1, _TW, _matrix_2, _block, _n):
+        
+        # computes transpose(_matrix_1)._TW._matrix_2
+        # _block specifies _TW as a block matrix and the return type as a block matrix
+        
+        if not _block:
+            ret = np.zeros(_n*_n).reshape((_n, _n))
+        else:
+            ret = self.allocateFourthOrderElement(_n)
+      
+        for i in range(_n):
+            for j in range(_n):
+                acc = 0.0
+                for k in range(_n):
+                    for l in range(_n):
+                        acc += _matrix_1[k][i]*_TW[k][l]*_matrix_2[l][j] 
+                ret[i,j] = acc
+                 
+        return ret
+       
+    
+    
     def computeTable(self, tableFunc, _unprimed, _class):
     
         # mapping to transform T(i,j,k,l) -> T(i,j) 
@@ -737,16 +731,20 @@ class utils:
         
         return ret
     
-    def processTensorInput(self, _posLst, _unprimed, _class, _n):
+    def processTensorInput(self, _posLst, _unprimed, _class, _vecFlag, _n):
                
-        # get bases in vector form 
-                
-        bases_vecs = []
+        # if _vecFlag get bases in vector form 
+        # otherwise return bases in matrix form        
         
-        basesLst = self.getBases(_posLst, _class)
+        bases = []
         
-        for i in basesLst:
-            bases_vecs += self.getRows(i,_n)
+        basesLst = self.getBases(_posLst, _unprimed, _class)
+        
+        if _vecFlag:
+            for i in basesLst:
+                bases += self.getRows(i,_n)
+        else:
+            bases = basesLst
         
         # get symbols in vector form
         
@@ -756,17 +754,21 @@ class utils:
             tmp = self.getSymbols(i, _n)
             symbol_vecs += tmp
             
-        return bases_vecs, symbol_vecs
+        return bases, symbol_vecs
    
     
-    def getBases(self, _posLst, _class):
+    def getBases(self, _posLst, _unprimed, _class):
     
         basesLst = []
         n = len(_posLst)
         
         for i in range(0, n, 2):
             _tuple = (_posLst[i], _posLst[i+1])
-            tmp = _class._forwardTable[_tuple]
+            if _unprimed:
+                tmp = _class._forwardTable[_tuple]
+            else:
+                tmp = _class._forwardTablePrimed[_tuple]
+            
             basesLst.append(tmp)
             
         return basesLst
