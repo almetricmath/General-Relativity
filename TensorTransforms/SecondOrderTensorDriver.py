@@ -52,6 +52,8 @@ print(l_result)
 print('\n')
 
 
+sys.exit(0)
+
 # transform 2nd order contravariant tensor
 # polar based transform
 
@@ -60,22 +62,25 @@ print('\n')
 
 print('Transform to polar sqrt coordinate system')
 
-T1 = secondOrder.computeTensorInnerProduct(T, _posLst, True, secondOrder, 2)
+# need a tensor transform method
+#T1 = secondOrder.computeTensorInnerProduct(T, _posLst, True, secondOrder, 2)
 
-l_result = latex.convertMatrixToLatex(T1, 2)
+#l_result = latex.convertMatrixToLatex(T1, 2)
 print('T̅ = BᵀTB \n')
-print(l_result)
+#print(l_result)
 print('\n')
 
+'''
+#result3 = secondOrder.computeTensorOuterProduct(T1, _posLst, False, 2)
 
-result3 = secondOrder.computeTensorOuterProduct(T1, 'E1', 'E1', 2)
-l_result = latex.convertMatrixToLatex(result3, 2)
+#l_result = latex.convertMatrixToLatex(result3, 2)
 print('Full Tensor computed by outer products\n')
 print(l_result)
 print('\n')
 
-result4 = secondOrder.computeTensorInnerProduct(T1, 'E1', 'E1', 2)
-l_result = latex.convertMatrixToLatex(result3, 2)
+#result4 = secondOrder.computeTensorInnerProduct(T1, 'E1', 'E1', 2)
+#l_result = latex.convertMatrixToLatex(result3, 2)
 print('Full Tensor computed by inner products\n')
 print(l_result)
 print('\n')
+'''
