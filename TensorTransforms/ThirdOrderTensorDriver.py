@@ -20,12 +20,16 @@ t3 = t.thirdOrderTensor(r, theta)
 
 T = np.array([[[1, 2],[3, 4]],[[5, 6],[7, 8]]])
 
-result = t3.computeTensorOuterProduct(T, 'E', 'E', 'E', 2)
+# specify tensor index positions
+
+posLst = [t.pos.up, t.pos.up, t.pos.up]
+
+result = t3.computeTensorOuterProduct(T, posLst, True, 2)
 print('3rd order tensor by outer product\n')
 l_result = t3.convertToLatex(result, 2)
 print(l_result)
 print('\n')
-
+sys.exit(0)
 
 # compute 3rd order tensor using the inner product
 

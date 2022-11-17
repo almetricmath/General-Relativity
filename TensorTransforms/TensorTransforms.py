@@ -106,40 +106,24 @@ class thirdOrderTensor:
     def __init__(self, _r, _theta):
         self._latex = convertToLatex()
         self._vars = variables(_r, _theta)
-    
+        self._posNum = posNum()
+        self._utils = utils()
+       
+        # declare configuration tables in unprimed system
+        
+        self._forwardTable = self._utils.computeTable(self._utils.forwardTable, True, self)
+        self._transformTable = self._utils.computeTable(self._utils.transformTable, True, self)
+        
+        # declare configuration table in primed system
+        
+        self._forwardTablePrimed = self._utils.computeTable(self._utils.forwardTable, False, self)
+       
       
-    def computeTensorOuterProduct(self, _T, _labelBasis_1, _labelBasis_2, _labelBasis_3, _n):
+    def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
         
         # put basis matrices into vectors
         
-        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
-        
-        _Basis_1 = self._vars._vars[_labelBasis_1].value
-        symbol_1 = self._vars._vars[_labelBasis_1].symbol
-       
-        b_1 = []
-        for i in _Basis_1:
-            b_1.append(i)
-    
-        b_1 = np.array(b_1)
-        
-        _Basis_2 = self._vars._vars[_labelBasis_2].value
-        symbol_2 = self._vars._vars[_labelBasis_2].symbol
-       
-        b_2 = []
-        for i in _Basis_2:
-            b_2.append(i)
-    
-        b_2 = np.array(b_2)
-        
-        _Basis_3 = self._vars._vars[_labelBasis_3].value
-        symbol_3 = self._vars._vars[_labelBasis_3].symbol
-       
-        b_3 = []
-        for i in _Basis_3:
-            b_3.append(i)
-    
-        b_3 = np.array(b_3)
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
         
         
         ret = 0
@@ -148,15 +132,16 @@ class thirdOrderTensor:
             for j in range(_n):
                 for k in range(_n):
                     coeff = _T[i,j,k]
-                    print('T' + subscript_num[i+1] + subscript_num[j+1] + subscript_num[k+1] + ' = ', coeff)
-                    self.printVector(b_1[i], False, symbol_1.lower() + subscript_num[i+1], _n)
-                    self.printVector(b_2[j], False, symbol_2.lower() + subscript_num[j+1], _n) 
-                    self.printVector(b_3[k], False, symbol_3.lower() + subscript_num[k+1], _n)
-                    outer = np.einsum('i,j,k',b_1[i], b_2[j], b_3[k])
+                    print('T' + self._posNum.indice(_posLst[0], i, False)  +  self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], k, False)  + ' = ', coeff)
+                    self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i, False), _n)
+                    self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j, False), _n) 
+                    self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k, False), _n)
+                    outer = np.einsum('i,j,k',_basisLst[0][i], _basisLst[1][j], _basisLst[2][k])
                     l_outer = self.convertToLatex(outer, _n)
-                    print('outer' + subscript_num[i+1] + subscript_num[j+1] + subscript_num[k+1] + '\n')
+                    print('outer' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], k, False),'\n')
                     print(l_outer, '\n')
                     ret += coeff*outer
+     
         return ret
       
         
@@ -213,7 +198,7 @@ class thirdOrderTensor:
          print(_label + ' = ', l_result, '\n')
      
     def printVector(self, _vec, _transpose, _label, _n):
-         l_result = self._latex.converVectorToLatex(_vec, _transpose, _n)
+         l_result = self._latex.convertVectorToLatex(_vec, _transpose, _n)
          print(_label + ' = ', l_result, '\n')
          
     def convertToLatex(self, _result, _n):
@@ -761,8 +746,16 @@ class utils:
     def getBases(self, _posLst, _unprimed, _class):
     
         basesLst = []
+        
         n = len(_posLst)
         
+        # check for an odd number of indices and add a dummy term 
+        # in this case
+        
+        if n % 2 != 0:
+            _posLst.append(pos.up)
+
+           
         for i in range(0, n, 2):
             _tuple = (_posLst[i], _posLst[i+1])
             if _unprimed:
@@ -771,7 +764,7 @@ class utils:
                 tmp = _class._forwardTablePrimed[_tuple]
             
             basesLst.append(tmp)
-            
+                  
         return basesLst
     
     def forwardTable(self, _tuple, _unprimed, _class):
