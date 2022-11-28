@@ -168,13 +168,16 @@ class thirdOrderTensor:
         
         basis_2 = _basisLst[1]
         basis_3 = _basisLst[2]
+        
+        self.printMatrix(basis_2, 'L', _n)
+        self.printMatrix(basis_3, 'H', _n)
+        
         ret = []
         
         for i in range(_n):
-            tmp = np.dot(np.transpose(basis_2), T_ij[i])
-            tmp = np.dot(tmp, basis_3)
-            ret.append(tmp) 
-         
+            tmp = self._utils.matrix_1T_TW_matrix_2(basis_2, T_ij[i], basis_3, False, _n)
+            ret.append(tmp)
+       
         ret = np.array(ret)
         return ret
      
@@ -671,7 +674,7 @@ class utils:
             for k in range(_n): 
                 sum +=  _block_vec[k]*_L[k][j]
                 print(_symbol, self._posNum.coordinateIndice(_posLst[0], k, False), self._posNum.coordinateIndice(_posLst[1], 1, True), self._posNum.coordinateIndice(_posLst[2], 2, True) + ' = ', _block_vec[k])
-                print('L', self._posNum.coordinateIndice(pos.down, k, False), self._posNum.coordinateIndice(pos.down, j, False)  + ' = ', _L[k][j])
+                print('F', self._posNum.coordinateIndice(pos.down, k, False), self._posNum.coordinateIndice(pos.down, j, False)  + ' = ', _L[k][j])
             ret.append(sum)
         
         ret = np.array(ret)
