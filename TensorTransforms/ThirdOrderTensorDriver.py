@@ -29,23 +29,25 @@ print('3rd order tensor by outer product\n')
 l_result = t3.convertToLatex(result, 2)
 print(l_result)
 print('\n')
-sys.exit(0)
 
 # compute 3rd order tensor using the inner product
 
 print('3rd order tensor by EᵀTE\n')
-result2 = t3.computeTensorInnerProduct(T, 'E', 'E', 'E', 2)
+result2 = t3.computeTensorInnerProduct(T, posLst, True, 2)
 
 l_result = t3.convertToLatex(result2, 2)
 print(l_result)
 print('\n')
+
+sys.exit(0)
 
 # transform 3rd order contravariant tensor
 # polar based transform
 
 print('Transform Tensor to polar sqrt system\n')
 
-# compute transformed tensor using the outer product
+# compute transformed tensor using the inner product
+# use computing with the weight matrix instead - 11/27/2022
 
 print(' Inner Product - BᵀTB')
 T1 = t3.computeTensorInnerProduct(T, 'B', 'B', 'B', 2)
@@ -57,4 +59,3 @@ result4 = t3.computeTensorInnerProduct(T1, 'E', 'E1', 'E1', 2)
 print('3rd order Tensor computed by E̅ᵀT̅ E̅ = \n')
 l_result = t3.convertToLatex(result2, 2)
 print(l_result, '\n')
-

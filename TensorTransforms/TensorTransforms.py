@@ -125,71 +125,57 @@ class thirdOrderTensor:
         
         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
         
-        
         ret = 0
         
         for i in range(_n):
             for j in range(_n):
                 for k in range(_n):
                     coeff = _T[i,j,k]
-                    print('T' + self._posNum.indice(_posLst[0], i, False)  +  self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], k, False)  + ' = ', coeff)
-                    self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i, False), _n)
-                    self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j, False), _n) 
-                    self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k, False), _n)
+                    print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], k, False)  + ' = ', coeff)
+                    self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
+                    self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n) 
+                    self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.basisIndice(_posLst[2], k, False), _n)
                     outer = np.einsum('i,j,k',_basisLst[0][i], _basisLst[1][j], _basisLst[2][k])
                     l_outer = self.convertToLatex(outer, _n)
-                    print('outer' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], k, False),'\n')
+                    print('outer' + self._posNum.basisIndice(_posLst[0], i, False) + self._posNum.basisIndice(_posLst[1], j, False) + self._posNum.basisIndice(_posLst[2], k, False),'\n')
                     print(l_outer, '\n')
                     ret += coeff*outer
      
         return ret
       
+    def computeWeightMatrix(self, _T, _posLst, _basis, _n):
         
-    def computeTensorInnerProduct(self, _T, _labelBasis_1, _labelBasis_2, _labelBasis_3, _n): 
+        # compute T_ij = T(i,j,k)L_il
         
+        ret = self._utils.blockInnerProduct(_T, 'T', _posLst, _basis, _n) 
+        return ret
+        
+        
+    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
+        
+        # put basis matrices into vectors
+        
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
         
         # Compute weight matrix
         
+        if _unprimed: 
+            T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst[0], _n) 
+        else:
+            # use weight that has been transformed to a primed coordinate system
+            T_ij = _T
         
-        _Basis_1 = self._vars._vars[_labelBasis_1].value
-        symbol_1 = self._vars._vars[_labelBasis_1].symbol
-        subscript_num = ['₀','₁','₂','₃','₄','₅','₆','₇','₈', '₉']
         
-        T_weight = []
-        
-        for i in range(_n):
-            T_tmp = 0
-            print('[T]' + subscript_num[i+1] + ' Calculation\n')
-            for j in range(_n):
-                T_tmp += _T[j]*_Basis_1[j,i]
-                l_result = self._latex.convertMatrixToLatex(_T[j], _n)
-                print('T' + subscript_num[j+1] +'\n', l_result, '\n')
-                print(symbol_1 + subscript_num[j+1] + subscript_num[i+1] + ' = ' + str(_Basis_1[j,i]) + '\n')
-            T_weight.append(T_tmp)
-            l_result = self._latex.convertMatrixToLatex(T_tmp, _n)
-            print('[T]' + subscript_num[i+1] +'\n', l_result, '\n')
-            
-          
-        T_weight = np.array(T_weight)
-        
-            
-        # compute T1 for each element
+        basis_2 = _basisLst[1]
+        basis_3 = _basisLst[2]
         ret = []
-        _Basis_2 = self._vars._vars[_labelBasis_2].value
-        symbol_2 = self._vars._vars[_labelBasis_2].symbol
-        _Basis_3 = self._vars._vars[_labelBasis_3].value
-        symbol_3 = self._vars._vars[_labelBasis_3].symbol
-        l_result = self._latex.convertMatrixToLatex(np.transpose(_Basis_2), _n)
-        print( symbol_2  + 'ᵀ = ', l_result, '\n')
-        l_result = self._latex.convertMatrixToLatex(_Basis_3, _n)
-        print(symbol_3 + ' = ', l_result, '\n')
-       
+        
         for i in range(_n):
-            
-            tmp = np.dot(np.transpose(_Basis_2), T_weight[i])
-            tmp = np.dot(tmp, _Basis_3)
+            tmp = np.dot(np.transpose(basis_2), T_ij[i])
+            tmp = np.dot(tmp, basis_3)
             ret.append(tmp) 
-            
+         
+        ret = np.array(ret)
         return ret
      
   
@@ -522,7 +508,7 @@ class posNum:
         self._sup_let = ['ᶦ','ʲ','ᵏ','ˡ']
         self._sub_let = ['ᵢ','ⱼ','ₖ','ₗ']
     
-    def indice(self, _pos, _index, _letterFlag):
+    def basisIndice(self, _pos, _index, _letterFlag):
     
         # tensor coordinate down -> basis coordinate up 
         # and visa versa
@@ -540,7 +526,25 @@ class posNum:
                 return self._sup_let[_index]
         else:
            return None
+       
         
+    def coordinateIndice(self, _pos, _index, _letterFlag):
+        
+         
+        if _pos == pos.up:
+            if not _letterFlag:
+                return self._sup_num[_index + 1]
+            else:
+                return self._sup_let[_index]
+                
+        elif _pos == pos.down:
+            if not _letterFlag:
+                return self._sub_num[_index + 1] 
+            else:
+                return self._sub_let[_index]
+        else:
+           return None
+       
        
 class dictElement:
     
@@ -631,6 +635,10 @@ class utils:
     
     # utility functions for showing partial results
     
+    def __init__(self):
+        
+        self._posNum = posNum()
+    
     def allocateFourthOrderElement(self, _n):
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
@@ -639,7 +647,8 @@ class utils:
     def outer(self, _v1, _v2):
        ret = np.einsum('i,j', _v1, _v2)  
        return ret
-
+    
+    
     # outer product of two matrices
 
     def m_outer(self, _m1, _m2, _n):
@@ -650,6 +659,25 @@ class utils:
         
         return ret
     
+    def blockInnerProduct(self, _block_vec, _symbol, _posLst, _L, _n):
+        
+        # multiplies a block vector ( vector whose elements are matrices )
+        # and returns a block vector 
+        
+        ret = []
+        
+        for j in range(_n):
+            sum = 0
+            for k in range(_n): 
+                sum +=  _block_vec[k]*_L[k][j]
+                print(_symbol, self._posNum.coordinateIndice(_posLst[0], k, False), self._posNum.coordinateIndice(_posLst[1], 1, True), self._posNum.coordinateIndice(_posLst[2], 2, True) + ' = ', _block_vec[k])
+                print('L', self._posNum.coordinateIndice(pos.down, k, False), self._posNum.coordinateIndice(pos.down, j, False)  + ' = ', _L[k][j])
+            ret.append(sum)
+        
+        ret = np.array(ret)
+        return ret
+        
+        
     def matrix_1T_TW_matrix_2(self, _matrix_1, _TW, _matrix_2, _block, _n):
         
         # computes transpose(_matrix_1)._TW._matrix_2
@@ -750,10 +778,10 @@ class utils:
         n = len(_posLst)
         
         # check for an odd number of indices and add a dummy term 
-        # in this case
+        # in this case the same as the previous term
         
         if n % 2 != 0:
-            _posLst.append(pos.up)
+            _posLst.append(_posLst[-1])
 
            
         for i in range(0, n, 2):
