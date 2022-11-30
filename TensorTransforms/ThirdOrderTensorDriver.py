@@ -18,11 +18,11 @@ r = 2
 theta = np.pi/3
 t3 = t.thirdOrderTensor(r, theta)
 
-T = np.array([[[1, 2],[3, 4]],[[5, 6],[7, 8]]])
+T = np.array([[[1.0, 2.0],[3.0, 4.0]],[[5.0, 6.0],[7.0, 8.0]]])
 
 # specify tensor index positions
 
-posLst = [t.pos.up, t.pos.up, t.pos.up]
+posLst = [t.pos.up, t.pos.down, t.pos.up]
 
 result = t3.computeTensorOuterProduct(T, posLst, True, 2)
 print('3rd order tensor by outer product\n')

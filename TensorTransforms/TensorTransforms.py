@@ -157,6 +157,18 @@ class thirdOrderTensor:
         
         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
         
+        # declare matrices
+        
+        basis_1 = _basisLst[0]
+        basis_2 = _basisLst[1]
+        basis_3 = _basisLst[2]
+        
+        # print matrices
+        
+        self.printMatrix(basis_1, 'L = ' + _symbolLst[0], _n)  
+        self.printMatrix(basis_2, 'F = ' + _symbolLst[1], _n)
+        self.printMatrix(basis_3, 'H = ' + _symbolLst[2], _n)
+      
         # Compute weight matrix
         
         if _unprimed: 
@@ -164,14 +176,7 @@ class thirdOrderTensor:
         else:
             # use weight that has been transformed to a primed coordinate system
             T_ij = _T
-        
-        
-        basis_2 = _basisLst[1]
-        basis_3 = _basisLst[2]
-        
-        self.printMatrix(basis_2, 'L', _n)
-        self.printMatrix(basis_3, 'H', _n)
-        
+          
         ret = []
         
         for i in range(_n):
@@ -641,11 +646,11 @@ class utils:
     def __init__(self):
         
         self._posNum = posNum()
+        self._latex = convertToLatex()
     
     def allocateFourthOrderElement(self, _n):
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
-   
     
     def outer(self, _v1, _v2):
        ret = np.einsum('i,j', _v1, _v2)  
@@ -673,14 +678,20 @@ class utils:
             sum = 0
             for k in range(_n): 
                 sum +=  _block_vec[k]*_L[k][j]
-                print(_symbol, self._posNum.coordinateIndice(_posLst[0], k, False), self._posNum.coordinateIndice(_posLst[1], 1, True), self._posNum.coordinateIndice(_posLst[2], 2, True) + ' = ', _block_vec[k])
-                print('F', self._posNum.coordinateIndice(pos.down, k, False), self._posNum.coordinateIndice(pos.down, j, False)  + ' = ', _L[k][j])
+                self.printMatrix(_block_vec[k],_symbol + self._posNum.coordinateIndice(_posLst[0],k, False) + self._posNum.coordinateIndice(_posLst[1],1, True) + self._posNum.coordinateIndice(_posLst[2], 2,True),_n)
+                print('L' + self._posNum.coordinateIndice(pos.down,k, False) + self._posNum.coordinateIndice(pos.down, j, False), _L[k][j])
             ret.append(sum)
+            l_sum = self._latex.convertMatrixToLatex(sum, _n)
+            print(_symbol + self._posNum.coordinateIndice(pos.down, j, False) + ' = ', l_sum, "\n") 
+            
         
         ret = np.array(ret)
         return ret
-        
-        
+     
+    def printMatrix(self, _M, _label, _n):
+         l_result = self._latex.convertMatrixToLatex(_M, 2)
+         print(_label + ' = ', l_result, '\n')
+    
     def matrix_1T_TW_matrix_2(self, _matrix_1, _TW, _matrix_2, _block, _n):
         
         # computes transpose(_matrix_1)._TW._matrix_2
