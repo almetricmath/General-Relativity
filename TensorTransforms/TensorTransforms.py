@@ -52,7 +52,7 @@ class secondOrderTensor:
         
         self._forwardTablePrimed = self._utils.computeTable(self._utils.forwardTable, False, self)
        
-    def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
+    def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n, _verbose):
         
         # get bases as vectors
         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
@@ -61,26 +61,29 @@ class secondOrderTensor:
         for i in range(_n):
             for j in range(_n):
                 coeff = _T[i, j]
-                print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False), ' = ' ,coeff)
-                self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
-                self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n)
+                if _verbose:
+                    print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False), ' = ' ,coeff)
+                    self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
+                    self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n)
                 outer = np.einsum('i,j',_basisLst[0][i], _basisLst[1][j])
-                self.printMatrix(outer,'outer' + self._posNum.basisIndice(_posLst[0],i, False) + self._posNum.basisIndice(_posLst[1],j, False), _n)
+                if _verbose:
+                    self.printMatrix(outer,'outer' + self._posNum.basisIndice(_posLst[0],i, False) + self._posNum.basisIndice(_posLst[1],j, False), _n)
                 ret += coeff*outer
         return ret
     
-    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
+    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n, _verbose):
         
         # get bases as matrices
         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, False, _n)
         
-        l_result = self._latex.convertMatrixToLatex(_T, _n)
-        print('T' + '\n', l_result, '\n')
-        l_result = self._latex.convertMatrixToLatex(np.transpose(_basisLst[0]), _n)
-        print(_symbolLst[0], l_result, '\n')
-        l_result = self._latex.convertMatrixToLatex(_basisLst[1], _n)
-        print(_symbolLst[1], l_result, '\n')
-        
+        if _verbose:
+            l_result = self._latex.convertMatrixToLatex(_T, _n)
+            print('T' + '\n', l_result, '\n')
+            l_result = self._latex.convertMatrixToLatex(np.transpose(_basisLst[0]), _n)
+            print(_symbolLst[0], l_result, '\n')
+            l_result = self._latex.convertMatrixToLatex(_basisLst[1], _n)
+            print(_symbolLst[1], l_result, '\n')
+            
        
         tmp = np.dot(np.transpose(_basisLst[0]), _T)
         ret = np.dot(tmp, _basisLst[1])
