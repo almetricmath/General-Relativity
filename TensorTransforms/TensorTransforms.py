@@ -61,31 +61,29 @@ class secondOrderTensor:
         for i in range(_n):
             for j in range(_n):
                 coeff = _T[i, j]
-                print('T' + self._posNum.indice(_posLst[0], i, False)  +  self._posNum.indice(_posLst[1], j, False), coeff)
-                self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i, False), _n)
-                self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j, False), _n)
+                print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False), ' = ' ,coeff)
+                self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
+                self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n)
                 outer = np.einsum('i,j',_basisLst[0][i], _basisLst[1][j])
-                self.printMatrix(outer,'outer' + self._posNum.indice(_posLst[0],i, False) + self._posNum.indice(_posLst[1],j, False), _n)
+                self.printMatrix(outer,'outer' + self._posNum.basisIndice(_posLst[0],i, False) + self._posNum.basisIndice(_posLst[1],j, False), _n)
                 ret += coeff*outer
         return ret
     
-    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _class, _n):
+    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
         
         # get bases as matrices
         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, False, _n)
-        #basesLst = self._utils.getBases(_posLst, _unprimed, _class)
-        
         
         l_result = self._latex.convertMatrixToLatex(_T, _n)
         print('T' + '\n', l_result, '\n')
-        l_result = self._latex.convertMatrixToLatex(np.transpose(_basisLst[0]._transposeBasis), _n)
+        l_result = self._latex.convertMatrixToLatex(np.transpose(_basisLst[0]), _n)
         print(_symbolLst[0], l_result, '\n')
-        l_result = self._latex.convertMatrixToLatex(_basisLst[0]._basis, _n)
+        l_result = self._latex.convertMatrixToLatex(_basisLst[1], _n)
         print(_symbolLst[1], l_result, '\n')
         
        
-        tmp = np.dot(np.transpose(_basisLst[0]._transposeBasis), _T)
-        ret = np.dot(tmp, _basisLst[0]._basis)
+        tmp = np.dot(np.transpose(_basisLst[0]), _T)
+        ret = np.dot(tmp, _basisLst[1])
         return ret
 
     def printMatrix(self, _M, _label, _n):
@@ -100,7 +98,31 @@ class secondOrderTensor:
              _label += ' = ' 
          print(_label, l_result, '\n')
     
- 
+    def transformTensor(self, _T, _posLst, _n):
+        
+        transformLst = self.processTransformInput(_posLst, _n)
+        M1 = transformLst[0]._basis.value
+        symbol_1 = transformLst[0]._basis.symbol
+        print(symbol_1, ' = ', M1, '\n')
+        M2 = transformLst[1]._basis.value
+        symbol_2 = transformLst[1]._basis.symbol
+        print(symbol_2, ' = ', M2, '\n')
+        ret = self._utils.matrix_1T_TW_matrix_2(M1, _T, M2, False, _n)
+        
+        return ret
+        
+        
+    def processTransformInput(self, _posLst, _n):
+        
+        ret = []
+        
+        for i in _posLst:
+            tmp = self._transformTable[i]
+            ret.append(tmp)
+        
+        return ret
+                
+            
 class thirdOrderTensor:
     
     def __init__(self, _r, _theta):
@@ -185,8 +207,61 @@ class thirdOrderTensor:
        
         ret = np.array(ret)
         return ret
-     
-  
+    
+    def transformTensor(self, _T, _posLst, _unprimed, _n):
+        
+        # transforms tensor coordinates
+        
+        _transformLst = self.processTransformInput(_posLst, _n)
+        element_0 = _transformLst[0]
+        
+        M1 = element_0._transposeBasis
+        M2 = element_0._basis
+
+        if _posLst[0] == pos.up:
+            M3 = self._vars['E'].value
+            M3_Symbol = self._vars['E'].symbol
+        else:
+            M3 = self._vars['WT'].value
+            M3_Symbol = self._vars['WT'].symbol
+            
+            
+        self.printMatrix(M1, 'M1', _n)
+        self.printMatrix(M2, 'M2', _n)
+        self.printMatrix(M3, 'M3', _n)
+        
+        # compute Tn
+        
+        if _unprimed: 
+            T_ij = self.computeWeightMatrix(_T, _posLst, M3, _n) 
+            self.printMatrix(T_ij[0], 'T' + self._posNum.coordinateIndice(pos.down, 0, False), _n)
+            self.printMatrix(T_ij[1], 'T' + self._posNum.coordinateIndice(pos.down, 1, False), _n)
+        else:
+            # use weight that has been transformed to a primed coordinate system
+            T_ij = _T
+            
+        # perform transpose(M2).Tn.M3
+        
+        ret = []
+        
+        for i in range(_n):
+            tmp = self._utils.matrix_1T_TW_matrix_2(M1, T_ij[i], M2, False, _n)
+            ret.append(tmp)
+        
+        return ret
+    
+    def processTransformInput(self, _posLst, _n):
+        
+        ret = []
+        
+        for i in range(0, len(_posLst), 2):
+            _tuple = ( _posLst[i], _posLst[i+1])
+            tmp = self._transformTable[_tuple]
+            ret.append((tmp))
+        
+        return ret
+            
+   
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, _n)
          print(_label + ' = ', l_result, '\n')
@@ -568,16 +643,15 @@ class transformElement:
     # so for this reason, the transpose attribute holds the untransposed matrix
     
     def __init__(self):
-        self._transposeIndx = ''
-        self._transposeSymbol = ''
         self._indx = ''
         self._symbol = ''
+        self._transposeFlag = False
 
 class computeElement:
     
     def __init__(self):
-        self._transposeBasis = dictElement()
         self._basis = dictElement()
+        self._transposeFlag = False
     
 class variables:
 
@@ -721,7 +795,7 @@ class utils:
         
         ret = {}
         
-        indx = [(pos.up,pos.up),(pos.up, pos.down), (pos.down, pos.up), (pos.down, pos.down)]
+        indx = [pos.up, pos.down]
          
         for i in indx:
             ret[i] = tableFunc(i, _unprimed, _class)  
@@ -733,14 +807,7 @@ class utils:
         ret = []
         tmp_vec = []
         
-        tmp = _basis._transposeBasis
-        for i in range(_n):
-            tmp_vec.append(tmp[i])
-        
-        ret.append(tmp_vec)
-        
-        tmp_vec = []
-        tmp = _basis._basis
+        tmp = _basis._basis.value
         for i in range(_n):
             tmp_vec.append(tmp[i])
         
@@ -748,13 +815,10 @@ class utils:
         
         return ret
     
-    def getSymbols(self, _basis, _n):
+    def getSymbols(self, _element, _n):
         
         ret = []
-        
-        tmp = _basis._transposeSymbol
-        ret.append(tmp)
-        tmp = _basis._symbol
+        tmp = _element._basis.symbol
         ret.append(tmp)
         
         return ret
@@ -766,18 +830,22 @@ class utils:
         
         bases = []
         
+         
         basesLst = self.getBases(_posLst, _unprimed, _class)
-        
+         
         if _vecFlag:
             for i in basesLst:
                 bases += self.getRows(i,_n)
         else:
-            bases = basesLst
+            for i in basesLst:
+                tmp = i._basis.value
+                bases.append(tmp)
+                
         
         # get symbols in vector form
         
-        symbol_vecs = []
         
+        symbol_vecs = []
         for i in basesLst:
             tmp = self.getSymbols(i, _n)
             symbol_vecs += tmp
@@ -789,31 +857,21 @@ class utils:
     
         basesLst = []
         
-        n = len(_posLst)
-        
-        # check for an odd number of indices and add a dummy term 
-        # in this case the same as the previous term
-        
-        if n % 2 != 0:
-            _posLst.append(_posLst[-1])
-
-           
-        for i in range(0, n, 2):
-            _tuple = (_posLst[i], _posLst[i+1])
+        for i in _posLst:
             if _unprimed:
-                tmp = _class._forwardTable[_tuple]
+                tmp = _class._forwardTable[i]
             else:
-                tmp = _class._forwardTablePrimed[_tuple]
-            
+                tmp = _class._forwardTablePrimed[i]
             basesLst.append(tmp)
-                  
+        
         return basesLst
     
-    def forwardTable(self, _tuple, _unprimed, _class):
+    def forwardTable(self, _pos, _unprimed, _class):
         
         # function to implement Table 2 and Table 5 from the writeup
         # note there is no need to compute the transposes, they are not needed 
         # the way the algorithms are written, but need to be kept track of
+        # _pos can be pos.up or pos.down
         
         ret = computeElement()
         suffix = ''
@@ -821,43 +879,28 @@ class utils:
         if not _unprimed:  # prime coordinate system
             suffix = '1'
         
-        if _tuple[0] == pos.up:
-            transposeIndx = 'E' + suffix
-        else:
-            transposeIndx = 'W' + suffix
-        
-                
-        if _tuple[1] == pos.up:
+        if _pos == pos.up:
             indx = 'E' + suffix
         else:
             indx = 'W' + suffix
-
-        ret._transposeBasis = _class._vars._vars[transposeIndx].value
-        ret._transposeSymbol = _class._vars._vars[transposeIndx].symbol
-        ret._basis = _class._vars._vars[indx].value
-        ret._symbol = _class._vars._vars[indx].symbol
+        
+        ret._basis = _class._vars._vars[indx]
         
         return ret
    
     
-    def transformTable(self, _tuple, _unprimed, _class):
+    def transformTable(self, _pos, _unprimed, _class):
         
         ret = computeElement()
+        ret._transposeFlag = False
         
-        if _tuple[0] == pos.up:
-            transposeIndx = 'B'
-        else:
-            transposeIndx = 'A'
-            
-        if _tuple[1] == pos.up:
+        if _pos == pos.up:
             indx = 'B'
         else:
             indx = 'AT'
-            
-        ret._transposeBasis = _class._vars._vars[transposeIndx].value
-        ret._transposeSymbol = _class._vars._vars[transposeIndx].symbol
-        ret._basis = _class._vars._vars[indx].value
-        ret._symbol = _class._vars._vars[indx].symbol
+            ret._transposeFlag = True
+                  
+        ret._basis = _class._vars._vars[indx]
         
         return ret
 
