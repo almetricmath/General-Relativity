@@ -6,8 +6,6 @@ Created on Tue Dec  6 19:55:01 2022
 """
 import numpy as np
 import TensorTransforms as t
-import sys
-
 
 # compute 2nd order tensor in polar coordinates 
 # using both outer product and inner product
@@ -18,101 +16,63 @@ theta = np.pi/3
 # 2nd order tensor
 # contravariant tensor
 
-# create tensor 
-T = np.array([[1,2],[3,4]])
-
-
 secondOrder = t.secondOrderTensor(r, theta)
 verbose = False
-posLst = [t.pos.up, t.pos.up]
+utils = t.utils()
 
-result = secondOrder.computeTensorOuterProduct(T, posLst, True, 2, verbose)
+# initial configuration
 
-print('Second Order Tensor Components\n')
+# create tensor 
+T = np.array([[1,2],[3,4]]) # [up, up] indices
 
-latex = t.convertToLatex()
+inPosLst = [t.pos.up, t.pos.up]
 
-l_result = latex.convertMatrixToLatex(T, 2)
-print('T\n')
-print(l_result)
-print('\n')
+# Test configurations - convert T[up, up] to possible configurations and see that
+# the results are the same
 
-l_result = latex.convertMatrixToLatex(result, 2)
-print('Full Tensor computed by outer products\n')
-print(l_result)
-print('\n')
+posLst = [ [t.pos.down, t.pos.up], [t.pos.up, t.pos.down], [t.pos.down, t.pos.down] ] 
 
+# initial run
 
-# Run the different configurations so that the results are the same
+# compute tensor by outer products
+
+result_outer = secondOrder.computeTensorOuterProduct(T, inPosLst, True, 2, verbose)
+print('Initial Second Order Tensor Components - ', inPosLst,'-\n')
+print('T = ', T, '\n\n')
+print('Full Tensor, T', inPosLst, 'computed by outer products\n')
+print(result_outer, '\n\n')
+
+# compute tensor by inner product
+
+result_inner = secondOrder.computeTensorInnerProduct(T, inPosLst, True, 2, verbose)
+print('Full Tensor, T', inPosLst, 'computed by inner product\n')
+print(result_inner, '\n\n')
+
+print('Difference between outer product and inner product computations\n')
+print(result_inner - result_outer, '\n\n')
+
+# Run various configurations
 
 G = np.array([[1, 0],[0, r**2]])
-T_lower_i_upper_j = np.dot(G, T)
-verbose = False
-
-latex = t.convertToLatex()
-l_result = latex.convertMatrixToLatex(T_lower_i_upper_j , 2)
-print('T_lower_i_upper_j \n')
-print(l_result)
-print('\n')
-
-posLst = [t.pos.down, t.pos.up]
-
-result1 = secondOrder.computeTensorOuterProduct(T_lower_i_upper_j, posLst, True, 2, False)
-l_result = latex.convertMatrixToLatex(result1, 2)
-print('Full Tensor, T_lower_i_upper_j, computed by outer products\n')
-print(l_result)
-print('\n')
-
-# compute difference between resul4 and result
-l_result = latex.convertMatrixToLatex(result1 - result, 2)
-print('Difference')
-print(l_result)
-print('\n')
+Ginv = np.linalg.inv(G)
 
 
-T_upper_i_lower_j = np.dot(T, G)
-
-l_result = latex.convertMatrixToLatex(T_upper_i_lower_j , 2)
-print('T_upper_i_lower_j \n')
-print(l_result)
-print('\n')
-
-posLst = [t.pos.up, t.pos.down]
-
-result2 = secondOrder.computeTensorOuterProduct(T_upper_i_lower_j, posLst, True, 2, False)
-l_result = latex.convertMatrixToLatex(result2, 2)
-print(('Full Tensor, T_upper_i_lower_j, computed by outer products\n'))
-print(l_result)
-print('\n')
-
-# compute difference between result5 and result
-l_result = latex.convertMatrixToLatex(result2 - result, 2)
-print('Difference')
-print(l_result)
-print('\n')
-
-tmp = np.dot(T, G)
-T_lower_i_lower_j = np.dot(G, tmp)
-
-l_result = latex.convertMatrixToLatex(T_lower_i_lower_j , 2)
-print('T_lower_i_lower_j \n')
-print(l_result)
-print('\n')
-
-posLst = [t.pos.down, t.pos.down]
-
-result3 = secondOrder.computeTensorOuterProduct(T_lower_i_lower_j, posLst, True, 2, False)
-l_result = latex.convertMatrixToLatex(result3, 2)
-print(('Full Tensor, T_lower_i_lower_j, computed by outer products\n'))
-print(l_result)
-print('\n')
-
-# compute difference between resul6 and result
-l_result = latex.convertMatrixToLatex(result3 - result, 2)
-print('Difference')
-print(l_result)
-print('\n')
-
-
-
+for i in posLst:
+    T_config = utils.changeConfig(T, inPosLst, i, G, Ginv)
+    # Compute using outer products
+    result_config_outer = secondOrder.computeTensorOuterProduct(T_config, i, True, 2, verbose)
+    print('T ', inPosLst, ' -> T', i, T_config, '\n\n')
+    print('Difference in Full Tensor, T', inPosLst, ' and T', i, 'computed by outer products, \n')
+    print(result_config_outer - result_outer,'\n\n')
+    
+    # compute using inner product
+    result_config_inner = secondOrder.computeTensorInnerProduct(T_config, i, True, 2, verbose)
+    print('Difference in Full Tensor, T', inPosLst, ' and T', i, 'computed by inner products, \n')
+    print(result_config_inner - result_inner,'\n\n')
+   
+    
+    
+    
+    
+    
 

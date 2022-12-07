@@ -907,4 +907,40 @@ class utils:
         
         return ret
 
+    # change configuration on a second order block
+    def changeConfig(self, _T, _inPosLst, _outPosLst, _G, _Ginv):
+        
+        n = len(_inPosLst)
+        m = len(_outPosLst)
+        
+        ret = []
+        
+        if n != m:
+            print('input and output position lists are different lengths')
+            return ret
+        
+        ret = _T
+        
+        if _inPosLst[0] != _outPosLst[0]:
+            if _inPosLst[0] == pos.up: # up to down 
+                ret = np.dot(_G, ret)
+            else:
+                # down to up
+                ret = np.dot(_Ginv, ret)
+        
+        if _inPosLst[1] != _outPosLst[1]:
+            if _inPosLst[1] == pos.up: # up to down 
+                ret = np.dot(ret, _G)
+            else:
+                # down to up
+                ret = np.dot(ret, _Ginv)
+                
+        return ret
+                
+            
+                
+            
+        
+
+        
      
