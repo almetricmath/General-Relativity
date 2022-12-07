@@ -24,8 +24,9 @@ T = np.array([[1,2],[3,4]])
 
 secondOrder = t.secondOrderTensor(r, theta)
 posLst = [t.pos.up, t.pos.up]
+verbose = True
 
-result = secondOrder.computeTensorOuterProduct(T, posLst, True, 2, True)
+result = secondOrder.computeTensorOuterProduct(T, posLst, True, 2, verbose)
 
 print('Second Order Tensor Components\n')
 
@@ -44,7 +45,7 @@ print('\n')
 
 # compute tensor using transpose(E).T.E
 
-result1 = secondOrder.computeTensorInnerProduct(T, posLst, True, 2, True)
+result1 = secondOrder.computeTensorInnerProduct(T, posLst, True, 2, verbose)
 
 l_result = latex.convertMatrixToLatex(result1, 2)
 print('Full Tensor computed by the inner product \n')
@@ -72,7 +73,7 @@ print('T̅ = \n', l_result)
 
 # compute tensor in primed coordinates using the outer product
 
-result2 = secondOrder.computeTensorOuterProduct(T1, posLst, False, 2, False)
+result2 = secondOrder.computeTensorOuterProduct(T1, posLst, False, 2, verbose)
 
 l_result = latex.convertMatrixToLatex(result2, 2)
 print('Full Tensor in primed coordinates computed by outer products\n')
@@ -87,7 +88,7 @@ print('\n')
 
 # compute tensor in primed coordinates using the inner product
 
-result3 = secondOrder.computeTensorInnerProduct(T1, posLst, False, 2, False)
+result3 = secondOrder.computeTensorInnerProduct(T1, posLst, False, 2, verbose)
 l_result = latex.convertMatrixToLatex(result3, 2)
 print('Full Tensor in primed coordinates computed by the inner product\n')
 print(l_result)
@@ -98,76 +99,4 @@ l_result = latex.convertMatrixToLatex(result3 - result, 2)
 print('Difference')
 print(l_result)
 print('\n')
-
-
-# Run the different configurations so that the results are the same
-
-G = np.array([[1, 0],[0, r**2]])
-T_lower_i_upper_j = np.dot(G, T)
-
-l_result = latex.convertMatrixToLatex(T_lower_i_upper_j , 2)
-print('T_lower_i_upper_j \n')
-print(l_result)
-print('\n')
-
-posLst = [t.pos.down, t.pos.up]
-
-result4 = secondOrder.computeTensorOuterProduct(T_lower_i_upper_j, posLst, True, 2, False)
-l_result = latex.convertMatrixToLatex(result4, 2)
-print('Full Tensor, T_lower_i_upper_j, computed by outer products\n')
-print(l_result)
-print('\n')
-
-# compute difference between resul4 and result
-l_result = latex.convertMatrixToLatex(result4 - result, 2)
-print('Difference')
-print(l_result)
-print('\n')
-
-
-T_upper_i_lower_j = np.dot(T, G)
-
-l_result = latex.convertMatrixToLatex(T_upper_i_lower_j , 2)
-print('T_upper_i_lower_j \n')
-print(l_result)
-print('\n')
-
-posLst = [t.pos.up, t.pos.down]
-
-result5 = secondOrder.computeTensorOuterProduct(T_upper_i_lower_j, posLst, True, 2, False)
-l_result = latex.convertMatrixToLatex(result5, 2)
-print(('Full Tensor, T_upper_i_lower_j, computed by outer products\n'))
-print(l_result)
-print('\n')
-
-# compute difference between result5 and result
-l_result = latex.convertMatrixToLatex(result5 - result, 2)
-print('Difference')
-print(l_result)
-print('\n')
-
-tmp = np.dot(T, G)
-T_lower_i_lower_j = np.dot(G, tmp)
-
-l_result = latex.convertMatrixToLatex(T_lower_i_lower_j , 2)
-print('T_lower_i_lower_j \n')
-print(l_result)
-print('\n')
-
-posLst = [t.pos.down, t.pos.down]
-
-result6 = secondOrder.computeTensorOuterProduct(T_lower_i_lower_j, posLst, True, 2, False)
-l_result = latex.convertMatrixToLatex(result6, 2)
-print(('Full Tensor, T_lower_i_lower_j, computed by outer products\n'))
-print(l_result)
-print('\n')
-
-# compute difference between resul6 and result
-l_result = latex.convertMatrixToLatex(result6 - result, 2)
-print('Difference')
-print(l_result)
-print('\n')
-
-
-
 
