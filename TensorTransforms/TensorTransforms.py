@@ -83,10 +83,10 @@ class secondOrderTensor:
             print(_symbolLst[0], l_result, '\n')
             l_result = self._latex.convertMatrixToLatex(_basisLst[1], _n)
             print(_symbolLst[1], l_result, '\n')
-            
-       
-        tmp = np.dot(np.transpose(_basisLst[0]), _T)
-        ret = np.dot(tmp, _basisLst[1])
+             
+        ret = self._utils.matrix_1T_TW_matrix_2(_basisLst[0], _T, _basisLst[1], False, _n)
+        
+        
         return ret
 
     def printMatrix(self, _M, _label, _n):
@@ -109,7 +109,7 @@ class secondOrderTensor:
         print(symbol_1, ' = ', M1, '\n')
         M2 = transformLst[1]._basis.value
         symbol_2 = transformLst[1]._basis.symbol
-        print(symbol_2, ' = ', M2, '\n')
+        print(symbol_2, ' = ', M2, '\n\n')
         ret = self._utils.matrix_1T_TW_matrix_2(M1, _T, M2, False, _n)
         
         return ret
