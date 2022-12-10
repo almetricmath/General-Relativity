@@ -23,8 +23,9 @@ T = np.array([[[1.0, 2.0],[3.0, 4.0]],[[5.0, 6.0],[7.0, 8.0]]])
 # specify tensor index positions
 
 posLst = [t.pos.up, t.pos.down, t.pos.up]
+verbose = False
 
-result = t3.computeTensorOuterProduct(T, posLst, True, 2)
+result = t3.computeTensorOuterProduct(T, posLst, True, 2, verbose)
 print('3rd order tensor by outer product\n')
 l_result = t3.convertToLatex(result, 2)
 print(l_result)
@@ -33,29 +34,34 @@ print('\n')
 # compute 3rd order tensor using the inner product
 
 print('3rd order tensor by EᵀTE\n')
-result2 = t3.computeTensorInnerProduct(T, posLst, True, 2)
+result2 = t3.computeTensorInnerProduct(T, posLst, True, 2, verbose)
 
 l_result = t3.convertToLatex(result2, 2)
 print(l_result)
 print('\n')
 
-sys.exit(0)
+diff_result = t3.convertToLatex(result2 - result, 2)
+print('Difference between the inner product and outer product tensor computations in umprimed coordinates\n') 
+print(diff_result, '\n\n')
+
 
 # transform 3rd order contravariant tensor
 # polar based transform
 
 print('Transform Tensor to polar sqrt system\n')
 
-# compute transformed tensor using the inner product
 # use computing with the weight matrix instead - 11/27/2022
 
 print(' Inner Product - BᵀTB')
-T1 = t3.computeTensorInnerProduct(T, 'B', 'B', 'B', 2)
 
-# compute transformed tensor using transpose(E1).T1_E1_1.E1
+T1 = t3.transformTensor(T, posLst, True, 2)
 
-print('Inner Product\n of result')
-result4 = t3.computeTensorInnerProduct(T1, 'E', 'E1', 'E1', 2)
-print('3rd order Tensor computed by E̅ᵀT̅ E̅ = \n')
-l_result = t3.convertToLatex(result2, 2)
+print(' Compute transformed tensor using transpose(F1).[T1_n].H1 ', '\n')
+
+result3 = t3.computeTensorInnerProduct(T1, posLst, False, 2, verbose)
+l_result = t3.convertToLatex(result3, 2)
 print(l_result, '\n')
+
+diff_result = t3.convertToLatex(result3 - result, 2)
+print('Difference between the inner product in the primed coordinate system and the outer product in umprimed coordinates\n') 
+print(diff_result, '\n\n')

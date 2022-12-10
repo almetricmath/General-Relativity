@@ -103,7 +103,7 @@ class secondOrderTensor:
     
     def transformTensor(self, _T, _posLst, _n):
         
-        transformLst = self.processTransformInput(_posLst, _n)
+        transformLst = self._utils.processTransformInput(_posLst, self, _n)
         M1 = transformLst[0]._basis.value
         symbol_1 = transformLst[0]._basis.symbol
         print(symbol_1, ' = ', M1, '\n')
@@ -115,17 +115,6 @@ class secondOrderTensor:
         return ret
         
         
-    def processTransformInput(self, _posLst, _n):
-        
-        ret = []
-        
-        for i in _posLst:
-            tmp = self._transformTable[i]
-            ret.append(tmp)
-        
-        return ret
-                
-            
 class thirdOrderTensor:
     
     def __init__(self, _r, _theta):
@@ -144,7 +133,7 @@ class thirdOrderTensor:
         self._forwardTablePrimed = self._utils.computeTable(self._utils.forwardTable, False, self)
        
       
-    def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
+    def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n, _verbose):
         
         # put basis matrices into vectors
         
@@ -156,14 +145,16 @@ class thirdOrderTensor:
             for j in range(_n):
                 for k in range(_n):
                     coeff = _T[i,j,k]
-                    print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], k, False)  + ' = ', coeff)
-                    self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
-                    self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n) 
-                    self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.basisIndice(_posLst[2], k, False), _n)
+                    if _verbose:
+                        print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], k, False)  + ' = ', coeff)
+                        self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
+                        self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n) 
+                        self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.basisIndice(_posLst[2], k, False), _n)
                     outer = np.einsum('i,j,k',_basisLst[0][i], _basisLst[1][j], _basisLst[2][k])
                     l_outer = self.convertToLatex(outer, _n)
-                    print('outer' + self._posNum.basisIndice(_posLst[0], i, False) + self._posNum.basisIndice(_posLst[1], j, False) + self._posNum.basisIndice(_posLst[2], k, False),'\n')
-                    print(l_outer, '\n')
+                    if _verbose:
+                        print('outer' + self._posNum.basisIndice(_posLst[0], i, False) + self._posNum.basisIndice(_posLst[1], j, False) + self._posNum.basisIndice(_posLst[2], k, False),'\n')
+                        print(l_outer, '\n')
                     ret += coeff*outer
      
         return ret
@@ -176,7 +167,7 @@ class thirdOrderTensor:
         return ret
         
         
-    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
+    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n, _verbose):
         
         # put basis matrices into vectors
         
@@ -190,9 +181,10 @@ class thirdOrderTensor:
         
         # print matrices
         
-        self.printMatrix(basis_1, 'L = ' + _symbolLst[0], _n)  
-        self.printMatrix(basis_2, 'F = ' + _symbolLst[1], _n)
-        self.printMatrix(basis_3, 'H = ' + _symbolLst[2], _n)
+        if _verbose:
+            self.printMatrix(basis_1, 'L = ' + _symbolLst[0], _n)  
+            self.printMatrix(basis_2, 'F = ' + _symbolLst[1], _n)
+            self.printMatrix(basis_3, 'H = ' + _symbolLst[2], _n)
       
         # Compute weight matrix
         
@@ -215,56 +207,35 @@ class thirdOrderTensor:
         
         # transforms tensor coordinates
         
-        _transformLst = self.processTransformInput(_posLst, _n)
-        element_0 = _transformLst[0]
+        _transformLst = self._utils.processTransformInput(_posLst, self, _n)
+       
         
-        M1 = element_0._transposeBasis
-        M2 = element_0._basis
+        M1 = _transformLst[1]._basis.value
+        symbol_1 = _transformLst[1]._basis.symbol
+        M2 = _transformLst[2]._basis.value
+        symbol_2 = _transformLst[1]._basis.symbol
 
-        if _posLst[0] == pos.up:
-            M3 = self._vars['E'].value
-            M3_Symbol = self._vars['E'].symbol
-        else:
-            M3 = self._vars['WT'].value
-            M3_Symbol = self._vars['WT'].symbol
+        L = self._forwardTable[_posLst[0]]._basis.value
+        symbol_L = self._forwardTable[_posLst[0]]._basis.symbol
+             
             
-            
-        self.printMatrix(M1, 'M1', _n)
-        self.printMatrix(M2, 'M2', _n)
-        self.printMatrix(M3, 'M3', _n)
+        self.printMatrix(M1, 'M1 = ' + symbol_1, _n)
+        self.printMatrix(M2, 'M2 = ' + symbol_2, _n)
+        self.printMatrix(L, 'L = ' + symbol_L  , _n)
         
-        # compute Tn
+        #compute T_n
         
-        if _unprimed: 
-            T_ij = self.computeWeightMatrix(_T, _posLst, M3, _n) 
-            self.printMatrix(T_ij[0], 'T' + self._posNum.coordinateIndice(pos.down, 0, False), _n)
-            self.printMatrix(T_ij[1], 'T' + self._posNum.coordinateIndice(pos.down, 1, False), _n)
-        else:
-            # use weight that has been transformed to a primed coordinate system
-            T_ij = _T
-            
+        T_n = self._utils.blockInnerProduct(_T, 'T', _posLst, L, _n)
         # perform transpose(M2).Tn.M3
         
         ret = []
         
         for i in range(_n):
-            tmp = self._utils.matrix_1T_TW_matrix_2(M1, T_ij[i], M2, False, _n)
+            tmp = self._utils.matrix_1T_TW_matrix_2(M1, T_n[i], M2, False, _n)
             ret.append(tmp)
         
         return ret
     
-    def processTransformInput(self, _posLst, _n):
-        
-        ret = []
-        
-        for i in range(0, len(_posLst), 2):
-            _tuple = ( _posLst[i], _posLst[i+1])
-            tmp = self._transformTable[_tuple]
-            ret.append((tmp))
-        
-        return ret
-            
-   
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, _n)
          print(_label + ' = ', l_result, '\n')
@@ -746,7 +717,7 @@ class utils:
     
     def blockInnerProduct(self, _block_vec, _symbol, _posLst, _L, _n):
         
-        # multiplies a block vector ( vector whose elements are matrices )
+        # multiplies a block vector ( vector whose elements are matrices ) with a vector
         # and returns a block vector 
         
         ret = []
@@ -755,7 +726,8 @@ class utils:
             sum = 0
             for k in range(_n): 
                 sum +=  _block_vec[k]*_L[k][j]
-                self.printMatrix(_block_vec[k],_symbol + self._posNum.coordinateIndice(_posLst[0],k, False) + self._posNum.coordinateIndice(_posLst[1],1, True) + self._posNum.coordinateIndice(_posLst[2], 2,True),_n)
+                _indices = self._posNum.coordinateIndice(_posLst[0],k, False) + self._posNum.coordinateIndice(_posLst[1],1, True) + self._posNum.coordinateIndice(_posLst[2], 2,True)
+                self.printMatrix(_block_vec[k], _symbol + _indices, _n)
                 print('L' + self._posNum.coordinateIndice(pos.down,k, False) + self._posNum.coordinateIndice(pos.down, j, False), _L[k][j])
             ret.append(sum)
             l_sum = self._latex.convertMatrixToLatex(sum, _n)
@@ -855,6 +827,15 @@ class utils:
             
         return bases, symbol_vecs
    
+    def processTransformInput(self, _posLst, _class, _n):
+        
+        ret = []
+        
+        for i in _posLst:
+            tmp = _class._transformTable[i]
+            ret.append(tmp)
+        
+        return ret
     
     def getBases(self, _posLst, _unprimed, _class):
     
