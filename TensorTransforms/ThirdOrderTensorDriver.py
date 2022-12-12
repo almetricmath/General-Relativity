@@ -54,9 +54,11 @@ print('Transform Tensor to polar sqrt system\n')
 
 print(' Inner Product - BᵀTB')
 
-T1 = t3.transformTensor(T, posLst, True, 2)
+verbose = True
+T1 = t3.transformTensor(T, posLst, True, 2, verbose)
 
 print(' Compute transformed tensor using transpose(F1).[T1_n].H1 ', '\n')
+
 
 result3 = t3.computeTensorInnerProduct(T1, posLst, False, 2, verbose)
 l_result = t3.convertToLatex(result3, 2)

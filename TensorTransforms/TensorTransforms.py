@@ -198,12 +198,14 @@ class thirdOrderTensor:
         
         for i in range(_n):
             tmp = self._utils.matrix_1T_TW_matrix_2(basis_2, T_ij[i], basis_3, False, _n)
+            if _verbose:
+                self.printMatrix(tmp, 'FᵀT̅'+self._posNum.coordinateIndice(pos.down, i, False)+'H', _n)
             ret.append(tmp)
        
         ret = np.array(ret)
         return ret
     
-    def transformTensor(self, _T, _posLst, _unprimed, _n):
+    def transformTensor(self, _T, _posLst, _unprimed, _n, _verbose):
         
         # transforms tensor coordinates
         
@@ -218,14 +220,15 @@ class thirdOrderTensor:
         L = self._forwardTable[_posLst[0]]._basis.value
         symbol_L = self._forwardTable[_posLst[0]]._basis.symbol
              
+        if _verbose:
+            self.printMatrix(M1, 'M1 = ' + symbol_1, _n)
+            self.printMatrix(M2, 'M2 = ' + symbol_2, _n)
+            self.printMatrix(L, 'L = ' + symbol_L  , _n)
             
-        self.printMatrix(M1, 'M1 = ' + symbol_1, _n)
-        self.printMatrix(M2, 'M2 = ' + symbol_2, _n)
-        self.printMatrix(L, 'L = ' + symbol_L  , _n)
-        
         #compute T_n
         
         T_n = self._utils.blockInnerProduct(_T, 'T', _posLst, L, _n)
+         
         # perform transpose(M2).Tn.M3
         
         ret = []
@@ -233,7 +236,9 @@ class thirdOrderTensor:
         for i in range(_n):
             tmp = self._utils.matrix_1T_TW_matrix_2(M1, T_n[i], M2, False, _n)
             ret.append(tmp)
-        
+            if _verbose:
+                self.printMatrix(tmp, 'T̅' + self._posNum.coordinateIndice(pos.down, i, False), _n)
+            
         return ret
     
     def printMatrix(self, _M, _label, _n):
