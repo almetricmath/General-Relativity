@@ -159,11 +159,11 @@ class thirdOrderTensor:
      
         return ret
       
-    def computeWeightMatrix(self, _T, _posLst, _basis, _n):
+    def computeWeightMatrix(self, _T, _posLst, _basis, _n, _verbose):
         
         # compute T_ij = T(i,j,k)L_il
         
-        ret = self._utils.blockInnerProduct(_T, 'T', _posLst, _basis, _n) 
+        ret = self._utils.blockInnerProduct(_T, 'T', _posLst, _basis, _n, _verbose) 
         return ret
         
         
@@ -189,7 +189,7 @@ class thirdOrderTensor:
         # Compute weight matrix
         
         if _unprimed: 
-            T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst[0], _n) 
+            T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst[0], _n, _verbose) 
         else:
             # use weight that has been transformed to a primed coordinate system
             T_ij = _T
@@ -227,7 +227,7 @@ class thirdOrderTensor:
             
         #compute T_n
         
-        T_n = self._utils.blockInnerProduct(_T, 'T', _posLst, L, _n)
+        T_n = self._utils.blockInnerProduct(_T, 'T', _posLst, L, _n, _verbose)
          
         # perform transpose(M2).Tn.M3
         
@@ -238,8 +238,23 @@ class thirdOrderTensor:
             ret.append(tmp)
             if _verbose:
                 self.printMatrix(tmp, 'T̅' + self._posNum.coordinateIndice(pos.down, i, False), _n)
-            
-        return ret
+        
+        T1_n = np.array(ret)
+        
+        # convert [T1(1, j, k), T(2, j, k)] to T1_ijk
+        # need to use L_prime inverse
+        # get L_prime
+        
+        _basisLstPrime, _symbolLstPrime = self._utils.processTensorInput(_posLst, False, self, False, _n)
+        
+        L_prime = _basisLstPrime[0]
+        symbol_L_prime = _symbolLstPrime[0]
+        
+        L_prime_inv = np.linalg.inv(L_prime)
+        
+        T1_ijk = self._utils.blockInnerProduct(T1_n, 'T1', _posLst, L_prime_inv, _n, _verbose) 
+        
+        return T1_n, T1_ijk
     
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, _n)
@@ -720,7 +735,7 @@ class utils:
         
         return ret
     
-    def blockInnerProduct(self, _block_vec, _symbol, _posLst, _L, _n):
+    def blockInnerProduct(self, _block_vec, _symbol, _posLst, _L, _n, _verbose):
         
         # multiplies a block vector ( vector whose elements are matrices ) with a vector
         # and returns a block vector 
@@ -732,12 +747,15 @@ class utils:
             for k in range(_n): 
                 sum +=  _block_vec[k]*_L[k][j]
                 _indices = self._posNum.coordinateIndice(_posLst[0],k, False) + self._posNum.coordinateIndice(_posLst[1],1, True) + self._posNum.coordinateIndice(_posLst[2], 2,True)
-                self.printMatrix(_block_vec[k], _symbol + _indices, _n)
-                print('L' + self._posNum.coordinateIndice(pos.down,k, False) + self._posNum.coordinateIndice(pos.down, j, False), _L[k][j])
+                if _verbose:
+                    self.printMatrix(_block_vec[k], _symbol + _indices, _n)
+                    print('L' + self._posNum.coordinateIndice(pos.down,k, False) + self._posNum.coordinateIndice(pos.down, j, False), _L[k][j])
             ret.append(sum)
-            l_sum = self._latex.convertMatrixToLatex(sum, _n)
-            print(_symbol + self._posNum.coordinateIndice(pos.down, j, False) + ' = ', l_sum, "\n") 
             
+            if _verbose:
+                l_sum = self._latex.convertMatrixToLatex(sum, _n)
+                print(_symbol + self._posNum.coordinateIndice(pos.down, j, False) + ' = ', l_sum, "\n") 
+                
         
         ret = np.array(ret)
         return ret

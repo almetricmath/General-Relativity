@@ -55,15 +55,25 @@ print('Transform Tensor to polar sqrt system\n')
 print(' Inner Product - BᵀTB')
 
 verbose = True
-T1 = t3.transformTensor(T, posLst, True, 2, verbose)
+T1_n, T1_ijk = t3.transformTensor(T, posLst, True, 2, verbose)
 
 print(' Compute transformed tensor using transpose(F1).[T1_n].H1 ', '\n')
 
-
-result3 = t3.computeTensorInnerProduct(T1, posLst, False, 2, verbose)
+result3 = t3.computeTensorInnerProduct(T1_n, posLst, False, 2, verbose)
 l_result = t3.convertToLatex(result3, 2)
 print(l_result, '\n')
 
 diff_result = t3.convertToLatex(result3 - result, 2)
 print('Difference between the inner product in the primed coordinate system and the outer product in umprimed coordinates\n') 
 print(diff_result, '\n\n')
+
+result4 = t3.computeTensorOuterProduct(T1_ijk, posLst, False, 2, verbose)
+l_result = t3.convertToLatex(result4, 2)
+print(l_result, '\n')
+
+diff_result = t3.convertToLatex(result4 - result, 2)
+print('Difference between the outer product in the primed coordinate system and the outer product in umprimed coordinates\n') 
+print(diff_result, '\n\n')
+
+
+
