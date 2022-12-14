@@ -114,7 +114,8 @@ class secondOrderTensor:
         
         return ret
     
-    # change configuration on a second order block
+    # change configuration for a second order tensor
+    
     def changeConfig(self, _T, _inPosLst, _outPosLst, _G, _Ginv):
         
         n = len(_inPosLst)
@@ -145,8 +146,6 @@ class secondOrderTensor:
         return ret
                 
    
-        
-        
 class thirdOrderTensor:
     
     def __init__(self, _r, _theta):
@@ -295,6 +294,45 @@ class thirdOrderTensor:
         T1_ijk = self._utils.blockInnerProduct(T1_n, 'T̅', _posLst, L_prime_inv, 'L̅⁻¹' ,_n, _verbose) 
         
         return T1_n, T1_ijk
+    
+    # change configuration for a third order tensor
+    
+    def changeConfig(self, _T, _inPosLst, _outPosLst, _G, _Ginv, _n, _verbose):
+        
+        n = len(_inPosLst)
+        m = len(_outPosLst)
+        
+        ret = copy.deepcopy(_T)
+        
+        if n != m:
+            print('input and output position lists are different lengths')
+            return ret
+    
+        if _inPosLst[0] != _outPosLst[0]:
+            if _inPosLst[1] == pos.up: # up to down 
+                ret = self._utils.blockInnerProduct(_T, 'T', _inPosLst, _G, 'G', _n, _verbose)
+            else:
+                ret = self._utils.blockInnerProduct(_T, 'T', _inPosLst, _Ginv, 'G⁻¹', _n, _verbose)
+                
+
+        if _inPosLst[1] != _outPosLst[1]:
+            for i in range(n - 1):
+                if _inPosLst[1] == pos.up: # up to down 
+                        ret[i] = np.dot(_G, ret[i])
+                else:
+                    # down to up
+                    ret[i] = np.dot(_Ginv, ret[i])
+                    
+        if _inPosLst[2] != _outPosLst[2]:
+            for i in range(n - 1):
+                if _inPosLst[2] == pos.up: # up to down 
+                        ret[i] = np.dot(ret[i], _G )
+                else:
+                    # down to up
+                    ret[i] = np.dot(ret[i], _Ginv )
+                    
+        return ret
+   
     
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, _n)
