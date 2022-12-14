@@ -46,6 +46,7 @@ print(result_outer, '\n\n')
 # compute tensor by inner product
 
 result_inner = secondOrder.computeTensorInnerProduct(T, inPosLst, True, 2, verbose)
+
 print('Full Tensor, T', inPosLst, 'computed by inner products\n')
 print(result_inner, '\n\n')
 
@@ -80,7 +81,7 @@ Ginv = np.linalg.inv(G)
 
 
 for i in posLst:
-    T_config = utils.changeConfig(T, inPosLst, i, G, Ginv)
+    T_config = secondOrder.changeConfig(T, inPosLst, i, G, Ginv)
     # transform Tensor
     T1_config = secondOrder.transformTensor(T_config, i, 2)
     # Compute using outer products
