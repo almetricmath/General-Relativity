@@ -113,6 +113,38 @@ class secondOrderTensor:
         ret = self._utils.matrix_1T_TW_matrix_2(M1, _T, M2, False, _n)
         
         return ret
+    
+    # change configuration on a second order block
+    def changeConfig(self, _T, _inPosLst, _outPosLst, _G, _Ginv):
+        
+        n = len(_inPosLst)
+        m = len(_outPosLst)
+        
+        ret = []
+        
+        if n != m:
+            print('input and output position lists are different lengths')
+            return ret
+        
+        ret = _T
+        
+        if _inPosLst[0] != _outPosLst[0]:
+            if _inPosLst[0] == pos.up: # up to down 
+                ret = np.dot(_G, ret)
+            else:
+                # down to up
+                ret = np.dot(_Ginv, ret)
+        
+        if _inPosLst[1] != _outPosLst[1]:
+            if _inPosLst[1] == pos.up: # up to down 
+                ret = np.dot(ret, _G)
+            else:
+                # down to up
+                ret = np.dot(ret, _Ginv)
+                
+        return ret
+                
+   
         
         
 class thirdOrderTensor:
@@ -159,11 +191,11 @@ class thirdOrderTensor:
      
         return ret
       
-    def computeWeightMatrix(self, _T, _posLst, _basis, _n, _verbose):
+    def computeWeightMatrix(self, _T, _posLst, _basis, _basis_symbol, _n, _verbose):
         
         # compute T_ij = T(i,j,k)L_il
         
-        ret = self._utils.blockInnerProduct(_T, 'T', _posLst, _basis, _n, _verbose) 
+        ret = self._utils.blockInnerProduct(_T, 'T', _posLst, _basis, _basis_symbol, _n, _verbose) 
         return ret
         
         
@@ -182,14 +214,20 @@ class thirdOrderTensor:
         # print matrices
         
         if _verbose:
-            self.printMatrix(basis_1, 'L = ' + _symbolLst[0], _n)  
-            self.printMatrix(basis_2, 'F = ' + _symbolLst[1], _n)
-            self.printMatrix(basis_3, 'H = ' + _symbolLst[2], _n)
-      
+            if _unprimed:
+                self.printMatrix(basis_1, 'L = ' + _symbolLst[0], _n)  
+                self.printMatrix(basis_2, 'F = ' + _symbolLst[1], _n)
+                self.printMatrix(basis_3, 'H = ' + _symbolLst[2], _n)
+            else:
+                self.printMatrix(basis_1, 'L̅ = ' + _symbolLst[0], _n)  
+                self.printMatrix(basis_2, 'F̅ = ' + _symbolLst[1], _n)
+                self.printMatrix(basis_3, 'H̅ = ' + _symbolLst[2], _n)
+                
+          
         # Compute weight matrix
         
         if _unprimed: 
-            T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst[0], _n, _verbose) 
+            T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst[0], _symbolLst[0], _n, _verbose) 
         else:
             # use weight that has been transformed to a primed coordinate system
             T_ij = _T
@@ -199,7 +237,11 @@ class thirdOrderTensor:
         for i in range(_n):
             tmp = self._utils.matrix_1T_TW_matrix_2(basis_2, T_ij[i], basis_3, False, _n)
             if _verbose:
-                self.printMatrix(tmp, 'FᵀT̅'+self._posNum.coordinateIndice(pos.down, i, False)+'H', _n)
+                if _unprimed:
+                    self.printMatrix(tmp, 'FᵀT'+self._posNum.coordinateIndice(pos.down, i, False)+'H', _n)
+                else:
+                    self.printMatrix(tmp, 'F̅ᵀT̅'+self._posNum.coordinateIndice(pos.down, i, False)+'H̅', _n)
+                    
             ret.append(tmp)
        
         ret = np.array(ret)
@@ -227,7 +269,7 @@ class thirdOrderTensor:
             
         #compute T_n
         
-        T_n = self._utils.blockInnerProduct(_T, 'T', _posLst, L, _n, _verbose)
+        T_n = self._utils.blockInnerProduct(_T, 'T', _posLst, L, symbol_L, _n, _verbose)
          
         # perform transpose(M2).Tn.M3
         
@@ -247,12 +289,10 @@ class thirdOrderTensor:
         
         _basisLstPrime, _symbolLstPrime = self._utils.processTensorInput(_posLst, False, self, False, _n)
         
-        L_prime = _basisLstPrime[0]
-        symbol_L_prime = _symbolLstPrime[0]
-        
+        L_prime = _basisLstPrime[0] 
         L_prime_inv = np.linalg.inv(L_prime)
         
-        T1_ijk = self._utils.blockInnerProduct(T1_n, 'T1', _posLst, L_prime_inv, _n, _verbose) 
+        T1_ijk = self._utils.blockInnerProduct(T1_n, 'T̅', _posLst, L_prime_inv, 'L̅⁻¹' ,_n, _verbose) 
         
         return T1_n, T1_ijk
     
@@ -735,7 +775,7 @@ class utils:
         
         return ret
     
-    def blockInnerProduct(self, _block_vec, _symbol, _posLst, _L, _n, _verbose):
+    def blockInnerProduct(self, _block_vec, _symbol, _posLst, _L, _symbol_L, _n, _verbose):
         
         # multiplies a block vector ( vector whose elements are matrices ) with a vector
         # and returns a block vector 
@@ -749,7 +789,7 @@ class utils:
                 _indices = self._posNum.coordinateIndice(_posLst[0],k, False) + self._posNum.coordinateIndice(_posLst[1],1, True) + self._posNum.coordinateIndice(_posLst[2], 2,True)
                 if _verbose:
                     self.printMatrix(_block_vec[k], _symbol + _indices, _n)
-                    print('L' + self._posNum.coordinateIndice(pos.down,k, False) + self._posNum.coordinateIndice(pos.down, j, False), _L[k][j])
+                    print(_symbol_L + self._posNum.coordinateIndice(pos.down,k, False) + self._posNum.coordinateIndice(pos.down, j, False), _L[k][j])
             ret.append(sum)
             
             if _verbose:
@@ -911,36 +951,6 @@ class utils:
         
         return ret
 
-    # change configuration on a second order block
-    def changeConfig(self, _T, _inPosLst, _outPosLst, _G, _Ginv):
-        
-        n = len(_inPosLst)
-        m = len(_outPosLst)
-        
-        ret = []
-        
-        if n != m:
-            print('input and output position lists are different lengths')
-            return ret
-        
-        ret = _T
-        
-        if _inPosLst[0] != _outPosLst[0]:
-            if _inPosLst[0] == pos.up: # up to down 
-                ret = np.dot(_G, ret)
-            else:
-                # down to up
-                ret = np.dot(_Ginv, ret)
-        
-        if _inPosLst[1] != _outPosLst[1]:
-            if _inPosLst[1] == pos.up: # up to down 
-                ret = np.dot(ret, _G)
-            else:
-                # down to up
-                ret = np.dot(ret, _Ginv)
-                
-        return ret
-                
             
                 
             

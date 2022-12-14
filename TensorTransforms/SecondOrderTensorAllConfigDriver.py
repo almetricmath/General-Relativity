@@ -58,7 +58,7 @@ Ginv = np.linalg.inv(G)
 
 
 for i in posLst:
-    T_config = utils.changeConfig(T, inPosLst, i, G, Ginv)
+    T_config = secondOrder.changeConfig(T, inPosLst, i, G, Ginv)
     # Compute using outer products
     result_config_outer = secondOrder.computeTensorOuterProduct(T_config, i, True, 2, verbose)
     print('T ', inPosLst, ' -> T', i, T_config, '\n\n')
