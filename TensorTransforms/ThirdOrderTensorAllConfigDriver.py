@@ -57,15 +57,34 @@ posLst = [t.pos.up, t.pos.up, t.pos.up]
 
 T_init = t3.changeConfig(T, inPosLst, posLst, G, Ginv, 2, verbose)
 
+# Test outer product formulation
+
+print('Configuration = ', posLst, '\n')
+print('T = ', T_init, '\n')
+
 result2 = t3.computeTensorOuterProduct(T_init, posLst, True, 2, verbose)
 print('3rd order tensor by outer product\n')
 l_result = t3.convertToLatex(result2, 2)
 print(l_result)
 print('\n')
 
+
 diff_result = t3.convertToLatex(result2 - result, 2)
-print('Difference between the inner product and outer product tensor computations in umprimed coordinates\n') 
+print('Difference between the outer product computations in different configurations in umprimed coordinates\n') 
 print(diff_result, '\n\n')
+
+# Test inner product formulation
+
+print(' Compute transformed tensor using transpose(F1).[T1_n].H1 ', '\n')
+
+result3 = t3.computeTensorInnerProduct(T_init, posLst, True, 2, verbose)
+l_result = t3.convertToLatex(result3, 2)
+print(l_result, '\n')
+
+diff_result = t3.convertToLatex(result3 - result, 2)
+print('Difference between the inner product computations in different configurations in unprimed coordinates\n') 
+print(diff_result, '\n\n')
+
 
 posLst = [ [t.pos.up, t.pos.up, t.pos.down], [t.pos.up, t.pos.down, t.pos.up],  [t.pos.up, t.pos.down, t.pos.down], [t.pos.down, t.pos.up, t.pos.up], [t.pos.down, t.pos.up, t.pos.down], [t.pos.down, t.pos.down, t.pos.up], [t.pos.down, t.pos.down, t.pos.down]] 
 
@@ -75,14 +94,29 @@ inPosLst = [t.pos.up, t.pos .up, t.pos.up]
 for item in posLst:
     T_config = 0
     T_config = t3.changeConfig(T_init, inPosLst, item, G, Ginv, 2, verbose)
-    result3 = t3.computeTensorOuterProduct(T_config, item, True, 2, verbose)
+    print('configuration = ', item, '\n')
+    print('T = ', T_config, '\n')
+    result4 = t3.computeTensorOuterProduct(T_config, item, True, 2, verbose)
     print('3rd order tensor by outer product\n')
-    l_result = t3.convertToLatex(result3, 2)
+    l_result = t3.convertToLatex(result4, 2)
     print(l_result)
     print('\n')
     
-    diff_result = t3.convertToLatex(result3 - result, 2)
-    print('Difference between the inner product and outer product tensor computations in umprimed coordinates\n') 
+    diff_result = t3.convertToLatex(result4 - result, 2)
+    print('Difference between the outer product and outer product tensor computations in different configurations in unprimed coordinates\n') 
     print(diff_result, '\n\n')
+    
+    result5 = t3.computeTensorInnerProduct(T_config, item, True, 2, verbose)
+    l_result = t3.convertToLatex(result5, 2)
+    print(l_result, '\n')
+
+    diff_result = t3.convertToLatex(result5 - result, 2)
+    print('Difference between the inner product computations in different configurations in unprimed coordinates\n') 
+    print(diff_result, '\n\n')
+
+    
+    
+    
+    
 
 

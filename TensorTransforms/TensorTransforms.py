@@ -127,7 +127,7 @@ class secondOrderTensor:
             print('input and output position lists are different lengths')
             return ret
         
-        ret = _T
+        ret = copy.deepcopy(_T)
         
         if _inPosLst[0] != _outPosLst[0]:
             if _inPosLst[0] == pos.up: # up to down 
