@@ -64,7 +64,7 @@ l_result = t3.convertToLatex(result3, 2)
 print(l_result, '\n')
 
 diff_result = t3.convertToLatex(result3 - result, 2)
-print('Difference between the inner product in the primed coordinate system and the outer product in umprimed coordinates\n') 
+print('Difference between the inner product in the primed coordinate system and the outer product in unprimed coordinates\n') 
 print(diff_result, '\n\n')
 
 result4 = t3.computeTensorOuterProduct(T1_ijk, posLst, False, 2, verbose)
