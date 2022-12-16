@@ -27,9 +27,10 @@ T = np.array([[[1.0, 2.0],[3.0, 4.0]],[[5.0, 6.0],[7.0, 8.0]]])
 
 inPosLst = [t.pos.up, t.pos.down, t.pos.up]
 verbose = False
+unprimed = True
 
 
-result = t3.computeTensorOuterProduct(T, inPosLst, True, 2, verbose)
+result = t3.computeTensorOuterProduct(T, inPosLst, unprimed, 2, verbose)
 print('Original Configuration = ', inPosLst, '\n')
 print('3rd order tensor by outer product\n')
 l_result = t3.convertToLatex(result, 2)
@@ -38,8 +39,8 @@ print('\n')
 
 # compute 3rd order tensor using the inner product
 
-print('3rd order tensor by EᵀTE\n')
-result1 = t3.computeTensorInnerProduct(T, inPosLst, True, 2, verbose)
+print('3rd order tensor by inner product\n')
+result1 = t3.computeTensorInnerProduct(T, inPosLst, unprimed, 2, verbose)
 
 l_result = t3.convertToLatex(result1, 2)
 print(l_result)
@@ -64,7 +65,7 @@ T_init = t3.changeConfig(T, inPosLst, posLst, G, Ginv, 2, verbose)
 print('Initial Configuration = ', posLst, '\n')
 print('T = ', T_init, '\n')
 
-result2 = t3.computeTensorOuterProduct(T_init, posLst, True, 2, verbose)
+result2 = t3.computeTensorOuterProduct(T_init, posLst, unprimed, 2, verbose)
 print('3rd order tensor by outer product\n')
 l_result = t3.convertToLatex(result2, 2)
 print(l_result)
@@ -77,9 +78,8 @@ print(diff_result, '\n\n')
 
 # Test inner product formulation
 
-print(' Compute transformed tensor using transpose(F1).[T1_n].H1 ', '\n')
-
-result3 = t3.computeTensorInnerProduct(T_init, posLst, True, 2, verbose)
+print('3rd order tensor by inner product\n')
+result3 = t3.computeTensorInnerProduct(T_init, posLst, unprimed, 2, verbose)
 l_result = t3.convertToLatex(result3, 2)
 print(l_result, '\n')
 
@@ -94,13 +94,15 @@ inPosLst = [t.pos.up, t.pos .up, t.pos.up]
 
 
 for item in posLst:
+    unprimed = True # transforming tensor from unprimed system
     T_config = 0
     T_config = t3.changeConfig(T_init, inPosLst, item, G, Ginv, 2, verbose)
-    T1_n, T1_ijk = t3.transformTensor(T_config, item, True, 2, verbose)
+    T1_n, T1_ijk = t3.transformTensor(T_config, item, unprimed, 2, verbose)
 
     print('configuration = ', item, '\n')
     print('T̅ = ', T1_ijk, '\n')
-    result4 = t3.computeTensorOuterProduct(T1_ijk, item, False, 2, verbose)
+    unprimed = False # computing tensor in primed coordinate system
+    result4 = t3.computeTensorOuterProduct(T1_ijk, item, unprimed, 2, verbose)
     print('3rd order tensor by outer product\n')
     l_result = t3.convertToLatex(result4, 2)
     print(l_result)
@@ -111,7 +113,8 @@ for item in posLst:
     print('Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates\n') 
     print(diff_result, '\n\n')
     
-    result5 = t3.computeTensorInnerProduct(T1_n, item, False, 2, verbose)
+    print('3rd order tensor by inner product\n')
+    result5 = t3.computeTensorInnerProduct(T1_n, item, unprimed, 2, verbose)
     l_result = t3.convertToLatex(result5, 2)
     print(l_result, '\n')
 
