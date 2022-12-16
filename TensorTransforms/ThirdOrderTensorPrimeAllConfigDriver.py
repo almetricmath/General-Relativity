@@ -94,10 +94,9 @@ inPosLst = [t.pos.up, t.pos .up, t.pos.up]
 
 
 for item in posLst:
-    unprimed = True # transforming tensor from unprimed system
     T_config = 0
     T_config = t3.changeConfig(T_init, inPosLst, item, G, Ginv, 2, verbose)
-    T1_n, T1_ijk = t3.transformTensor(T_config, item, unprimed, 2, verbose)
+    T1_n, T1_ijk = t3.transformTensor(T_config, item, 2, verbose) # transform from unprimed to prime coordinates
 
     print('configuration = ', item, '\n')
     print('T̅ = ', T1_ijk, '\n')

@@ -246,7 +246,7 @@ class thirdOrderTensor:
         ret = np.array(ret)
         return ret
     
-    def transformTensor(self, _T, _posLst, _unprimed, _n, _verbose):
+    def transformTensor(self, _T, _posLst, _n, _verbose):
         
         # transforms tensor coordinates
         
@@ -282,7 +282,7 @@ class thirdOrderTensor:
         
         T1_n = np.array(ret)
         
-        # convert [T1(1, j, k), T(2, j, k)] to T1_ijk
+        # convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
         # need to use L_prime inverse
         # get L_prime
         

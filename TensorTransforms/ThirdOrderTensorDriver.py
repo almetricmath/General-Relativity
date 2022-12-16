@@ -51,7 +51,7 @@ print(diff_result, '\n\n')
 
 print('Transform Tensor to polar sqrt system\n')
 
-T1_n, T1_ijk = t3.transformTensor(T, posLst, unprimed, 2, verbose)
+T1_n, T1_ijk = t3.transformTensor(T, posLst, 2, verbose)
 unprimed = False
 
 print(' Compute transformed tensor using  [transpose(M1)]⊗[T.L]⊗[M2]\n')
