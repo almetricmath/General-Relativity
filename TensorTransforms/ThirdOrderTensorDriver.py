@@ -23,7 +23,7 @@ T = np.array([[[1.0, 2.0],[3.0, 4.0]],[[5.0, 6.0],[7.0, 8.0]]])
 # specify tensor index positions
 
 posLst = [t.pos.up, t.pos.down, t.pos.up]
-verbose = False
+verbose = True
 
 result = t3.computeTensorOuterProduct(T, posLst, True, 2, verbose)
 print('3rd order tensor by outer product\n')
@@ -50,11 +50,6 @@ print(diff_result, '\n\n')
 
 print('Transform Tensor to polar sqrt system\n')
 
-# use computing with the weight matrix instead - 11/27/2022
-
-print(' Inner Product - BᵀTB')
-
-verbose = True
 T1_n, T1_ijk = t3.transformTensor(T, posLst, True, 2, verbose)
 
 print(' Compute transformed tensor using transpose(F1).[T1_n].H1 ', '\n')
