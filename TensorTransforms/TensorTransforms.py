@@ -389,12 +389,12 @@ class fourthOrderTensor:
         
         # get Basis 3 and Basis 4 in matrix form
         
-        B3 = _basisLst[1]._transposeBasis
-        B4 = _basisLst[1]._basis
+        B3 = _basisLst[2]
+        B4 = _basisLst[3]
         
         # print Basis 3 and Basis 4
         
-        self.printComputeElement(_basisLst[1], _n)
+        self.printMatrix(B3, 'B3 = ', _n)
         
         ret = self.allocateFourthOrderElement(_n)
         
@@ -402,39 +402,14 @@ class fourthOrderTensor:
             for j in range(_n):
                 TW = _T[i,j]
                 l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
-                print('T' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], 2, True) + self._posNum.indice(_posLst[3], 3, True), l_t_matrix,'\n')
+                print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], 2, True) + self._posNum.coordinateIndice(_posLst[3], 3, True), l_t_matrix,'\n')
                 result = self._utils.matrix_1T_TW_matrix_2(B3, TW, B4, False, _n)
                 l_result = self._latex.convertMatrixToLatex(result, _n)
-                print('T' +self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False), l_result,'\n') 
+                print('T' +self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False), l_result,'\n') 
                 ret[i][j] = result
             
         return ret
 
-    def getColumns(self, _basis, _n):
-        
-        # get the column vectors from each Basis Matrix
-        
-        ret = [np.array([])]*_n 
-        
-        for j in range(_n):
-           tmp = []
-           for i in range(_n):
-               tmp.append(_basis[i,j])
-           ret[j] = np.array(tmp)
-
-        return ret
-       
-    def colT_T_col(self, _col_1, _T, _col_2, _n):
-        
-        # compute transpose(col_1).T_ij.col_2
-        
-        ret = 0.0
-        
-        for k in range(_n):
-            for l in range(_n):
-                ret += _col_1[k]*_T[k,l]*_col_2[l]
-        
-        return ret
                 
     
     def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
@@ -446,12 +421,13 @@ class fourthOrderTensor:
          
          print('Compute Tensor Inner Product\n')
          
-         print('Weight Matrix Computed with Matrix Product\n')
-         
-        # compute weight matrix in the unprimed system
-        
          _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, False, _n)
        
+        
+         print('Weight Matrix Computed with Matrix Product\n')
+ 
+         # compute weight matrix in the unprimed system
+          
         
          if _unprimed: 
              T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, True, _n)
@@ -463,24 +439,18 @@ class fourthOrderTensor:
          
          # get Basis 1 and Basis 2
          
-         B1 = _basisLst[0]._transposeBasis
-         B2 = _basisLst[0]._basis
+         B1 = _basisLst[0]
+         B2 = _basisLst[1]
         
          # print Basis 1 and Basis 2
          
-         self.printComputeElement(_basisLst[0], _n)
-         
-         # get columns from B1 and B2
-         
-         colB1 = self.getColumns(B1, 2)
-         colB2 = self.getColumns(B2, 2)
-         
+         self.printMatrix(B1, 'B1', _n)
+         self.printMatrix(B2, 'B2', _n)
+  
          # compute transpose(col(B1, i)).T(i,j).col(B2, j)
          
-         for i in range(_n):
-             for j in range(_n):
-                 ret[i,j] = self.colT_T_col(colB1[i], T_ij, colB2[j], _n)
-                 
+         ret = self._utils.matrix_1T_TW_matrix_2(B1, T_ij, B2, True, _n)
+        
          return ret
          
            
@@ -500,14 +470,14 @@ class fourthOrderTensor:
                 for k in range(_n):
                     for l in range(_n):
                         coeff = _T[i, j, k, l]
-                        print('T' + self._posNum.indice(_posLst[0], i, False)  +  self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], k, False) + self._posNum.indice(_posLst[3], l, False)  + ' = ', coeff)
-                        self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.indice(_posLst[0], i, False), _n)
-                        self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.indice(_posLst[1], j, False), _n) 
-                        self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.indice(_posLst[2], k, False), _n)
-                        self.printVector( _basisLst[3][l], False, _symbolLst[3].lower() + self._posNum.indice(_posLst[3], l, False), _n)
+                        print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], k, False) + self._posNum.coordinateIndice(_posLst[3], l, False)  + ' = ', coeff)
+                        self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
+                        self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n) 
+                        self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.basisIndice(_posLst[2], k, False), _n)
+                        self.printVector( _basisLst[3][l], False, _symbolLst[3].lower() + self._posNum.basisIndice(_posLst[3], l, False), _n)
                         outer = np.einsum('i,j,k,l',_basisLst[0][i], _basisLst[1][j], _basisLst[2][k],_basisLst[3][l])
                         l_outer = self.convertElementToLatex(outer, _n)
-                        print('outer' + self._posNum.indice(_posLst[0], i, False) + self._posNum.indice(_posLst[1], j, False) + self._posNum.indice(_posLst[2], k, False) + self._posNum.indice(_posLst[3], l, False),'\n')
+                        print('outer' + self._posNum.basisIndice(_posLst[0], i, False) + self._posNum.basisIndice(_posLst[1], j, False) + self._posNum.basisIndice(_posLst[2], k, False) + self._posNum.basisIndice(_posLst[3], l, False),'\n')
                         print(l_outer, '\n')
                              
                         ret += coeff*outer

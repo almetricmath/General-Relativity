@@ -44,6 +44,10 @@ print('Fourth Order Tensor by Inner Product')
 print(l_result)
 print('\n')
 
+l_diff = t4.convertElementToLatex(result_2 - result_1, 2)
+print('Difference between inner product and outer product = ', l_diff, '\n')
+
+sys.exit(0)
 
 # tensor under coordinate change
 
