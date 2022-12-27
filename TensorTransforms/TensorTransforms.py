@@ -450,7 +450,7 @@ class fourthOrderTensor:
   
          # compute transpose(col(B1, i)).T(i,j).col(B2, j)
          
-         ret = self._utils.matrix_1T_TW_matrix_2(B1, T_ij, B2, True, _n, False)
+         ret = self._utils.matrix_1T_TW_matrix_2(B1, T_ij, B2, True, _n, _verbose)
         
          return ret
          
@@ -823,8 +823,10 @@ class utils:
         else:
             ret = self.allocateFourthOrderElement(_n)
       
+        eqstr = ''
+      
         for i in range(_n):
-            for j in range(_n):
+            for j in range(_n): 
                 if _verbose:
                     print('(i, j) = (' + str(i) + ',' +  str(j) + ')')
                 acc = 0.0
@@ -832,20 +834,20 @@ class utils:
                     for l in range(_n):
                         acc += _matrix_1[k][i]*_TW[k][l]*_matrix_2[l][j]
                         if _verbose:
-                            print('(k, i) = (',k,',', i, ')  _matrix_1[' + str(k) + ',' + str(i) +'] = ' + str("{:.6f}".format(_matrix_1[k][i])) + '\n')
-                        
-                        if _block:
-                            l_TW_kl = self._latex.convertMatrixToLatex(_TW[k][l], _n)
-                            if _verbose:
-                                print('TW[',k, ',', l, '] = ' + l_TW_kl + '\n')
-                        else:
-                            if _verbose:
-                                print('TW[',k, ',', l, '] = ',str("{:.6f}".format(_TW[k][l])), '\n')
-                        if _verbose:
-                            print('(l, j) = (',l,',', j, ') ', '_matrix_2[',l,',', j,'] = ',str("{:.6f}".format(_matrix_2[l][j])),'\n')
-                            print('acc = ', acc, '\n')
+                            if _block:
+                                l_TW_kl = self._latex.convertMatrixToLatex(_TW[k][l], _n)
+                                if eqstr:
+                                    eqstr += '+' + '(' + str("{:.6f}".format(_matrix_1[k][i])) + ')' + l_TW_kl + '(' + str("{:.6f}".format(_matrix_2[l][j])) + ')'
+                                else:
+                                    eqstr += '(' + str("{:.6f}".format(_matrix_1[k][i])) + ')' + l_TW_kl + '(' + str("{:.6f}".format(_matrix_2[l][j])) + ')'
+                            else:
+                                eqstr += '+' + '(' + str("{:.6f}".format(_matrix_1[k][i])) + ')' + '(' + str("{:.6f}".format(_TW[k][l])) + ')  (' + str("{:.6f}".format(_matrix_2[l][j])) + ')'
                 ret[i,j] = acc
-                 
+                
+                if _verbose:
+                    print(eqstr + '\n')
+                eqstr = ''
+                  
         return ret
        
     
