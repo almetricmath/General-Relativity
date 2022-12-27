@@ -372,17 +372,17 @@ class fourthOrderTensor:
         # declare configuration table in primed system
         
         self._forwardTablePrimed = self._utils.computeTable(self._utils.forwardTable, False, self)
-        
+    
     
     def printComputeElement(self, _elem, _n):
           l_transposeBasis = self._latex.convertMatrixToLatex(np.transpose(_elem._transposeBasis), _n)
-          print(_elem._transposeSymbol  + ' = ' + l_transposeBasis, "\n")
+          print(_elem._transposeSymbol  + ' = ' + l_transposeBasis + '\n')
           l_basis = self._latex.convertMatrixToLatex(_elem._basis, _n)
-          print(_elem._symbol + ' = ' + l_basis, "\n")
+          print(_elem._symbol + ' = ' + l_basis + '\n')
           return 
 
 
-    def computeWeightMatrix(self, _T, _posLst, _basisLst, _unprimed, _n):
+    def computeWeightMatrix(self, _T, _posLst, _basisLst, _unprimed, _n, _verbose):
         
         # computes weight matrix using matrix operations transpose(B3).T.B4
         # _tuple = (k = (up/down), l = (up/down))
@@ -395,24 +395,25 @@ class fourthOrderTensor:
         # print Basis 3 and Basis 4
         
         self.printMatrix(B3, 'B3 = ', _n)
-        
+        self.printMatrix(B4, 'B4', _n)
+    
         ret = self.allocateFourthOrderElement(_n)
         
         for i in range(_n):
             for j in range(_n):
                 TW = _T[i,j]
                 l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
-                print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], 2, True) + self._posNum.coordinateIndice(_posLst[3], 3, True), l_t_matrix,'\n')
-                result = self._utils.matrix_1T_TW_matrix_2(B3, TW, B4, False, _n)
+                print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], 2, True) + self._posNum.coordinateIndice(_posLst[3], 3, True) + ' = ' + l_t_matrix + '\n')
+                result = self._utils.matrix_1T_TW_matrix_2(B3, TW, B4, False, _n, False)
                 l_result = self._latex.convertMatrixToLatex(result, _n)
-                print('T' +self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False), l_result,'\n') 
+                print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + ' = ' + l_result + '\n') 
                 ret[i][j] = result
             
         return ret
 
                 
     
-    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n):
+    def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n, _verbose):
        
          # implements streamlined calculation
          # compute weight matrices
@@ -430,7 +431,7 @@ class fourthOrderTensor:
           
         
          if _unprimed: 
-             T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, True, _n)
+             T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, True, _n, _verbose)
          else:
              # use weight that has been transformed to a primed coordinate system
              T_ij = _T
@@ -449,7 +450,7 @@ class fourthOrderTensor:
   
          # compute transpose(col(B1, i)).T(i,j).col(B2, j)
          
-         ret = self._utils.matrix_1T_TW_matrix_2(B1, T_ij, B2, True, _n)
+         ret = self._utils.matrix_1T_TW_matrix_2(B1, T_ij, B2, True, _n, False)
         
          return ret
          
@@ -812,7 +813,7 @@ class utils:
          l_result = self._latex.convertMatrixToLatex(_M, 2)
          print(_label + ' = ', l_result, '\n')
     
-    def matrix_1T_TW_matrix_2(self, _matrix_1, _TW, _matrix_2, _block, _n):
+    def matrix_1T_TW_matrix_2(self, _matrix_1, _TW, _matrix_2, _block, _n, _verbose):
         
         # computes transpose(_matrix_1)._TW._matrix_2
         # _block specifies _TW as a block matrix and the return type as a block matrix
@@ -824,10 +825,25 @@ class utils:
       
         for i in range(_n):
             for j in range(_n):
+                if _verbose:
+                    print('(i, j) = (' + str(i) + ',' +  str(j) + ')')
                 acc = 0.0
                 for k in range(_n):
                     for l in range(_n):
-                        acc += _matrix_1[k][i]*_TW[k][l]*_matrix_2[l][j] 
+                        acc += _matrix_1[k][i]*_TW[k][l]*_matrix_2[l][j]
+                        if _verbose:
+                            print('(k, i) = (',k,',', i, ')  _matrix_1[' + str(k) + ',' + str(i) +'] = ' + str("{:.6f}".format(_matrix_1[k][i])) + '\n')
+                        
+                        if _block:
+                            l_TW_kl = self._latex.convertMatrixToLatex(_TW[k][l], _n)
+                            if _verbose:
+                                print('TW[',k, ',', l, '] = ' + l_TW_kl + '\n')
+                        else:
+                            if _verbose:
+                                print('TW[',k, ',', l, '] = ',str("{:.6f}".format(_TW[k][l])), '\n')
+                        if _verbose:
+                            print('(l, j) = (',l,',', j, ') ', '_matrix_2[',l,',', j,'] = ',str("{:.6f}".format(_matrix_2[l][j])),'\n')
+                            print('acc = ', acc, '\n')
                 ret[i,j] = acc
                  
         return ret

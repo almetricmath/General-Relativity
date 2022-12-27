@@ -30,18 +30,20 @@ posLst = [t.pos.up, t.pos.down, t.pos.down, t.pos.up]
 
 # compute 4th order tensor using the outer product
 
+print('Outer Product Calculation\n')
 result_1 = t4.computeTensorOuterProduct(TW, posLst, True, 2)
 l_result = t4.convertElementToLatex(result_1, 2)
-print('Fourth Order Tensor by Outer Product')
-print(l_result)
+
+print('result = ', l_result)
 print('\n')
 
 # compute 4th order tensor using the inner product
 
-result_2 = t4.computeTensorInnerProduct(TW, posLst, True, 2)
+print('Inner Product Calculation\n')
+verbose = True
+result_2 = t4.computeTensorInnerProduct(TW, posLst, True, 2, verbose)
 l_result = t4.convertElementToLatex(result_2, 2)
-print('Fourth Order Tensor by Inner Product')
-print(l_result)
+print('result = ', l_result)
 print('\n')
 
 l_diff = t4.convertElementToLatex(result_2 - result_1, 2)
