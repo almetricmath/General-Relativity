@@ -828,7 +828,7 @@ class utils:
         for i in range(_n):
             for j in range(_n): 
                 if _verbose:
-                    print('(i, j) = (' + str(i) + ',' +  str(j) + ')')
+                    print('(i, j) = (' + str(i+1) + ',' +  str(j+1) + ')')
                 acc = 0.0
                 for k in range(_n):
                     for l in range(_n):
@@ -846,6 +846,8 @@ class utils:
                 
                 if _verbose:
                     print(eqstr + '\n')
+                    l_result = self._latex.convertMatrixToLatex(acc, _n)
+                    print('result = ', l_result, '\n')
                 eqstr = ''
                   
         return ret
