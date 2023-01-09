@@ -202,7 +202,7 @@ class thirdOrderTensor:
         
         # put basis matrices into vectors
         
-        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
+        _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, False, _n)
         
         # declare matrices
         
@@ -234,7 +234,7 @@ class thirdOrderTensor:
         ret = []
         
         for i in range(_n):
-            tmp = self._utils.matrix_1T_TW_matrix_2(basis_2, T_ij[i], basis_3, False, _n)
+            tmp = self._utils.matrix_1T_TW_matrix_2(basis_2, T_ij[i], basis_3, False, _n, _verbose)
             if _verbose:
                 if _unprimed:
                     self.printMatrix(tmp, 'FᵀT'+self._posNum.coordinateIndice(pos.down, i, False)+'H', _n)
@@ -275,7 +275,7 @@ class thirdOrderTensor:
         ret = []
         
         for i in range(_n):
-            tmp = self._utils.matrix_1T_TW_matrix_2(M1, T_n[i], M2, False, _n)
+            tmp = self._utils.matrix_1T_TW_matrix_2(M1, T_n[i], M2, False, _n, _verbose)
             ret.append(tmp)
             if _verbose:
                 self.printMatrix(tmp, 'T̅' + self._posNum.coordinateIndice(pos.down, i, False), _n)
@@ -490,14 +490,14 @@ class fourthOrderTensor:
         
         ret = computeElement()
         
-        _tuple = (_posLst[0], _posLst[1])
-        ret = self._transformTable[_tuple]
+        for i in _posLst:
+            ret = self._transformTable[i]
         
         return ret
         
     # transform tensor
     
-    def transformTensor(self, _T, _posLst, _unprimed, _n):
+    def transformTensor(self, _T, _posLst, _unprimed, _n, _verbose):
         
         # 1st work unprimed to primed system
         # compute tensor coordinate change using matrices
@@ -506,7 +506,7 @@ class fourthOrderTensor:
        
         # Compute weight matrix in unprimed system
         
-        T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, True, _n)
+        T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, True, _n, _verbose)
       
         self.printWeightMatrices(T_ij, _posLst, _n)
         
@@ -585,7 +585,7 @@ class fourthOrderTensor:
     
         for i in range(_n):
             for j in range(_n):
-                self.printMatrix(_T[i][j], 'T' + self._posNum.indice(_posLst[2], i, False) + self._posNum.indice(_posLst[3], j, False), _n)
+                self.printMatrix(_T[i][j], 'T' + self._posNum.coordinateIndice(_posLst[2], i, False) + self._posNum.coordinateIndice(_posLst[3], j, False), _n)
  
 class convertToLatex:
 
@@ -839,15 +839,18 @@ class utils:
                                 if eqstr:
                                     eqstr += '+' + '(' + str("{:.6f}".format(_matrix_1[k][i])) + ')' + l_TW_kl + '(' + str("{:.6f}".format(_matrix_2[l][j])) + ')'
                                 else:
-                                    eqstr += '(' + str("{:.6f}".format(_matrix_1[k][i])) + ')' + l_TW_kl + '(' + str("{:.6f}".format(_matrix_2[l][j])) + ')'
+                                    eqstr += '+ (' + str("{:.6f}".format(_matrix_1[k][i])) + ')' + l_TW_kl + '(' + str("{:.6f}".format(_matrix_2[l][j])) + ')'
                             else:
-                                eqstr += '+' + '(' + str("{:.6f}".format(_matrix_1[k][i])) + ')' + '(' + str("{:.6f}".format(_TW[k][l])) + ')  (' + str("{:.6f}".format(_matrix_2[l][j])) + ')'
+                                eqstr += '+' + '(' + str("{:.6f}".format(_matrix_1[k][i])) + ')' + '(' + str("{:.6f}".format(_TW[k][l])) + ')(' + str("{:.6f}".format(_matrix_2[l][j])) + ')'
                 ret[i,j] = acc
                 
                 if _verbose:
-                    print(eqstr + '\n')
-                    l_result = self._latex.convertMatrixToLatex(acc, _n)
-                    print('result = ', l_result, '\n')
+                    print(eqstr[1:] + '\n')
+                    if _block:
+                        l_result = self._latex.convertMatrixToLatex(acc, _n)
+                        print('result = ', l_result, '\n')
+                    else:
+                        print('result = ', acc, '\n')
                 eqstr = ''
                   
         return ret
