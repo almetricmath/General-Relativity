@@ -512,15 +512,17 @@ class fourthOrderTensor:
         
         # get transforms involved with coordinate change
         
-        _transform = self.processTransformInput(_posLst, True, _n)
+        _transformLst = self._utils.processTransformInput(_posLst, self, _n)
         
         # allocate return structure
         
         T1_ij = self.allocateFourthOrderElement(_n)
-        symbol_1 = _transform._transposeSymbol
-        symbol_2 = _transform._symbol
+        M1 = _transformLst[0]._basis.value
+        symbol_1 = _transformLst[0]._basis.symbol
+        M2 = _transformLst[1]._basis.value
+        symbol_2 = _transformLst[1]._basis.symbol
         
-        T1_ij = self._utils.matrix_1T_TW_matrix_2(_transform._transposeBasis, T_ij, _transform._basis, True, _n)
+        T1_ij = self._utils.matrix_1T_TW_matrix_2(M1, T_ij, M2, True, _n, _verbose)
          
         '''          
         # could transform T1_ij -> T1_ijkl

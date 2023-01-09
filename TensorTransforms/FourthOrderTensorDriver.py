@@ -49,17 +49,27 @@ print('\n')
 l_diff = t4.convertElementToLatex(result_2 - result_1, 2)
 print('Difference between inner product and outer product = ', l_diff, '\n')
 
-sys.exit(0)
-
 # tensor under coordinate change
 
 # transform tensor components
 
-T_test = t4.transformTensor(TW, posLst, False, 2)
+T_prime_block = t4.transformTensor(TW, posLst, False, 2, verbose)
+
+print('Block Tensor Components Under a Coordinate Transformation\n')
+l_Tblock = t4.convertElementToLatex(T_prime_block, 2)
+print('Transformed T_block = ', T_prime_block, '\n')
 
 # compute tensor
 
-result3 = t4.computeTensorInnerProduct(T_test, posLst, False, 2)
-l_result = t4.convertElementToLatex(result3, 2)
+result_3 = t4.computeTensorInnerProduct(T_prime_block, posLst, False, 2, verbose)
+l_result = t4.convertElementToLatex(result_3, 2)
 print(l_result)
-print('\n')    
+print('\n')
+
+l_diff = t4.convertElementToLatex(result_3 - result_1, 2)
+print('Difference between inner product in primed coordinates and outer product in unprimed coordinates = ', l_diff, '\n')
+
+
+
+
+
