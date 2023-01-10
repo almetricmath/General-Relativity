@@ -382,7 +382,7 @@ class fourthOrderTensor:
           return 
 
 
-    def computeWeightMatrix(self, _T, _posLst, _basisLst, _unprimed, _n, _verbose):
+    def computeWeightMatrix(self, _T, _posLst, _basisLst, _symbolLst, _unprimed, _n, _verbose):
         
         # computes weight matrix using matrix operations transpose(B3).T.B4
         # _tuple = (k = (up/down), l = (up/down))
@@ -390,23 +390,29 @@ class fourthOrderTensor:
         # get Basis 3 and Basis 4 in matrix form
         
         B3 = _basisLst[2]
+        symbol_3 = _symbolLst[2]
         B4 = _basisLst[3]
+        symbol_4 = _symbolLst[3]
         
         # print Basis 3 and Basis 4
         
-        self.printMatrix(B3, 'B3 = ', _n)
-        self.printMatrix(B4, 'B4', _n)
-    
+        if _verbose:
+            self.printMatrix(B3, 'B3 = ' + symbol_3, _n)
+            self.printMatrix(B4, 'B4 = ' + symbol_4, _n)
+        
         ret = self.allocateFourthOrderElement(_n)
         
         for i in range(_n):
             for j in range(_n):
                 TW = _T[i,j]
-                l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
-                print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], 2, True) + self._posNum.coordinateIndice(_posLst[3], 3, True) + ' = ' + l_t_matrix + '\n')
+                if _verbose:
+                    l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
+                    print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], 2, True) + self._posNum.coordinateIndice(_posLst[3], 3, True) + ' = ' + l_t_matrix + '\n')
                 result = self._utils.matrix_1T_TW_matrix_2(B3, TW, B4, False, _n, False)
-                l_result = self._latex.convertMatrixToLatex(result, _n)
-                print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + ' = ' + l_result + '\n') 
+                
+                if _verbose:
+                    l_result = self._latex.convertMatrixToLatex(result, _n)
+                    print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + ' = ' + l_result + '\n') 
                 ret[i][j] = result
             
         return ret
@@ -431,7 +437,7 @@ class fourthOrderTensor:
           
         
          if _unprimed: 
-             T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, True, _n, _verbose)
+             T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, _symbolLst, True, _n, _verbose)
          else:
              # use weight that has been transformed to a primed coordinate system
              T_ij = _T
@@ -441,14 +447,19 @@ class fourthOrderTensor:
          # get Basis 1 and Basis 2
          
          B1 = _basisLst[0]
+         symbol_1 = _symbolLst[0]
          B2 = _basisLst[1]
+         symbol_2 = _symbolLst[1]
+         
         
          # print Basis 1 and Basis 2
          
-         self.printMatrix(B1, 'B1', _n)
-         self.printMatrix(B2, 'B2', _n)
+         self.printMatrix(B1, 'B1 = ' + symbol_1 + ' = ', _n)
+         self.printMatrix(B2, 'B2 = ' + symbol_2 + ' = ', _n)
   
-         # compute transpose(col(B1, i)).T(i,j).col(B2, j)
+         # compute transpose(C).T(i,j).D
+         
+         print('Compute Submatrices of transpose(C).T_block(i,j).D\n')
          
          ret = self._utils.matrix_1T_TW_matrix_2(B1, T_ij, B2, True, _n, _verbose)
         
@@ -506,9 +517,11 @@ class fourthOrderTensor:
        
         # Compute weight matrix in unprimed system
         
-        T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, True, _n, _verbose)
-      
-        self.printWeightMatrices(T_ij, _posLst, _n)
+        T_ij = self.computeWeightMatrix(_T, _posLst, _basisLst, _symbolLst, True, _n, False)  # no need to print the T_block calculations in the unprimed system
+        
+        if _verbose:
+            print('Block Tensor Components in Unprimed System\n')
+            self.printWeightMatrices(T_ij, _posLst, _n)
         
         # get transforms involved with coordinate change
         
@@ -516,13 +529,14 @@ class fourthOrderTensor:
         
         # allocate return structure
         
-        T1_ij = self.allocateFourthOrderElement(_n)
         M1 = _transformLst[0]._basis.value
         symbol_1 = _transformLst[0]._basis.symbol
         M2 = _transformLst[1]._basis.value
         symbol_2 = _transformLst[1]._basis.symbol
         
-        T1_ij = self._utils.matrix_1T_TW_matrix_2(M1, T_ij, M2, True, _n, _verbose)
+        print('Compute Submatrices of transpose(M1^-1).T_block(i,j).M2^-1\n')
+        
+        T_prime_ij = self._utils.matrix_1T_TW_matrix_2(M1, T_ij, M2, True, _n, _verbose)
          
         '''          
         # could transform T1_ij -> T1_ijkl
@@ -552,7 +566,7 @@ class fourthOrderTensor:
                 tmp = np.dot(T1_ij[i][j],np.transpose(W1))
                 ret[i][j] = np.dot(E1, tmp)
         '''    
-        return T1_ij
+        return T_prime_ij
        
         
     def printMatrix(self, _M, _label, _n):

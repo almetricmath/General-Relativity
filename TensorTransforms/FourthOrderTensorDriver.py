@@ -30,7 +30,7 @@ posLst = [t.pos.up, t.pos.down, t.pos.down, t.pos.up]
 
 # compute 4th order tensor using the outer product
 
-print('Outer Product Calculation\n')
+print('\nOuter Product Calculation\n')
 result_1 = t4.computeTensorOuterProduct(TW, posLst, True, 2)
 l_result = t4.convertElementToLatex(result_1, 2)
 
@@ -53,13 +53,18 @@ print('Difference between inner product and outer product = ', l_diff, '\n')
 
 # transform tensor components
 
+print('Transform Tensor Components\n')
+
 T_prime_block = t4.transformTensor(TW, posLst, False, 2, verbose)
 
-print('Block Tensor Components Under a Coordinate Transformation\n')
+print('Block Tensor Components in the Primed Coordinate System\n')
 l_Tblock = t4.convertElementToLatex(T_prime_block, 2)
 print('Transformed T_block = ', T_prime_block, '\n')
 
 # compute tensor
+
+
+print('Compute Tensor in the Primed Coordinate System Using an Inner Product\n') 
 
 result_3 = t4.computeTensorInnerProduct(T_prime_block, posLst, False, 2, verbose)
 l_result = t4.convertElementToLatex(result_3, 2)
