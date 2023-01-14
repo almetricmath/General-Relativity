@@ -55,14 +55,16 @@ print('Difference between inner product and outer product = ', l_diff, '\n')
 
 print('Transform Tensor Components\n')
 
-T_prime_block = t4.transformTensor(TW, posLst, False, 2, verbose)
+T_prime_block, T_ijkl = t4.transformTensor(TW, posLst, False, 2, verbose)
 
 print('Block Tensor Components in the Primed Coordinate System\n')
 l_Tblock = t4.convertElementToLatex(T_prime_block, 2)
-print('Transformed T_block = ', T_prime_block, '\n')
+print('Transformed T_block = ', l_Tblock, '\n')
+print('T_ijkl in Primed Coordinate System\n')
+l_T_ijkl = t4.convertElementToLatex(T_ijkl, 2)
+print('Transformed T_ijkl = ', l_T_ijkl, '\n')
 
-# compute tensor
-
+# compute tensor in the primed coordinates using the inner product
 
 print('Compute Tensor in the Primed Coordinate System Using an Inner Product\n') 
 
@@ -72,7 +74,17 @@ print(l_result)
 print('\n')
 
 l_diff = t4.convertElementToLatex(result_3 - result_1, 2)
-print('Difference between inner product in primed coordinates and outer product in unprimed coordinates = ', l_diff, '\n')
+print('Difference between the inner product in primed coordinates and outer product in unprimed coordinates = ', l_diff, '\n')
+
+# compute tensor in the primed coordinates using the outer product
+
+result_4 = t4.computeTensorOuterProduct(T_ijkl, posLst, False, 2)
+l_result = t4.convertElementToLatex(result_1, 2)
+
+l_diff = t4.convertElementToLatex(result_4 - result_1, 2)
+print('Difference between the outer product in primed coordinates and outer product in unprimed coordinates = ', l_diff, '\n')
+
+
 
 
 

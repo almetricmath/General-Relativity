@@ -283,13 +283,12 @@ class thirdOrderTensor:
         T1_n = np.array(ret)
         
         # convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
-        # need to use L_prime inverse
         # get L_prime
         
         _basisLstPrime, _symbolLstPrime = self._utils.processTensorInput(_posLst, False, self, False, _n)
         
         L_prime = _basisLstPrime[0] 
-        L_prime_inv = np.linalg.inv(L_prime)
+        L_prime_inv = np.linalg.inv(L_prime) # need to use L_prime inverse
         
         T1_ijk = self._utils.blockInnerProduct(T1_n, 'T̅', _posLst, L_prime_inv, 'L̅⁻¹' ,_n, _verbose) 
         
@@ -446,22 +445,22 @@ class fourthOrderTensor:
          
          # get Basis 1 and Basis 2
          
-         B1 = _basisLst[0]
-         symbol_1 = _symbolLst[0]
-         B2 = _basisLst[1]
-         symbol_2 = _symbolLst[1]
+         C = _basisLst[0]
+         symbol_C = _symbolLst[0]
+         D = _basisLst[1]
+         symbol_D = _symbolLst[1]
          
         
          # print Basis 1 and Basis 2
          
-         self.printMatrix(B1, 'B1 = ' + symbol_1 + ' = ', _n)
-         self.printMatrix(B2, 'B2 = ' + symbol_2 + ' = ', _n)
+         self.printMatrix(C, 'C = ' + symbol_C + ' = ', _n)
+         self.printMatrix(D, 'D = ' + symbol_D + ' = ', _n)
   
          # compute transpose(C).T(i,j).D
          
          print('Compute Submatrices of transpose(C).T_block(i,j).D\n')
          
-         ret = self._utils.matrix_1T_TW_matrix_2(B1, T_ij, B2, True, _n, _verbose)
+         ret = self._utils.matrix_1T_TW_matrix_2(C, T_ij, D, True, _n, _verbose)
         
          return ret
          
@@ -537,38 +536,29 @@ class fourthOrderTensor:
         print('Compute Submatrices of transpose(M1^-1).T_block(i,j).M2^-1\n')
         
         T_prime_ij = self._utils.matrix_1T_TW_matrix_2(M1, T_ij, M2, True, _n, _verbose)
+        
+        
+        # Transform T_prime_ij -> T_prime_ijkl
          
-        '''          
-        # could transform T1_ij -> T1_ijkl
+        _basisLstPrime, _symbolLstPrime = self._utils.processTensorInput(_posLst, False, self, False, _n) 
+       
+        T_prime_ijkl = self.allocateFourthOrderElement(_n)
+       
+        F_primeT = np.transpose(_basisLstPrime[2])  
+        F_primeT_inv = np.linalg.inv(F_primeT) # need to use L_prime inverse
+        F_prime_inv = np.transpose( F_primeT_inv) # transpose because the matrix_1T_TW_matrix_2 automatically transposes
+                                                  # could put a switch in matrix_1T_TW_matrix_2 to indicate if it should compute transposing the first matruix or not
         
-        # T1_ij in the primed system
-        # need to do transform with primed coordinates
-        # get inverse bases in the primed system
-        # flip up/down values in the _posLst
-        
-        inversePosLst = []
-        for p in _posLst:
-            if p == pos.up:
-                tmp = pos.down
-            elif p == pos.down:
-                tmp = pos.up
-            inversePosLst.append(tmp)
-        
-        _inverseBasisLst, _inverseSymbolLst, col_1, col_2 = self.processTensorInput(inversePosLst, False, False, _n)
-        
-        ret = self.allocateFourthOrderElement(_n)
-        W1 = self._vars._vars['W1'].value
-        E1 = self._vars._vars['E1'].value
-      
+        H_prime = _basisLstPrime[3]
+        H_prime_inv = np.linalg.inv(H_prime) # need to use L_prime inverse
         
         for i in range(_n):
             for j in range(_n):
-                tmp = np.dot(T1_ij[i][j],np.transpose(W1))
-                ret[i][j] = np.dot(E1, tmp)
-        '''    
-        return T_prime_ij
+                T_prime_ijkl[i][j] = self._utils.matrix_1T_TW_matrix_2( F_prime_inv, T_prime_ij[i][j], H_prime_inv, False, _n, _verbose)
+            
+        return T_prime_ij, T_prime_ijkl
        
-        
+    
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, 2)
          print(_label + ' = ', l_result, '\n')
