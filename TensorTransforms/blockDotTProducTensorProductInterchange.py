@@ -7,6 +7,7 @@ Created on Sun Jan 22 18:16:04 2023
 
 import TensorTransforms as t
 import numpy as np
+import sys
 
 
 def convertElementToLatex(_elem, _class, _n):
@@ -37,66 +38,30 @@ W = np.array([[0.500000, 0.866025], [-0.433013, 0.250000]])
 
 _n = 2
 
-tensorProduct  = np.array([[[[0.0]*_n]*_n]*_n]*_n)
-
 # first perform tensor product then dot - W.[E x T]
 
 # tensor product E x T
 
-for k in [E]:
-    for i in range(_n):
-        for j in range(_n):
-            tensorProduct[i][j] = np.dot(k,T[i][j])
+tensorProduct = t.utils().tensorProduct(np.array([E]), T, _n)
 
 l_tensorProduct = convertElementToLatex(tensorProduct, t.convertToLatex(), _n)
 print('[[E] x T] = ', l_tensorProduct,'\n')
 
-result = np.array([[[[0.0]*_n]*_n]*_n]*_n)
-
-# dot product W.[E x T]
-
-for i in range(_n):
-    for j in range(_n):
-        tmp = 0
-        for k in range(_n):
-            tmp += W[i][k]*tensorProduct[k][j]
-        result[i][j] = tmp
-        
+result = t.utils().blockDotProduct(W, tensorProduct, _n)
 l_result = convertElementToLatex(result, t.convertToLatex(), _n)
-print('W.[[E] x T] = ')
-print(l_result, '\n')
+print('W.[[E] x T] = ', l_result, '\n')
 
-# second perform dot then tensor product - E x [W.T]
+# second perform dot then tensor product - [E] x [W.T]
 
-dotProduct  = np.array([[[[0.0]*_n]*_n]*_n]*_n)
-
-for i in range(_n):
-    for j in range(_n):
-        tmp = 0
-        for k in range(_n):
-            tmp += W[i][k]*T[k][j]
-        dotProduct[i][j] = tmp
-
+dotProduct = t.utils().blockDotProduct(W, T, _n)
 l_dotProduct = convertElementToLatex(dotProduct, t.convertToLatex(), _n)
-print('[W.T] = ', l_dotProduct, '\n')
+print('[W.T] = ',l_dotProduct,'\n')
 
-result_1 = np.array([[[[0.0]*_n]*_n]*_n]*_n)
+result_1 = t.utils().tensorProduct(np.array([E]), dotProduct, _n)
+l_result = convertElementToLatex(result_1, t.convertToLatex(), _n)
 
-
-# tensor product E x dotProduct
-
-for k in [E]:
-    for i in range(_n):
-        for j in range(_n):
-            result_1[i][j] = np.dot(k,dotProduct[i][j])
-
-
-l_result_1 = convertElementToLatex(result_1, t.convertToLatex(), _n)
-print('[E] x [W.T] = ', l_result_1,'\n')
+print('[E] x [W.T] = ', l_result, '\n')
 
 l_diff = convertElementToLatex(result_1 - result, t.convertToLatex(), _n)
 print('difference = ', l_diff, '\n')
-
-
-
 

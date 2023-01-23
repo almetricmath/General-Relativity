@@ -558,7 +558,9 @@ class fourthOrderTensor:
             
         return T_prime_ij, T_prime_ijkl
        
-    
+  #  def changeConfig(self, _T, _inPosLst, _outPosLst, _G, _Ginv, _n, _verbose):
+        
+        
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, 2)
          print(_label + ' = ', l_result, '\n')
@@ -815,7 +817,50 @@ class utils:
         ret = np.array(ret)
         return ret
     
+    def tensorProduct(self, _elem_1, _elem_2, _n):
+        
+        ret = []
     
+        for k in _elem_1:
+            for i in range(_n):
+                for j in range(_n):
+                    ret.append(np.dot(k, _elem_2[i][j])) # dot return a regular multiplication for two scalars
+        
+        if _elem_1.shape < _elem_2.shape:
+            shape_factor = _elem_2.shape
+        elif _elem_1.shape == _elem_2.shape:
+            shape_factor = _elem_1.shape + _elem_2.shape
+        else:
+            shape_factor = _elem_1.shape
+       
+        ret = np.array(ret)
+        ret = np.reshape(ret, shape_factor)
+        
+        return ret
+        
+    def blockDotProduct(self, _elem_1, _elem_2, _n):
+        
+        ret = []
+
+        for i in range(_n):
+            for j in range(_n):
+                acc = 0.0
+                for k in range(_n):
+                    acc += np.dot(_elem_1[i][k], _elem_2[k][j])
+                ret.append(acc)
+        
+        if _elem_1.shape < _elem_2.shape:
+            shape_factor = _elem_2.shape
+        elif _elem_1.shape == _elem_2.shape:
+            shape_factor = _elem_1.shape + _elem_2.shape
+        else:
+            shape_factor = _elem_1.shape
+       
+        ret = np.array(ret)
+        ret = np.reshape(ret, shape_factor)
+        return ret
+           
+        
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, 2)
          print(_label + ' = ', l_result, '\n')
