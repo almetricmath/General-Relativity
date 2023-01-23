@@ -814,7 +814,8 @@ class utils:
         
         ret = np.array(ret)
         return ret
-     
+    
+    
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, 2)
          print(_label + ' = ', l_result, '\n')
@@ -856,7 +857,7 @@ class utils:
                         l_result = self._latex.convertMatrixToLatex(acc, _n)
                         print('result = ', l_result, '\n')
                     else:
-                        print('result = ', acc, '\n')
+                        print('result = ', "{:.6f}".format(acc), '\n')
                 eqstr = ''
                   
         return ret
