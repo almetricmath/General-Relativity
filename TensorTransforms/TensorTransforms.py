@@ -558,9 +558,46 @@ class fourthOrderTensor:
             
         return T_prime_ij, T_prime_ijkl
        
-  #  def changeConfig(self, _T, _inPosLst, _outPosLst, _G, _Ginv, _n, _verbose):
+    def changeConfig(self, _T, _inPosLst, _outPosLst, _G, _Ginv, _n, _verbose):
         
+        n = len(_inPosLst)
+        m = len(_outPosLst)
         
+        ret = copy.deepcopy(_T)
+        
+        if n != m:
+            print('input and output position lists are different lengths')
+            return ret
+    
+        
+        if _outPosLst[0] != _inPosLst[0]:
+            if _outPosLst[0] == pos.down: # _inPosLst[0] == pos.up
+                ret = self._utils.blockDotProduct(_G, ret, _n)
+            else:
+                ret = self._utils.blockDotProduct(_Ginv, ret, _n)
+                
+        
+        if _outPosLst[1] != _inPosLst[1]:
+            if _outPosLst[1] == pos.down: # _inPosLst[1] == pos.up
+                ret = self._utils.blockDotProduct(ret, _G, _n)
+            else:
+                ret = self._utils.blockDotProduct(ret, _Ginv, _n)
+                
+        if _outPosLst[2] != _inPosLst[2]:
+            if _outPosLst[2] == pos.down: # _inPosLst[2] == pos.up
+                ret = self._utils.tensorProduct([_G], ret, _n)
+            else:
+                ret = self._utils.tensorProduct([_Ginv], ret, _n)
+                
+        if _outPosLst[3] != _inPosLst[3]:
+             if _outPosLst[3] == pos.down: # _inPosLst[3] == pos.up
+                 ret = self._utils.tensorProduct(ret, [_G], _n)
+             else:
+                 ret = self._utils.tensorProduct( ret, [_Ginv], _n)
+                 
+        return ret
+        
+              
     def printMatrix(self, _M, _label, _n):
          l_result = self._latex.convertMatrixToLatex(_M, 2)
          print(_label + ' = ', l_result, '\n')
@@ -820,18 +857,37 @@ class utils:
     def tensorProduct(self, _elem_1, _elem_2, _n):
         
         ret = []
+        
+        # find which input element is a list
+        
+        reverseFlag = False
+        
+        if isinstance(_elem_1, list):
+            start = _elem_1
+            tmp_2 = _elem_2
+        else:
+            start = _elem_2
+            tmp_2 = _elem_1
+            reverseFlag = True
+            
+        
     
-        for k in _elem_1:
+        for k in start:
             for i in range(_n):
                 for j in range(_n):
-                    ret.append(np.dot(k, _elem_2[i][j])) # dot return a regular multiplication for two scalars
+                    if reverseFlag:
+                        ret.append(np.dot(tmp_2[i][j], k))
+                    else:
+                        ret.append(np.dot(k, tmp_2[i][j])) # dot return a regular multiplication for two scalars
         
-        if _elem_1.shape < _elem_2.shape:
-            shape_factor = _elem_2.shape
-        elif _elem_1.shape == _elem_2.shape:
-            shape_factor = _elem_1.shape + _elem_2.shape
+        start = start[0]
+        
+        if start.shape < tmp_2.shape:
+            shape_factor = tmp_2.shape
+        elif start.shape == tmp_2.shape:
+            shape_factor = start.shape + tmp_2.shape
         else:
-            shape_factor = _elem_1.shape
+            shape_factor = start.shape
        
         ret = np.array(ret)
         ret = np.reshape(ret, shape_factor)
