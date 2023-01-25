@@ -7,6 +7,7 @@ Created on Mon Jan 23 16:18:42 2023
 
 import TensorTransforms as t
 import numpy as np
+import sys
 
 r = 2
 theta = np.pi/3
@@ -27,10 +28,16 @@ verbose = False
 unprimed = True
 
 result = t4.computeTensorOuterProduct(T, inPosLst, unprimed, 2)
+l_result = t4.convertElementToLatex(result, 2)
 print('Original Configuration = ', inPosLst, '\n')
 print('4th order tensor by outer product\n')
-l_result = t4.convertElementToLatex(result, 2)
 print(l_result, '\n')
+
+result_1 = t4.computeTensorInnerProduct(T, inPosLst, unprimed, 2, verbose)
+l_result = t4.convertElementToLatex(result_1, 2)
+print('\nOriginal Configuration' '4th order tensor by inner product\n', l_result,'\n')
+l_diff = t4.convertElementToLatex(result_1 - result, 2)
+print('Difference with the outer product calculation = ', l_diff, '\n')
 
 
 # declare the metric and inverse metric
@@ -47,12 +54,19 @@ print('Initial Configuration = ', init_posLst, '\n')
 l_T_init =  t4.convertElementToLatex(T_init, 2)
 print('T = ', l_T_init, '\n')
 
-# Test outer product formulation
+# Test outer product in initial configuration
 
 result_1 = t4.computeTensorOuterProduct(T_init, init_posLst, unprimed, 2)
-
 l_diff = t4.convertElementToLatex(result_1 - result, 2)
-print('Difference with the Original configuration = ', l_diff, '\n')
+print('Difference of the Initial Configuration Outer Product with the Original Configuration = ', l_diff, '\n')
+
+# Test inner product in initial configuration
+
+result_2 = t4.computeTensorInnerProduct(T, inPosLst, unprimed, 2, verbose)
+l_diff = t4.convertElementToLatex(result_2 - result, 2)
+print('Difference of the Initial Configuration Inner Product with the Original Configuration = ', l_diff, '\n')
+
+
 
 posLst = [[t.pos.up, t.pos.up, t.pos.up, t.pos.down], [t.pos.up, t.pos.up, t.pos.down, t.pos.up],\
           [t.pos.up, t.pos.up, t.pos.down, t.pos.down], [t.pos.up, t.pos.down, t.pos.up, t.pos.up],\
@@ -68,22 +82,44 @@ for item in posLst:
     T_config = t4.changeConfig(T_init, init_posLst, item, G, Ginv, 2, verbose)
     print('configuration = ', item, '\n')
     print('T = ', T_config, '\n')
-    result_2 = t4.computeTensorOuterProduct(T_config, item, unprimed, 2)
+    result_3 = t4.computeTensorOuterProduct(T_config, item, unprimed, 2)
     print('4th order tensor by outer product\n')
-    l_result = t4.convertElementToLatex(result_2, 2)
+    l_result = t4.convertElementToLatex(result_3, 2)
     print(l_result)
     print('\n')
-    l_diff = t4.convertElementToLatex(result_2 - result, 2)
-    print('Difference with the Original configuration = ', l_diff, '\n')
-
+    l_diff = t4.convertElementToLatex(result_3 - result, 2)
+    print('Difference of Outer Product with the Original configuration = ', l_diff, '\n')
+    result_4 = t4.computeTensorInnerProduct(T, inPosLst, unprimed, 2, verbose)
+    l_diff = t4.convertElementToLatex(result_4 - result, 2)
+    print('Difference of Inner Product with the Original configuration = ', l_diff, '\n')
     
-    
+# raise the different combinations of indices
 
-                        
-          
- 
+posLst.reverse()
+del posLst[0]
+posLst[-1] = [t.pos.up, t.pos.up, t.pos.up, t.pos.up]
+init_posLst = [t.pos.down, t.pos.down, t.pos.down, t.pos.down]
 
+print('Running configurations in Reverse\n')
+print('Initial Configuration = ', inPosLst, '\n')
+T_init = T_config
+print('T = ', T_init, '\n')
 
+for item in posLst:
+    T_config = 0
+    T_config = t4.changeConfig(T_init, init_posLst, item, G, Ginv, 2, verbose)
+    print('configuration = ', item, '\n')
+    print('T = ', T_config, '\n')
+    result_5 = t4.computeTensorOuterProduct(T_config, item, unprimed, 2)
+    print('4th order tensor by outer product\n')
+    l_result = t4.convertElementToLatex(result_5, 2)
+    print(l_result)
+    print('\n')
+    l_diff = t4.convertElementToLatex(result_5 - result, 2)
+    print('Difference of Outer Product with the Original configuration = ', l_diff, '\n')
+    result_6 = t4.computeTensorInnerProduct(T, inPosLst, unprimed, 2, verbose)
+    l_diff = t4.convertElementToLatex(result_6 - result, 2)
+    print('Difference of Inner Product with the Original configuration = ', l_diff, '\n')
 
 
 
