@@ -507,7 +507,7 @@ class fourthOrderTensor:
         
     # transform tensor
     
-    def transformTensor(self, _T, _posLst, _unprimed, _n, _verbose):
+    def transformTensor(self, _T, _posLst, _n, _verbose):
         
         # 1st work unprimed to primed system
         # compute tensor coordinate change using matrices
@@ -529,9 +529,8 @@ class fourthOrderTensor:
         # allocate return structure
         
         M1 = _transformLst[0]._basis.value
-        symbol_1 = _transformLst[0]._basis.symbol
         M2 = _transformLst[1]._basis.value
-        symbol_2 = _transformLst[1]._basis.symbol
+     
         
         print('Compute Submatrices of transpose(M1^-1).T_block(i,j).M2^-1\n')
         
