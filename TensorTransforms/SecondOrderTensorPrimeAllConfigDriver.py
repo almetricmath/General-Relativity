@@ -57,7 +57,7 @@ print(result_inner - result_outer, '\n\n')
 
 print('Transform to polar sqrt coordinate system')
 
-T1 = secondOrder.transformTensor(T, inPosLst, 2)
+T1 = secondOrder.transformTensor(T, inPosLst, 2, verbose)
 print('T̅ = ', T1, '\n\n')
 
 # compute tensor in primed coordinates using the outer product
@@ -83,7 +83,7 @@ Ginv = np.linalg.inv(G)
 for i in posLst:
     T_config = secondOrder.changeConfig(T, inPosLst, i, G, Ginv)
     # transform Tensor
-    T1_config = secondOrder.transformTensor(T_config, i, 2)
+    T1_config = secondOrder.transformTensor(T_config, i, 2, verbose)
     # Compute using outer products
     
     result_config_prime_outer = secondOrder.computeTensorOuterProduct(T1_config, i, False, 2, verbose)

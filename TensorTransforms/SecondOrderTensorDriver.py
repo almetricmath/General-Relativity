@@ -66,7 +66,7 @@ print('\n')
 
 print('Transform to polar sqrt coordinate system')
 
-T1 = secondOrder.transformTensor(T, posLst, 2)
+T1 = secondOrder.transformTensor(T, posLst, 2, verbose)
 
 l_result = latex.convertMatrixToLatex(T1, 2)
 print('T̅ = \n', l_result)

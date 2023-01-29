@@ -84,7 +84,7 @@ class secondOrderTensor:
             l_result = self._latex.convertMatrixToLatex(_basisLst[1], _n)
             print(_symbolLst[1], l_result, '\n')
              
-        ret = self._utils.matrix_1T_TW_matrix_2(_basisLst[0], _T, _basisLst[1], False, _n)
+        ret = self._utils.matrix_1T_TW_matrix_2(_basisLst[0], _T, _basisLst[1], False, _n, _verbose)
         
         
         return ret
@@ -101,7 +101,7 @@ class secondOrderTensor:
              _label += ' = ' 
          print(_label, l_result, '\n')
     
-    def transformTensor(self, _T, _posLst, _n):
+    def transformTensor(self, _T, _posLst, _n, _verbose):
         
         transformLst = self._utils.processTransformInput(_posLst, self, _n)
         M1 = transformLst[0]._basis.value
@@ -110,7 +110,7 @@ class secondOrderTensor:
         M2 = transformLst[1]._basis.value
         symbol_2 = transformLst[1]._basis.symbol
         print(symbol_2, ' = ', M2, '\n\n')
-        ret = self._utils.matrix_1T_TW_matrix_2(M1, _T, M2, False, _n)
+        ret = self._utils.matrix_1T_TW_matrix_2(M1, _T, M2, False, _n, _verbose)
         
         return ret
     
