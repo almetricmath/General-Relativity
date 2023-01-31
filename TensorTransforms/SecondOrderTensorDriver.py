@@ -33,9 +33,7 @@ print('Second Order Tensor Components\n')
 latex = t.convertToLatex()
 
 l_result = latex.convertMatrixToLatex(T, 2)
-print('T\n')
-print(l_result)
-print('\n')
+print('T = ', l_result,'\n')
 
 l_result = latex.convertMatrixToLatex(result, 2)
 print('Full Tensor computed by outer products\n')
@@ -69,10 +67,11 @@ print('Transform to polar sqrt coordinate system')
 T1 = secondOrder.transformTensor(T, posLst, 2, verbose)
 
 l_result = latex.convertMatrixToLatex(T1, 2)
-print('T̅ = \n', l_result)
+print('T̅ = ', l_result,'\n')
 
 # compute tensor in primed coordinates using the outer product
 
+print('Compute Tensor Using Outer Product in Primed Coordinates\n')
 result2 = secondOrder.computeTensorOuterProduct(T1, posLst, False, 2, verbose)
 
 l_result = latex.convertMatrixToLatex(result2, 2)
@@ -82,12 +81,13 @@ print('\n')
 
 # compute difference between result2 and result
 l_result = latex.convertMatrixToLatex(result2 - result, 2)
-print('Difference')
+print('Difference Between Outer Product in Primed Coordinates and Outer Product in Unprimed Coordinates\n')
 print(l_result)
 print('\n')
 
 # compute tensor in primed coordinates using the inner product
 
+print('Compute Tensor Using the Inner Product in Primed Coordinates\n')
 result3 = secondOrder.computeTensorInnerProduct(T1, posLst, False, 2, verbose)
 l_result = latex.convertMatrixToLatex(result3, 2)
 print('Full Tensor in primed coordinates computed by the inner product\n')

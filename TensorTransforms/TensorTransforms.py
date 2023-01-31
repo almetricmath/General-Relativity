@@ -58,17 +58,23 @@ class secondOrderTensor:
         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
      
         ret = 0
+        eqstr = ''
+        
         for i in range(_n):
             for j in range(_n):
                 coeff = _T[i, j]
                 if _verbose:
-                    print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False), ' = ' ,coeff)
-                    self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
-                    self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n)
+                    if eqstr != '':
+                        eqstr += '+' + '(' + str("{:.6f}".format(coeff)) + ')'
+                    else:
+                        eqstr += '(' + str(coeff) + ')' 
                 outer = np.einsum('i,j',_basisLst[0][i], _basisLst[1][j])
-                if _verbose:
-                    self.printMatrix(outer,'outer' + self._posNum.basisIndice(_posLst[0],i, False) + self._posNum.basisIndice(_posLst[1],j, False), _n)
+                l_outer = self._latex.convertMatrixToLatex(outer, _n)
+                eqstr += l_outer
                 ret += coeff*outer
+        
+        if _verbose:
+            print(eqstr,'\n')        
         return ret
     
     def computeTensorInnerProduct(self, _T, _posLst, _unprimed, _n, _verbose):
@@ -78,11 +84,15 @@ class secondOrderTensor:
         
         if _verbose:
             l_result = self._latex.convertMatrixToLatex(_T, _n)
-            print('T' + '\n', l_result, '\n')
-            l_result = self._latex.convertMatrixToLatex(np.transpose(_basisLst[0]), _n)
-            print(_symbolLst[0], l_result, '\n')
+            if _unprimed:
+                T_symbol = 'T'
+            else:
+                T_symbol = 'T̅'
+            print(T_symbol + '\n', l_result, '\n')
+            l_result = self._latex.convertMatrixToLatex(_basisLst[0], _n)
+            print('F = ',_symbolLst[0], l_result, '\n')
             l_result = self._latex.convertMatrixToLatex(_basisLst[1], _n)
-            print(_symbolLst[1], l_result, '\n')
+            print('H = ', _symbolLst[1], l_result, '\n')
              
         ret = self._utils.matrix_1T_TW_matrix_2(_basisLst[0], _T, _basisLst[1], False, _n, _verbose)
         
