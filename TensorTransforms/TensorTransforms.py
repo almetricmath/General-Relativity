@@ -181,23 +181,32 @@ class thirdOrderTensor:
         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
         
         ret = 0
+        eqstr = ''
         
         for i in range(_n):
             for j in range(_n):
                 for k in range(_n):
                     coeff = _T[i,j,k]
                     if _verbose:
-                        print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], k, False)  + ' = ', coeff)
-                        self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
-                        self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n) 
-                        self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.basisIndice(_posLst[2], k, False), _n)
+                        if eqstr != '':
+                            eqstr += '+' + '(' + str("{:.6f}".format(coeff)) + ')'
+                        else:
+                            eqstr += '(' + str(coeff) + ')' 
+                   # if _verbose:
+                        
+                        
+                        #self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
+                        #self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n) 
+                        #self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.basisIndice(_posLst[2], k, False), _n)
                     outer = np.einsum('i,j,k',_basisLst[0][i], _basisLst[1][j], _basisLst[2][k])
                     l_outer = self.convertToLatex(outer, _n)
-                    if _verbose:
-                        print('outer' + self._posNum.basisIndice(_posLst[0], i, False) + self._posNum.basisIndice(_posLst[1], j, False) + self._posNum.basisIndice(_posLst[2], k, False),'\n')
-                        print(l_outer, '\n')
+                    eqstr += l_outer
                     ret += coeff*outer
      
+        if _verbose:
+            print('T' + self._posNum.coordinateIndice(_posLst[0], 0, True)  +  self._posNum.coordinateIndice(_posLst[1], 1, True) + self._posNum.coordinateIndice(_posLst[2], 2, True) + ' = ')
+            print(eqstr, '\n')
+            
         return ret
       
     def computeWeightMatrix(self, _T, _posLst, _basis, _basis_symbol, _n, _verbose):
@@ -244,6 +253,12 @@ class thirdOrderTensor:
         ret = []
         
         for i in range(_n):
+            if _verbose:
+                if _unprimed:
+                    print('FᵀT'+self._posNum.coordinateIndice(pos.down, i, False)+'H term by term ')
+                else:
+                    print('F̅ᵀT̅'+self._posNum.coordinateIndice(pos.down, i, False)+'H̅ term by term ')
+                    
             tmp = self._utils.matrix_1T_TW_matrix_2(basis_2, T_ij[i], basis_3, False, _n, _verbose)
             if _verbose:
                 if _unprimed:
@@ -266,7 +281,7 @@ class thirdOrderTensor:
         M1 = _transformLst[1]._basis.value
         symbol_1 = _transformLst[1]._basis.symbol
         M2 = _transformLst[2]._basis.value
-        symbol_2 = _transformLst[1]._basis.symbol
+        symbol_2 = _transformLst[2]._basis.symbol
 
         L = self._forwardTable[_posLst[0]]._basis.value
         symbol_L = self._forwardTable[_posLst[0]]._basis.symbol
@@ -285,6 +300,9 @@ class thirdOrderTensor:
         ret = []
         
         for i in range(_n):
+            if _verbose:
+                print(symbol_1 + 'ᵀT'+self._posNum.coordinateIndice(pos.down, i, False) + symbol_2 + ' = '  + str(np.transpose(M1)) + str(_T) + str(M2) +  ' term by term ')
+                
             tmp = self._utils.matrix_1T_TW_matrix_2(M1, T_n[i], M2, False, _n, _verbose)
             ret.append(tmp)
             if _verbose:
@@ -295,12 +313,14 @@ class thirdOrderTensor:
         # convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
         # get L_prime
         
+        print('Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk\n')
+        
         _basisLstPrime, _symbolLstPrime = self._utils.processTensorInput(_posLst, False, self, False, _n)
         
         L_prime = _basisLstPrime[0] 
         L_prime_inv = np.linalg.inv(L_prime) # need to use L_prime inverse
         
-        T1_ijk = self._utils.blockInnerProduct(T1_n, 'T̅', _posLst, L_prime_inv, 'L̅⁻¹' ,_n, _verbose) 
+        T1_ijk = self._utils.blockInnerProduct(T1_n, 'T̅', _posLst, L_prime_inv, '[inverse(L̅)]',_n, _verbose) 
         
         return T1_n, T1_ijk
     
@@ -844,22 +864,26 @@ class utils:
         # and returns a block vector 
         
         ret = []
+        eqstr = ''
         
         for j in range(_n):
             sum = 0
             for k in range(_n): 
                 sum +=  _block_vec[k]*_L[k][j]
-                _indices = self._posNum.coordinateIndice(_posLst[0],k, False) + self._posNum.coordinateIndice(_posLst[1],1, True) + self._posNum.coordinateIndice(_posLst[2], 2,True)
                 if _verbose:
-                    self.printMatrix(_block_vec[k], _symbol + _indices, _n)
-                    print(_symbol_L + self._posNum.coordinateIndice(pos.down,k, False) + self._posNum.coordinateIndice(pos.down, j, False), _L[k][j])
+                    if eqstr == '':
+                        eqstr += _symbol + '.' + _symbol_L + '(' + str(j + 1) + ') = ' 
+                        eqstr += str(_symbol) + self._posNum.coordinateIndice(pos.down, j, False) + ' = ' + str(_block_vec[k]) + '(' + str("{:.6f}".format(_L[k][j])) + ')'
+                    else:
+                        eqstr += '+' + str(_block_vec[k]) + '(' + str("{:.6f}".format(_L[k][j])) + ')'
+                 
             ret.append(sum)
             
             if _verbose:
                 l_sum = self._latex.convertMatrixToLatex(sum, _n)
-                print(_symbol + self._posNum.coordinateIndice(pos.down, j, False) + ' = ', l_sum, "\n") 
-                
-        
+                print(eqstr,' = ', l_sum, '\n')
+                eqstr = ''
+              
         ret = np.array(ret)
         return ret
     
@@ -935,6 +959,9 @@ class utils:
         # computes transpose(_matrix_1)._TW._matrix_2
         # _block specifies _TW as a block matrix and the return type as a block matrix
         
+        #if _verbose:
+        #    print(
+        
         if not _block:
             ret = np.zeros(_n*_n).reshape((_n, _n))
         else:
@@ -965,9 +992,9 @@ class utils:
                     print(eqstr[1:] + '\n')
                     if _block:
                         l_result = self._latex.convertMatrixToLatex(acc, _n)
-                        print('result = ', l_result, '\n')
+                        print(' = ', l_result, '\n')
                     else:
-                        print('result = ', "{:.6f}".format(acc), '\n')
+                        print(' = ', "{:.6f}".format(acc), '\n')
                 eqstr = ''
                   
         return ret

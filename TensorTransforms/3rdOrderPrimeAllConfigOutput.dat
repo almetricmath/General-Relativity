@@ -1,0 +1,431 @@
+Original Configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.up: 0>] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the inner product and outer product tensor computations in unprimed coordinates using the original configuration
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+Initial Configuration =  [<pos.up: 0>, <pos.up: 0>, <pos.up: 0>] 
+
+T =  [[[1.   2.  ]
+  [0.75 1.  ]]
+
+ [[5.   6.  ]
+  [1.75 2.  ]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product computations in the initial configuration and the outer product in the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in the initial configuration and the outer product initial configuration in the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.up: 0>, <pos.up: 0>, <pos.down: 1>] 
+
+T̅ =  [[[ 4.         61.11549815]
+  [ 1.57079633 16.        ]]
+
+ [[10.47197551 96.        ]
+  [ 1.91908974 16.75516082]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{-0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.up: 0>] 
+
+T̅ =  [[[ 4.          4.1887902 ]
+  [22.91831181 16.        ]]
+
+ [[10.47197551  6.57973627]
+  [28.         16.75516082]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{0.000000&0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&-0.000000\\0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.down: 1>] 
+
+T̅ =  [[[ 0.25        3.81971863]
+  [ 1.43239449 14.59025044]]
+
+ [[ 0.65449847  6.        ]
+  [ 1.75       15.27887454]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{-0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{0.000000&0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.down: 1>, <pos.up: 0>, <pos.up: 0>] 
+
+T̅ =  [[[  4.           4.1887902 ]
+  [  1.57079633   1.09662271]]
+
+ [[152.78874537  96.        ]
+  [ 28.          16.75516082]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&-0.000000\\0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.down: 1>, <pos.up: 0>, <pos.down: 1>] 
+
+T̅ =  [[[ 0.25        3.81971863]
+  [ 0.09817477  1.        ]]
+
+ [[ 9.54929659 87.54150267]
+  [ 1.75       15.27887454]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.down: 1>, <pos.down: 1>, <pos.up: 0>] 
+
+T̅ =  [[[ 0.25        0.26179939]
+  [ 1.43239449  1.        ]]
+
+ [[ 9.54929659  6.        ]
+  [25.53293828 15.27887454]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&-0.000000\\0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.down: 1>, <pos.down: 1>, <pos.down: 1>] 
+
+T̅ =  [[[ 0.015625    0.23873241]
+  [ 0.08952466  0.91189065]]
+
+ [[ 0.59683104  5.47134392]
+  [ 1.59580864 13.93266288]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+Running configurations in Reverse
+
+Initial Configuration =  [<pos.down: 1>, <pos.down: 1>, <pos.down: 1>] 
+
+T =  [[[  1.   8.]
+  [  3.  16.]]
+
+ [[ 20.  96.]
+  [ 28. 128.]]] 
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.down: 1>, <pos.down: 1>, <pos.up: 0>] 
+
+T̅ =  [[[ 0.25        0.26179939]
+  [ 1.43239449  1.        ]]
+
+ [[ 9.54929659  6.        ]
+  [25.53293828 15.27887454]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&-0.000000\\0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.down: 1>, <pos.up: 0>, <pos.down: 1>] 
+
+T̅ =  [[[ 0.25        3.81971863]
+  [ 0.09817477  1.        ]]
+
+ [[ 9.54929659 87.54150267]
+  [ 1.75       15.27887454]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.down: 1>, <pos.up: 0>, <pos.up: 0>] 
+
+T̅ =  [[[  4.           4.1887902 ]
+  [  1.57079633   1.09662271]]
+
+ [[152.78874537  96.        ]
+  [ 28.          16.75516082]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&-0.000000\\0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.down: 1>] 
+
+T̅ =  [[[ 0.25        3.81971863]
+  [ 1.43239449 14.59025044]]
+
+ [[ 0.65449847  6.        ]
+  [ 1.75       15.27887454]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{-0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{0.000000&0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.up: 0>] 
+
+T̅ =  [[[ 4.          4.1887902 ]
+  [22.91831181 16.        ]]
+
+ [[10.47197551  6.57973627]
+  [28.         16.75516082]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{0.000000&0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&-0.000000\\0.000000&0.000000}\\} 
+
+
+Convert [T1(1, j, k), T1(2, j, k)] to T1_ijk
+
+configuration =  [<pos.up: 0>, <pos.up: 0>, <pos.up: 0>] 
+
+T̅ =  [[[ 64.          67.02064328]
+  [ 25.13274123  17.54596338]]
+
+ [[167.55160819 105.27578028]
+  [ 30.70543591  18.37408988]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product tensor in primed coordinates in different configurations and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&-0.000000\\-0.000000&0.000000}\\} 
+
+
+3rd order tensor by inner product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations in different configurations in primed coordinates and the outer product of the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&-0.000000}&\bmatrix{-0.000000&-0.000000\\0.000000&0.000000}\\} 
+
+

@@ -1,0 +1,379 @@
+Original Configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.up: 0>] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+3rd order tensor by EᵀTE
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the inner product and outer product tensor computations in unprimed coordinates using the original configuration
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+Initial Configuration =  [<pos.up: 0>, <pos.up: 0>, <pos.up: 0>] 
+
+T =  [[[1.   2.  ]
+  [0.75 1.  ]]
+
+ [[5.   6.  ]
+  [1.75 2.  ]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product computations for the initial configuration and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+ Compute Tensor using transpose(F).[T_n].H  
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computation for the initial configuration and the outer product original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.up: 0>, <pos.up: 0>, <pos.down: 1>] 
+
+T =  [[[ 1.    8.  ]
+  [ 0.75  4.  ]]
+
+ [[ 5.   24.  ]
+  [ 1.75  8.  ]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.up: 0>] 
+
+T =  [[[1. 2.]
+  [3. 4.]]
+
+ [[5. 6.]
+  [7. 8.]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.down: 1>] 
+
+T =  [[[ 1.  8.]
+  [ 3. 16.]]
+
+ [[ 5. 24.]
+  [ 7. 32.]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.down: 1>, <pos.up: 0>, <pos.up: 0>] 
+
+T =  [[[ 1.    2.  ]
+  [ 0.75  1.  ]]
+
+ [[20.   24.  ]
+  [ 7.    8.  ]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.down: 1>, <pos.up: 0>, <pos.down: 1>] 
+
+T =  [[[ 1.    8.  ]
+  [ 0.75  4.  ]]
+
+ [[20.   96.  ]
+  [ 7.   32.  ]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.down: 1>, <pos.down: 1>, <pos.up: 0>] 
+
+T =  [[[ 1.  2.]
+  [ 3.  4.]]
+
+ [[20. 24.]
+  [28. 32.]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.down: 1>, <pos.down: 1>, <pos.down: 1>] 
+
+T =  [[[  1.   8.]
+  [  3.  16.]]
+
+ [[ 20.  96.]
+  [ 28. 128.]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+Running configurations in Reverse
+
+Initial Configuration =  [<pos.down: 1>, <pos.down: 1>, <pos.down: 1>] 
+
+T =  [[[  1.   8.]
+  [  3.  16.]]
+
+ [[ 20.  96.]
+  [ 28. 128.]]] 
+
+configuration =  [<pos.down: 1>, <pos.down: 1>, <pos.up: 0>] 
+
+T =  [[[ 1.  2.]
+  [ 3.  4.]]
+
+ [[20. 24.]
+  [28. 32.]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.down: 1>, <pos.up: 0>, <pos.down: 1>] 
+
+T =  [[[ 1.    8.  ]
+  [ 0.75  4.  ]]
+
+ [[20.   96.  ]
+  [ 7.   32.  ]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.down: 1>, <pos.up: 0>, <pos.up: 0>] 
+
+T =  [[[ 1.    2.  ]
+  [ 0.75  1.  ]]
+
+ [[20.   24.  ]
+  [ 7.    8.  ]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.down: 1>] 
+
+T =  [[[ 1.  8.]
+  [ 3. 16.]]
+
+ [[ 5. 24.]
+  [ 7. 32.]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.up: 0>, <pos.down: 1>, <pos.up: 0>] 
+
+T =  [[[1. 2.]
+  [3. 4.]]
+
+ [[5. 6.]
+  [7. 8.]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+configuration =  [<pos.up: 0>, <pos.up: 0>, <pos.up: 0>] 
+
+T =  [[[1.   2.  ]
+  [0.75 1.  ]]
+
+ [[5.   6.  ]
+  [1.75 2.  ]]] 
+
+3rd order tensor by outer product
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\}
+
+
+Difference between the outer product and outer product tensor computations between different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{0.000000&0.000000\\0.000000&0.000000}\\} 
+
+
+\bmatrix{\bmatrix{-0.498153&0.888462\\14.360894&-19.518507}&\bmatrix{1.290386&-2.157291\\-12.822355&16.039741}\\} 
+
+Difference between the inner product computations etween different configurations and the original configuration in unprimed coordinates
+
+\bmatrix{\bmatrix{0.000000&0.000000\\0.000000&0.000000}&\bmatrix{-0.000000&0.000000\\0.000000&0.000000}\\} 
+
+

@@ -130,7 +130,6 @@ print('Running configurations in Reverse\n')
 print('Initial Configuration = ', inPosLst, '\n')
 print('T = ', T_init, '\n')
 
-
 for item in posLst:
     T_config = 0
     T_config = t3.changeConfig(T_init, inPosLst, item, G, Ginv, 2, verbose)
