@@ -27,7 +27,7 @@ inPosLst = [t.pos.up, t.pos.down, t.pos.down, t.pos.up]
 verbose = False
 unprimed = True
 
-result = t4.computeTensorOuterProduct(T, inPosLst, unprimed, 2)
+result = t4.computeTensorOuterProduct(T, inPosLst, unprimed, 2, verbose)
 l_result = t4.convertElementToLatex(result, 2)
 print('Original Configuration = ', inPosLst, '\n')
 print('4th order tensor by outer product\n')
@@ -56,7 +56,7 @@ print('T = ', l_T_init, '\n')
 
 # Test outer product in initial configuration
 
-result_1 = t4.computeTensorOuterProduct(T_init, init_posLst, unprimed, 2)
+result_1 = t4.computeTensorOuterProduct(T_init, init_posLst, unprimed, 2, verbose)
 l_diff = t4.convertElementToLatex(result_1 - result, 2)
 print('Difference of the Initial Configuration Outer Product with the Original Configuration = ', l_diff, '\n')
 
@@ -76,13 +76,15 @@ posLst = [[t.pos.up, t.pos.up, t.pos.up, t.pos.down], [t.pos.up, t.pos.up, t.pos
           [t.pos.down, t.pos.up, t.pos.down, t.pos.down], [t.pos.down, t.pos.down, t.pos.up, t.pos.up],\
           [t.pos.down, t.pos.down, t.pos.up, t.pos.down], [t.pos.down, t.pos.down, t.pos.down, t.pos.up],\
           [t.pos.down, t.pos.down, t.pos.down, t.pos.down]]
-          
+  
+verbose = False
+        
 for item in posLst:
     T_config = 0
     T_config = t4.changeConfig(T_init, init_posLst, item, G, Ginv, 2, verbose)
     print('configuration = ', item, '\n')
     print('T = ', T_config, '\n')
-    result_3 = t4.computeTensorOuterProduct(T_config, item, unprimed, 2)
+    result_3 = t4.computeTensorOuterProduct(T_config, item, unprimed, 2, verbose)
     print('4th order tensor by outer product\n')
     l_result = t4.convertElementToLatex(result_3, 2)
     print(l_result)
@@ -110,7 +112,7 @@ for item in posLst:
     T_config = t4.changeConfig(T_init, init_posLst, item, G, Ginv, 2, verbose)
     print('configuration = ', item, '\n')
     print('T = ', T_config, '\n')
-    result_5 = t4.computeTensorOuterProduct(T_config, item, unprimed, 2)
+    result_5 = t4.computeTensorOuterProduct(T_config, item, unprimed, 2, verbose)
     print('4th order tensor by outer product\n')
     l_result = t4.convertElementToLatex(result_5, 2)
     print(l_result)

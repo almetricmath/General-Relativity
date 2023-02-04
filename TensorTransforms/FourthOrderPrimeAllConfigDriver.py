@@ -26,7 +26,7 @@ inPosLst = [t.pos.up, t.pos.down, t.pos.down, t.pos.up]
 verbose = False
 unprimed = True
 
-result = t4.computeTensorOuterProduct(T, inPosLst, unprimed, 2)
+result = t4.computeTensorOuterProduct(T, inPosLst, unprimed, 2, verbose)
 l_result = t4.convertElementToLatex(result, 2)
 print('Original Configuration = ', inPosLst, '\n')
 print('4th order tensor by outer product\n')
@@ -55,7 +55,7 @@ print('T = ', l_T_init, '\n')
 
 # Test outer product in initial configuration
 
-result_1 = t4.computeTensorOuterProduct(T_init, init_posLst, unprimed, 2)
+result_1 = t4.computeTensorOuterProduct(T_init, init_posLst, unprimed, 2, verbose)
 l_diff = t4.convertElementToLatex(result_1 - result, 2)
 print('Difference of the Initial Configuration Outer Product with the Original Configuration = ', l_diff, '\n')
 
@@ -77,6 +77,7 @@ posLst = [[t.pos.up, t.pos.up, t.pos.up, t.pos.down], [t.pos.up, t.pos.up, t.pos
           [t.pos.down, t.pos.down, t.pos.down, t.pos.down]]
 
 unprimed = False
+verbose = False
 
 for item in posLst:
     T_config = 0
@@ -85,7 +86,7 @@ for item in posLst:
     print('T = ', T_config, '\n')
     # transform tensor components
     T_config_Prime, T_Prime_ijkl = t4.transformTensor(T_config, item, 2, verbose)
-    result_3 = t4.computeTensorOuterProduct(T_Prime_ijkl, item, unprimed, 2)
+    result_3 = t4.computeTensorOuterProduct(T_Prime_ijkl, item, unprimed, 2, verbose)
     print('4th order tensor by outer product\n')
     l_result = t4.convertElementToLatex(result_3, 2)
     print(l_result)
@@ -115,7 +116,7 @@ for item in posLst:
   print('T = ', T_config, '\n')
   # transform tensor components
   T_config_Prime, T_Prime_ijkl = t4.transformTensor(T_config, item, 2, verbose)
-  result_3 = t4.computeTensorOuterProduct(T_Prime_ijkl, item, unprimed, 2)
+  result_3 = t4.computeTensorOuterProduct(T_Prime_ijkl, item, unprimed, 2, verbose)
   print('4th order tensor by outer product\n')
   l_result = t4.convertElementToLatex(result_3, 2)
   print(l_result)

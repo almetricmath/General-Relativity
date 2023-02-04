@@ -192,12 +192,7 @@ class thirdOrderTensor:
                             eqstr += '+' + '(' + str("{:.6f}".format(coeff)) + ')'
                         else:
                             eqstr += '(' + str(coeff) + ')' 
-                   # if _verbose:
-                        
-                        
-                        #self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
-                        #self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n) 
-                        #self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.basisIndice(_posLst[2], k, False), _n)
+                 
                     outer = np.einsum('i,j,k',_basisLst[0][i], _basisLst[1][j], _basisLst[2][k])
                     l_outer = self.convertToLatex(outer, _n)
                     eqstr += l_outer
@@ -418,16 +413,16 @@ class fourthOrderTensor:
         
         # get Basis 3 and Basis 4 in matrix form
         
-        B3 = _basisLst[2]
-        symbol_3 = _symbolLst[2]
-        B4 = _basisLst[3]
-        symbol_4 = _symbolLst[3]
+        F = _basisLst[2]
+        symbol_F = _symbolLst[2]
+        H = _basisLst[3]
+        symbol_H = _symbolLst[3]
         
         # print Basis 3 and Basis 4
         
         if _verbose:
-            self.printMatrix(B3, 'B3 = ' + symbol_3, _n)
-            self.printMatrix(B4, 'B4 = ' + symbol_4, _n)
+            self.printMatrix(F, 'F = ' + symbol_F, _n)
+            self.printMatrix(H, 'H = ' + symbol_H, _n)
         
         ret = self.allocateFourthOrderElement(_n)
         
@@ -437,11 +432,11 @@ class fourthOrderTensor:
                 if _verbose:
                     l_t_matrix = self._latex.convertMatrixToLatex(TW, _n)
                     print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], 2, True) + self._posNum.coordinateIndice(_posLst[3], 3, True) + ' = ' + l_t_matrix + '\n')
-                result = self._utils.matrix_1T_TW_matrix_2(B3, TW, B4, False, _n, False)
+                result = self._utils.matrix_1T_TW_matrix_2(F, TW, H, False, _n, False)
                 
                 if _verbose:
                     l_result = self._latex.convertMatrixToLatex(result, _n)
-                    print('T' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + ' = ' + l_result + '\n') 
+                    print('[T_block]' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + ' = ' + l_result + '\n') 
                 ret[i][j] = result
             
         return ret
@@ -500,7 +495,7 @@ class fourthOrderTensor:
         ret_ij = np.array([[[[0.0]*_n]*_n]*_n]*_n)
         return ret_ij
              
-    def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n):
+    def computeTensorOuterProduct(self, _T, _posLst, _unprimed, _n, _verbose):
      
         _basisLst, _symbolLst = self._utils.processTensorInput(_posLst, _unprimed, self, True, _n)
         
@@ -511,18 +506,20 @@ class fourthOrderTensor:
                 for k in range(_n):
                     for l in range(_n):
                         coeff = _T[i, j, k, l]
-                        print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], k, False) + self._posNum.coordinateIndice(_posLst[3], l, False)  + ' = ', coeff)
-                        self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
-                        self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n) 
-                        self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.basisIndice(_posLst[2], k, False), _n)
-                        self.printVector( _basisLst[3][l], False, _symbolLst[3].lower() + self._posNum.basisIndice(_posLst[3], l, False), _n)
+                        if _verbose:
+                            print('T' + self._posNum.coordinateIndice(_posLst[0], i, False)  +  self._posNum.coordinateIndice(_posLst[1], j, False) + self._posNum.coordinateIndice(_posLst[2], k, False) + self._posNum.coordinateIndice(_posLst[3], l, False)  + ' = ', str("{:.6f}".format(coeff) ))
+                            self.printVector( _basisLst[0][i], False, _symbolLst[0].lower() + self._posNum.basisIndice(_posLst[0], i, False), _n)
+                            self.printVector( _basisLst[1][j], False, _symbolLst[1].lower() + self._posNum.basisIndice(_posLst[1], j, False), _n) 
+                            self.printVector( _basisLst[2][k], False, _symbolLst[2].lower() + self._posNum.basisIndice(_posLst[2], k, False), _n)
+                            self.printVector( _basisLst[3][l], False, _symbolLst[3].lower() + self._posNum.basisIndice(_posLst[3], l, False), _n)
                         outer = np.einsum('i,j,k,l',_basisLst[0][i], _basisLst[1][j], _basisLst[2][k],_basisLst[3][l])
                         l_outer = self.convertElementToLatex(outer, _n)
-                        print('outer' + self._posNum.basisIndice(_posLst[0], i, False) + self._posNum.basisIndice(_posLst[1], j, False) + self._posNum.basisIndice(_posLst[2], k, False) + self._posNum.basisIndice(_posLst[3], l, False),'\n')
-                        print(l_outer, '\n')
+                        if _verbose:
+                            print('outer' + self._posNum.basisIndice(_posLst[0], i, False) + self._posNum.basisIndice(_posLst[1], j, False) + self._posNum.basisIndice(_posLst[2], k, False) + self._posNum.basisIndice(_posLst[3], l, False),'\n')
+                            print(l_outer, '\n')
                              
                         ret += coeff*outer
-            
+       
         return ret
     
         
@@ -568,22 +565,29 @@ class fourthOrderTensor:
         
         
         # Transform T_prime_ij -> T_prime_ijkl
-         
+        
+        print('Transform  T_prime_ij to T_prime_ijkl\n')
+        
         _basisLstPrime, _symbolLstPrime = self._utils.processTensorInput(_posLst, False, self, False, _n) 
        
         T_prime_ijkl = self.allocateFourthOrderElement(_n)
        
         F_primeT = np.transpose(_basisLstPrime[2])  
-        F_primeT_inv = np.linalg.inv(F_primeT) # need to use L_prime inverse
+        F_primeT_inv = np.linalg.inv(F_primeT) # need to use F_prime inverse
         F_prime_inv = np.transpose( F_primeT_inv) # transpose because the matrix_1T_TW_matrix_2 automatically transposes
                                                   # could put a switch in matrix_1T_TW_matrix_2 to indicate if it should compute transposing the first matruix or not
         
         H_prime = _basisLstPrime[3]
-        H_prime_inv = np.linalg.inv(H_prime) # need to use L_prime inverse
+        H_prime_inv = np.linalg.inv(H_prime) # need to use H_prime inverse
         
         for i in range(_n):
             for j in range(_n):
+                if _verbose:
+                    print('(' + str(i) + ',' + str(j) + ') component\n')
                 T_prime_ijkl[i][j] = self._utils.matrix_1T_TW_matrix_2( F_prime_inv, T_prime_ij[i][j], H_prime_inv, False, _n, _verbose)
+                if _verbose:
+                    l_T_prime_ijkl = self._latex.convertMatrixToLatex(T_prime_ijkl[i][j], _n)
+                    print('[T_ijkl]' + self._posNum.coordinateIndice(_posLst[0], i, False) + self._posNum.coordinateIndice(_posLst[1], j, False) + ' = ' + l_T_prime_ijkl + '\n')
             
         return T_prime_ij, T_prime_ijkl
        

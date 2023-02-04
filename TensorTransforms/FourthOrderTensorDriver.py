@@ -6,7 +6,6 @@ Created on Fri Oct 14 10:25:18 2022
 """
 
 import TensorTransforms as t
-print(t.__file__)
 import numpy as np
 import sys
 
@@ -30,8 +29,10 @@ posLst = [t.pos.up, t.pos.down, t.pos.down, t.pos.up]
 
 # compute 4th order tensor using the outer product
 
+verbose = True
+
 print('\nOuter Product Calculation\n')
-result_1 = t4.computeTensorOuterProduct(TW, posLst, True, 2)
+result_1 = t4.computeTensorOuterProduct(TW, posLst, True, 2, verbose)
 l_result = t4.convertElementToLatex(result_1, 2)
 
 print('result = ', l_result)
@@ -55,7 +56,7 @@ print('Difference between inner product and outer product = ', l_diff, '\n')
 
 print('Transform Tensor Components\n')
 
-T_prime_block, T_ijkl = t4.transformTensor(TW, posLst, False, 2, verbose)
+T_prime_block, T_ijkl = t4.transformTensor(TW, posLst, 2, verbose)
 
 print('Block Tensor Components in the Primed Coordinate System\n')
 l_Tblock = t4.convertElementToLatex(T_prime_block, 2)
@@ -78,8 +79,10 @@ print('Difference between the inner product in primed coordinates and outer prod
 
 # compute tensor in the primed coordinates using the outer product
 
-result_4 = t4.computeTensorOuterProduct(T_ijkl, posLst, False, 2)
-l_result = t4.convertElementToLatex(result_1, 2)
+result_4 = t4.computeTensorOuterProduct(T_ijkl, posLst, False, 2, verbose)
+l_result = t4.convertElementToLatex(result_4, 2)
+print('result = ', l_result)
+print('\n')
 
 l_diff = t4.convertElementToLatex(result_4 - result_1, 2)
 print('Difference between the outer product in primed coordinates and outer product in unprimed coordinates = ', l_diff, '\n')
