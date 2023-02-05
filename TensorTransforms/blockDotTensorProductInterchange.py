@@ -42,7 +42,7 @@ _n = 2
 
 # tensor product E x T
 
-tensorProduct = t.utils().tensorProduct(np.array([E]), T, _n)
+tensorProduct = t.utils().tensorProduct([E], T, _n)
 
 l_tensorProduct = convertElementToLatex(tensorProduct, t.convertToLatex(), _n)
 print('[[E] x T] = ', l_tensorProduct,'\n')
@@ -57,7 +57,7 @@ dotProduct = t.utils().blockDotProduct(W, T, _n)
 l_dotProduct = convertElementToLatex(dotProduct, t.convertToLatex(), _n)
 print('[W.T] = ',l_dotProduct,'\n')
 
-result_1 = t.utils().tensorProduct(np.array([E]), dotProduct, _n)
+result_1 = t.utils().tensorProduct([E], dotProduct, _n)
 l_result = convertElementToLatex(result_1, t.convertToLatex(), _n)
 
 print('[E] x [W.T] = ', l_result, '\n')
