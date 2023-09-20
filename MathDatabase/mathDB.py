@@ -17,7 +17,6 @@ class mathDB:
         
         self._db_name = db_name
         self._transformTable = {}
-        self._coordinateTable = {}
         self._dictionary = {}
         filename = Path(db_name)
         filename.touch(exist_ok=True)
