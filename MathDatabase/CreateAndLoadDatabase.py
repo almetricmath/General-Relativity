@@ -19,6 +19,7 @@ def I(n):
 
 class computeMatrices:
     
+    @staticmethod
     def computeTransform(_params, _vec):
         
         _n = len(_params)
