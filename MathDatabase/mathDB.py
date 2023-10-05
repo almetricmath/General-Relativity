@@ -135,6 +135,32 @@ class coordinateRecord:
         print('_inv_params = ', self._inv_params, '\n')
         print('_inv_vec = ', self._inv_vec, '\n')
 
+# develop a loop to process results given an input coordinate system
+
+def processLoop(_coords, msg):
+    
+    latex = convertToLatex()
+    
+    cM = computeMatrices()
+    A = cM.A_matrix(_coords)
+    A_latex = latex.convertMatrixToLatex(A)
+    print('A', msg, A_latex, '\n')
+    B = cM.B_matrix(_coords)
+    B_latex = latex.convertMatrixToLatex(B)
+    print('B', msg, B_latex, '\n')
+
+    E = I(2)
+    W = I(2)
+    E_bar = A*E
+    E_bar_latex = latex.convertMatrixToLatex(E_bar)
+    print('E', msg, E_bar_latex, '\n')
+    W_bar = sp.transpose(B)*W
+    W_bar_latex = latex.convertMatrixToLatex(W_bar)
+    print('W', msg,  W_bar_latex, '\n')
+
+    tmpRec = transformRecord(A, B, E_bar, W_bar)
+    return tmpRec
+
 
 class mathDB:
     

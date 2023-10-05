@@ -11,36 +11,6 @@ import mathDB as mathDB
 import sys
 
 
-    
-
-# develop a loop to process results given an input coordinate system
-
-def processLoop(_coords, msg):
-    
-    latex = mathDB.convertToLatex()
-    
-    cM = mathDB.computeMatrices()
-    A = cM.A_matrix(_coords)
-    A_latex = latex.convertMatrixToLatex(A)
-    print('A', msg, A_latex, '\n')
-    B = cM.B_matrix(_coords)
-    B_latex = latex.convertMatrixToLatex(B)
-    print('B', msg, B_latex, '\n')
-
-    E = mathDB.I(2)
-    W = mathDB.I(2)
-    E_bar = A*E
-    E_bar_latex = latex.convertMatrixToLatex(E_bar)
-    print('E', msg, E_bar_latex, '\n')
-    W_bar = sp.transpose(B)*W
-    W_bar_latex = latex.convertMatrixToLatex(W_bar)
-    print('W', msg,  W_bar_latex, '\n')
-
-    tmpRec = mathDB.transformRecord(A, B, E_bar, W_bar)
-    return tmpRec
-
-
-
 mathData = mathDB.mathDB('math.db')
 
 
@@ -74,7 +44,7 @@ y = symbols('y') #noqa
 print('polar from cartesian matrices \n')
 
 pFc = mathDB.polarFromCartesian(r, theta, x, y)
-rec = processLoop(pFc, '(polar, cartesian) = ')
+rec = mathDB.processLoop(pFc, '(polar, cartesian) = ')
 mathData.insertIntoTransformTable('polar', 'cartesian', rec)
 rec = mathDB.coordinateRecord(pFc)
 mathData.insertIntoCoordinateTable('polar', 'cartesian', rec)
@@ -90,7 +60,7 @@ W_polar = mathDB.I(2)
 print('polarSqrt from polar matrices \n')
 
 pSqrtFp = mathDB.polarSqrtFromPolar(r_bar, theta_bar, r, theta)
-rec = processLoop(pSqrtFp, '(polarSqrt, polar) = ')
+rec = mathDB.processLoop(pSqrtFp, '(polarSqrt, polar) = ')
 mathData.insertIntoTransformTable('polarSqrt', 'polar', rec)
 rec = mathDB.coordinateRecord(pSqrtFp)
 mathData.insertIntoCoordinateTable('polarSqrt', 'polar', rec)
@@ -100,7 +70,7 @@ mathData.insertIntoCoordinateTable('polarSqrt', 'polar', rec)
 print('polar1 from polar\n')
 
 p1Fp = mathDB.polar1FromPolar(r_bar, theta_bar, r, theta)
-rec = processLoop(p1Fp, '(polar1, polar) = ')
+rec = mathDB.processLoop(p1Fp, '(polar1, polar) = ')
 mathData.insertIntoTransformTable('polar1', 'polar', rec)
 rec = mathDB.coordinateRecord(p1Fp)
 mathData.insertIntoCoordinateTable('polar1', 'polar', rec)
@@ -110,21 +80,10 @@ mathData.insertIntoCoordinateTable('polar1', 'polar', rec)
 print('polarSqrt1 from polar\n')
 
 pSqrt1Fp = mathDB.polarSqrt1FromPolar(r_bar, theta_bar, r, theta)
-rec = processLoop(pSqrt1Fp, '(polarSqrt1, polar) = ')
+rec = mathDB.processLoop(pSqrt1Fp, '(polarSqrt1, polar) = ')
 mathData.insertIntoTransformTable('polarSqrt1', 'polar', rec)
 rec = mathDB.coordinateRecord(pSqrt1Fp)
 mathData.insertIntoCoordinateTable('polarSqrt1', 'polar', rec)
 
 mathData.close()
 sys.exit(0)
-
-
-
-
-
-
-
-
-
-
-
