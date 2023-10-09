@@ -115,12 +115,18 @@ class transformRecord:
         self._E = _E
         self._W = _W
         
-    def printRecord(self):
-        print('A = ', self._A, '\n')
-        print('B = ', self._B, '\n')
-        print('E = ', self._E, '\n')
-        print('W = ', self._W, '\n')
-
+    def printRecord(self, _key):
+        latex = convertToLatex()
+        
+        A_latex = latex.convertMatrixToLatex(self._A)
+        print('A',str(_key),' = \n', A_latex, '\n')
+        E_latex = latex.convertMatrixToLatex(self._E)
+        print('E',str(_key),' = \n', E_latex, '\n')
+        B_latex = latex.convertMatrixToLatex(self._B)
+        print('B',str(_key),' = \n', B_latex, '\n')
+        W_latex = latex.convertMatrixToLatex(self._W)
+        print('W',str(_key),' = ', W_latex, '\n\n')
+        
 class coordinateRecord:
     
     def __init__(self, _class):
@@ -137,7 +143,9 @@ class coordinateRecord:
 
 # develop a loop to process results given an input coordinate system
 
-def processLoop(_coords, msg):
+def createProcessLoop(_coords, msg):
+    
+    # process loop to create a transform record from the coordinate class
     
     latex = convertToLatex()
     
@@ -160,7 +168,6 @@ def processLoop(_coords, msg):
 
     tmpRec = transformRecord(A, B, E_bar, W_bar)
     return tmpRec
-
 
 class mathDB:
     
