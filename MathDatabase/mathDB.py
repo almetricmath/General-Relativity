@@ -10,6 +10,7 @@ from sympy.printing.latex import latex as sp_latex
 from pathlib import Path
 import pickle
 import os
+import string
 
 def I(n):
     return sp.eye(n)
@@ -18,8 +19,12 @@ def I(n):
 
 class computeMatrices:
     
-    @staticmethod
-    def computeTransform(_params, _vec):
+    def __init__(self, _logFilePtr):
+        self._logFilePtr = _logFilePtr 
+        self._latex = convertToLatex()
+    
+    
+    def computeTransform(self, _params, _vec):
         
         _n = len(_params)
         ret = sp.Matrix(0, 0, [])
@@ -30,50 +35,67 @@ class computeMatrices:
         return ret
         
     
-    @staticmethod
-    def A_matrix(_coords):
+    def A_matrix(self, _coords):
         
         params = _coords._params
         vec = _coords._vec
-        ret = computeMatrices.computeTransform(params, vec)
+        ret = self.computeTransform(params, vec)
+        ret_latex = self._latex.convertMatrixToLatex(ret)
+        
+        if self._logFilePtr:
+            self._logFilePtr.write('Computing A matrix for ' + _coords._name + '\n')
+            self._logFilePtr.write(ret_latex + '\n\n')
         
         return ret
         
         
-    @staticmethod
-    def B_matrix(_coords):
+    
+    def B_matrix(self, _coords):
         
         # use this method if for some reason the A matrix is singular
         
         inv_params = _coords._inv_params
         inv_vec = _coords._inv_vec
-        ret = computeMatrices.computeTransform(inv_params, inv_vec)
+        ret = self.computeTransform(inv_params, inv_vec)
+        ret_latex = self._latex.convertMatrixToLatex(ret)
+        if self._logFilePtr:
+            self._logFilePtr.write('Computing B matrix for ' + _coords._name + '\n')
+            self._logFilePtr.write(ret_latex + '\n' + '\n')
+       
         # substitute to get both A and B matrices in terms of the same parameters
        
-        
         vec = _coords._vec
         sub_str = dict(zip(inv_params, vec))
         ret = ret.subs(sub_str) 
         ret = sp.simplify(ret)
-        
-        
+        ret_latex = self._latex.convertMatrixToLatex(ret)
+        if self._logFilePtr:
+            self._logFilePtr.write('B matrix After simplification ' + ret_latex + '\n' + '\n')
+       
         # handle sqrt(r**2) = r
         params = _coords._params
         sub_str = map(lambda x: sp.sqrt(x**2), params)
         sub_str = dict(zip(sub_str, params))
         ret = ret.subs(sub_str)
         ret = sp.simplify(ret)
-        
-        
+        ret_latex = self._latex.convertMatrixToLatex(ret)
+        if self._logFilePtr:
+            self._logFilePtr.write('B matrix After sqrt simplification ' + ret_latex + '\n' + '\n')
+       
         return ret
         
-        
+    def close(self):
+        if self._logFilePtr:
+            self._logFilePtr.close()
+
+
 # class with static methods to compute polar matrices from cartesian coordinates
 
 
 class polarFromCartesian:
     
     def __init__(self, _r, _theta, _x, _y):
+        self._name = 'polarFromCartesian'
         self._params = sp.Array([_r, _theta])
         self._vec = sp.Array([self._params[0]*sp.cos(self._params[1]), self._params[0]*sp.sin(self._params[1])]) # definitions of x and y
         self._inv_params = sp.Array([_x, _y])
@@ -83,6 +105,7 @@ class polarFromCartesian:
 class polarSqrtFromPolar:
     
     def __init__(self, _r_bar, _theta_bar, _r, _theta):
+        self._name = 'polarSqrtFromCartesian'
         self._params = sp.Array([_r_bar, _theta_bar])
         self._vec = sp.Array([sp.sqrt(self._params[0]), sp.sqrt(self._params[1])])
         self._inv_params = sp.Array([_r, _theta])
@@ -92,6 +115,7 @@ class polarSqrtFromPolar:
 class polar1FromPolar:
     
     def __init__(self, _r_bar, _theta_bar, _r, _theta):
+        self._name = 'polar1FromPolar'
         self._params = sp.Array([_r_bar, _theta_bar])
         self._vec = sp.Array([_r_bar + _theta_bar, _r_bar - _theta_bar])
         self._inv_params = sp.Array([_r, _theta])
@@ -101,6 +125,7 @@ class polar1FromPolar:
 class polarSqrt1FromPolar:
     
     def __init__(self, _r_bar, _theta_bar, _r, _theta):
+        self._name = 'polarSqrt1FromPolar'
         self._params = sp.Array([_r_bar, _theta_bar])
         self._vec = sp.Array([sp.sqrt(_r_bar) + sp.sqrt(_theta_bar), sp.sqrt(_r_bar) - sp.sqrt(_theta_bar)])
         self._inv_params = sp.Array([_r, _theta])
@@ -130,12 +155,14 @@ class transformRecord:
 class coordinateRecord:
     
     def __init__(self, _class):
+        self._name = _class._name
         self._params = _class._params
         self._vec = _class._vec
         self._inv_params = _class._inv_params
         self._inv_vec = _class._inv_vec
         
     def printRecord(self):
+        print('name = ', self._name, '\n')
         print('_params = ', self._params, '\n')
         print('_vec = ', self._vec, '\n')
         print('_inv_params = ', self._inv_params, '\n')
@@ -143,13 +170,18 @@ class coordinateRecord:
 
 # develop a loop to process results given an input coordinate system
 
-def createProcessLoop(_coords, msg):
+def createProcessLoop(_coords, msg, _logFileName:string):
+    
+    if len(_logFileName) != 0:
+        logPtr = open(_logFileName, 'a')
+    else:
+        logPtr = None
     
     # process loop to create a transform record from the coordinate class
     
     latex = convertToLatex()
     
-    cM = computeMatrices()
+    cM = computeMatrices(logPtr)
     A = cM.A_matrix(_coords)
     A_latex = latex.convertMatrixToLatex(A)
     print('A', msg, A_latex, '\n')
@@ -167,6 +199,9 @@ def createProcessLoop(_coords, msg):
     print('W', msg,  W_bar_latex, '\n')
 
     tmpRec = transformRecord(A, B, E_bar, W_bar)
+    
+    cM.close()
+    
     return tmpRec
 
 class mathDB:

@@ -9,7 +9,6 @@ Created on Tue May 16 17:09:32 2023
 from sympy import * #noqa
 #from sympy.printing.latex import latex as sp_latex
 import mathDB
-import sys
 
 
 mathData = mathDB.mathDB('math.db')
@@ -72,7 +71,7 @@ print(str(key), 'coordinates\n')
 coord.printRecord()
 
 mathData.close()
-sys.exit(0)
+
 
 
 
