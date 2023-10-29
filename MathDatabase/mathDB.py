@@ -105,7 +105,7 @@ class polarFromCartesian:
 class polarSqrtFromPolar:
     
     def __init__(self, _r_bar, _theta_bar, _r, _theta):
-        self._name = 'polarSqrtFromCartesian'
+        self._name = 'polarSqrtFromPolar'
         self._params = sp.Array([_r_bar, _theta_bar])
         self._vec = sp.Array([sp.sqrt(self._params[0]), sp.sqrt(self._params[1])])
         self._inv_params = sp.Array([_r, _theta])
@@ -144,13 +144,13 @@ class transformRecord:
         latex = convertToLatex()
         
         A_latex = latex.convertMatrixToLatex(self._A)
-        print('A',str(_key),' = \n', A_latex, '\n')
-        E_latex = latex.convertMatrixToLatex(self._E)
-        print('E',str(_key),' = \n', E_latex, '\n')
+        print('A(',', '.join(_key),')  = ', A_latex, '\n')
         B_latex = latex.convertMatrixToLatex(self._B)
-        print('B',str(_key),' = \n', B_latex, '\n')
+        print('B(',', '.join(_key),') = ', B_latex, '\n')
+        E_latex = latex.convertMatrixToLatex(self._E)
+        print('E(',', '.join(_key),') = ', E_latex, '\n')
         W_latex = latex.convertMatrixToLatex(self._W)
-        print('W',str(_key),' = ', W_latex, '\n\n')
+        print('W(',', '.join(_key),') = ', W_latex, '\n\n')
         
 class coordinateRecord:
     

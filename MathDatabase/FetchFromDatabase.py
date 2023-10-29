@@ -21,7 +21,7 @@ transformTable = mathData.getTransformTable()
 key = ('polar', 'cartesian')
 if key in transformTable:
     transRec = transformTable[key] 
-    print(str(key), 'transform matrices')
+    print(str(key), 'transform matrices\n')
     transRec.printRecord(key)   
 else:
     print(str(key), " not in database\n")    
@@ -49,7 +49,7 @@ coord.printRecord()
 key = ('polar1', 'polar')
 if key in transformTable:
     transRec = transformTable[key] 
-    print(str(key), 'transform matrices')
+    print(str(key), 'transform matrices\n')
     transRec.printRecord(key)       
 else:
     print(key, " not in database")
@@ -61,7 +61,7 @@ coord.printRecord()
 key = ('polarSqrt1', 'polar')
 if key in transformTable:
    transRec = transformTable[key] 
-   print(str(key), 'transform matrices')
+   print(str(key), 'transform matrices\n')
    transRec.printRecord(key)         
 else:
     print(key, " not in database")
