@@ -42,6 +42,7 @@ if key in transformTable:
 else:
     print(key, " not in database")
 
+
 coord = coordTable[key]
 print(str(key), 'coordinates\n')
 coord.printRecord()

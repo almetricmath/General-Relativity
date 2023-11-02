@@ -140,6 +140,7 @@ class transformRecord:
         self._E = _E
         self._W = _W
         
+        
     def printRecord(self, _key):
         latex = convertToLatex()
         
@@ -170,7 +171,7 @@ class coordinateRecord:
 
 # develop a loop to process results given an input coordinate system
 
-def createProcessLoop(_coords, msg, _logFileName:string):
+def createProcessLoop(_coords, _E, _W, msg, _logFileName:string):
     
     if len(_logFileName) != 0:
         logPtr = open(_logFileName, 'a')
@@ -189,12 +190,11 @@ def createProcessLoop(_coords, msg, _logFileName:string):
     B_latex = latex.convertMatrixToLatex(B)
     print('B', msg, B_latex, '\n')
 
-    E = I(2)
-    W = I(2)
-    E_bar = A*E
+    
+    E_bar = A*_E
     E_bar_latex = latex.convertMatrixToLatex(E_bar)
     print('E', msg, E_bar_latex, '\n')
-    W_bar = sp.transpose(B)*W
+    W_bar = sp.transpose(B)*_W
     W_bar_latex = latex.convertMatrixToLatex(W_bar)
     print('W', msg,  W_bar_latex, '\n')
 
