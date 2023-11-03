@@ -192,9 +192,15 @@ def createProcessLoop(_coords, _E, _W, msg, _logFileName:string):
 
     
     E_bar = A*_E
+    # put expression in terms of new coordinates and simplify
+    sub_str = dict(zip(_coords._inv_params, _coords._vec))
+    E_bar = E_bar.subs(sub_str)
+    E_bar = sp.simplify(E_bar)
     E_bar_latex = latex.convertMatrixToLatex(E_bar)
     print('E', msg, E_bar_latex, '\n')
     W_bar = sp.transpose(B)*_W
+    W_bar = W_bar.subs(sub_str)
+    W_bar = sp.simplify(W_bar)
     W_bar_latex = latex.convertMatrixToLatex(W_bar)
     print('W', msg,  W_bar_latex, '\n')
 
