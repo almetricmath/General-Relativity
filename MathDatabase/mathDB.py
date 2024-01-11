@@ -11,6 +11,7 @@ from pathlib import Path
 import pickle
 import os
 import string
+import re
 
 def I(n):
     return sp.eye(n)
@@ -284,7 +285,8 @@ class convertToLatex:
         ret = '\\bmatrix{'
         
         for i in range(_n):
-            ret += self.convertElementToLatex(_vec[i])
+            tmp = self.convertElementToLatex(_vec[i])
+            ret += tmp
             if i != _n - 1:
                 if not transposeFlag:
                     ret += '&'
@@ -298,8 +300,7 @@ class convertToLatex:
         
         # formats matrix and vector symbolic elements to latex
         
-        ret = sp_latex(_elem)
-        
+        ret = sp_latex(_elem)     
         return ret
         
         

@@ -36,8 +36,8 @@ mathData.insertIntoCoordinateTable('polar', 'cartesian', rec)
 E_polar = table._E
 W_polar = table._W
 
-r_bar = symbols('\\bar{r}') #noqa
-theta_bar = symbols('\\bar{\\theta}') #noqa
+r_bar = symbols('\\overline{r}') #noqa
+theta_bar = symbols('\\overline{\\theta}') #noqa
 
 
 print('polarSqrt from polar matrices \n')
