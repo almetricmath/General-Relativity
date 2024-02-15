@@ -16,7 +16,7 @@ mathData = mathDB.mathDB('math.db')
 #  cartesian to polar 
 
 r = symbols('r') #noqa
-theta = symbols('theta') #noqa
+theta = symbols('\\theta') #noqa
 x = symbols('x') #noqa
 y = symbols('y') #noqa
 
