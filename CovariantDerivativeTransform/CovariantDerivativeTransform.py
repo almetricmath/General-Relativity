@@ -12,10 +12,6 @@ import mathDB
 import sys
 
 
-mathData = mathDB.mathDB('math.db')
-latex = mathDB.convertToLatex()
-
-
 class christoffelSymbols():
     
     # This class computes Christoffel Symbols of the Second Kind
@@ -79,19 +75,19 @@ class covariantDerivative:
         Gamma.compute()
         self._Gamma_vals = Gamma.getGamma() 
         self._dv_dp = {}
+        self._vDotGamma = {} 
         self._covar_p = {}
         
     def compute(self, _v_in):
         
         params = self._coords._params
-        
+
         for p in params:
-            dv_dp = sp.diff(_v_in, p)
-            self._dv_dp[str(p)] = dv_dp
-            covar_p = dv_dp + np.dot(_v_in, self._Gamma_vals[str(p)])
-            self._covar_p[str(p)] = covar_p
+            self._dv_dp[str(p)] = sp.diff(_v_in, p)
+            self._vDotGamma[str(p)] = np.dot(_v_in, self._Gamma_vals[str(p)])
+            self._covar_p[str(p)] = self._dv_dp[str(p)] + self._vDotGamma[str(p)]
         
-        # create a tensor matrix
+        # put the row vectors togeter to create a covariant derivative matrix
         
         matrix = []
         for p in self._covar_p.values():
@@ -99,8 +95,33 @@ class covariantDerivative:
             
         self._covar_matrix = sp.Matrix(matrix)
     
+    def printVars(self):
         
+        params = self._coords._params
+        n =len(params)
         
+        for p in params:
+            dv_dp_latex = latex.convertVectorToLatex(self._dv_dp[str(p)], False, n)
+            if '\overline' in str(p):
+                expr = '\\frac{d\\overline{\\bf{v}}}{d' + str(p) + '}'
+                expr1 = '\\overline{\\bf{v}}'
+                expr2 = '\\overline{p}'
+            else:
+                expr = '\\frac{d\\bf{v}}{d' + str(p) + '}'
+                expr1 = '\\bf{v}'
+                expr2 = 'p'
+                
+            print(f'{str(p)} component \n')
+            print(f'{expr} = {dv_dp_latex} \n')
+            vDotGamma_latex = latex.convertVectorToLatex(self._vDotGamma[str(p)], False, n)
+            print(f'v \. \\Gamma_{p} = {vDotGamma_latex} \n')
+            covar_p_latex = latex.convertVectorToLatex(self._covar_p[str(p)], False, n)
+            print(f'\\nabla_{str(p)} {str(expr1)}  = {covar_p_latex} \n')
+            
+        
+        covar_matrix_latex = latex.convertMatrixToLatex(self._covar_matrix)
+        print(f'\\nabla_{expr2} {expr1} = {covar_matrix_latex} \n')
+
     def getDv_dp(self):
         return self._dv_dp
     
@@ -110,31 +131,11 @@ class covariantDerivative:
     def getCovarMatrix(self):
         return self._covar_matrix
         
-  
-# Compute Covariant Derivative in Polar Coordinates 
 
-# Declare a vector field in polar coordinates
+mathData = mathDB.mathDB('math.db')
+latex = mathDB.convertToLatex()
 
-r = symbols('r') #noqa
-theta = symbols('theta') #noqa
-
-v = sp.Array([r**3*theta, r*theta**2])
-key = ('polar', 'cartesian')
-try:
-     covar_p = covariantDerivative(mathData, key)
-except KeyError as e:
-     print(str(e))
-     sys.exit(-1)
-
-covar_p.compute(v)
-covar_p_matrix = covar_p.getCovarMatrix()
-covar_p_matrix_latex = latex.convertMatrixToLatex(covar_p_matrix)
-print(f'covariance matrix in polar coordinates = {covar_p_matrix_latex}\n')
-
-
-# Compute Covariant Derivative in Polar Coordinates 
-
-# transform vector field to the polar sqrt system
+# Compute Covariant Derivative in Polar Sqrt Coordinates 
 
 transformTable = mathData.getTransformTable()
 
@@ -158,15 +159,28 @@ else:
 vec = coords._vec
 inv_params = coords._inv_params
 
+# Declare a vector field in polar coordinates
+
+r = symbols('r') #noqa
+theta = symbols('\\theta') #noqa
+
+v = sp.Array([r**3*theta, r*theta**2])
+
+# Compute Covariant Derivative in the polar sqrt coordinate system
+
+# Transfor vector field to the polar sqrt coordinate systtem
 
 v1 = np.dot(v, B)
-# first substitute (r, theta) coordinates with (r1, theta1) coordinates
+
+# substitute (r, theta) coordinates with (r1, theta1) coordinates
+
 sub_str = dict(zip(inv_params, vec))
 v1 = sp.Array(v1)
 v1 = v1.subs(sub_str) 
 v1 = sp.simplify(v1)
 v1_latex = latex.convertVectorToLatex(v1, False, 2)
-print(f'v1_latex = {v1_latex}\n')
+expr = '\\overline{\\bf v}'
+print( f'{expr} = {v1_latex}\n')
 
 try:
      covar_p_prime = covariantDerivative(mathData, key)
@@ -175,17 +189,24 @@ except KeyError as e:
      sys.exit(-1)
 
 covar_p_prime.compute(v1)
-covar_p_prime_matrix = covar_p_prime.getCovarMatrix()
-covar_p_prime_matrix_latex = latex.convertMatrixToLatex(covar_p_prime_matrix)
-print(f'covariance matrix in polar sqrt coordinates = {covar_p_prime_matrix_latex}\n')
+covar_p_prime.printVars()
+    
+# Compute Covariant Derivative in Polar Coordinates 
 
+# Declare a vector field in polar coordinates
 
+key = ('polar', 'cartesian')
+try:
+     covar_p = covariantDerivative(mathData, key)
+except KeyError as e:
+     print(str(e))
+     sys.exit(-1)
+
+covar_p.compute(v)
+covar_p.printVars()
 # Test transform of covariance derivative from polar coordinates to polar sqrt coordinates
 
-print('')
-covar_p_matrix_latex = latex.convertMatrixToLatex(covar_p_matrix)
-print(f'covariance matrix in polar coordinates = {covar_p_matrix_latex}\n')
-
+covar_p_matrix = covar_p.getCovarMatrix()
 
 test = A*covar_p_matrix*B
 sub_str = dict(zip(inv_params, vec))
