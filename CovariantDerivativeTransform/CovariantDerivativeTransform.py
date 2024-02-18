@@ -62,6 +62,7 @@ class covariantDerivative:
             self._coords = coordinateTable[_key]
         else:
             raise KeyError(f'{key} not in coordTable\n')
+            return
         
         # compute Christoffel Symbols
         
@@ -103,11 +104,12 @@ class covariantDerivative:
         for p in params:
             dv_dp_latex = latex.convertVectorToLatex(self._dv_dp[str(p)], False, n)
             if '\overline' in str(p):
-                expr = '\\frac{d\\overline{\\bf{v}}}{d' + str(p) + '}'
+                
+                expr = '\\frac{\\partial{\\overline{\\bf{v}}}}{\\partial{' + str(p) + '}}'
                 expr1 = '\\overline{\\bf{v}}'
                 expr2 = '\\overline{p}'
             else:
-                expr = '\\frac{d\\bf{v}}{d' + str(p) + '}'
+                expr = '\\frac{\\partial{\\bf{v}}}{\\partial{' + str(p) + '}}'
                 expr1 = '\\bf{v}'
                 expr2 = 'p'
                 
@@ -142,6 +144,7 @@ transformTable = mathData.getTransformTable()
 # get polarSqrt from polar coordinates 
 
 key = ('polarSqrt', 'polar')
+
 if key in transformTable:
     transRec = transformTable[key] 
     A = transRec._A
@@ -165,8 +168,16 @@ r = symbols('r') #noqa
 theta = symbols('\\theta') #noqa
 
 v = sp.Array([r**3*theta, r*theta**2])
+v_latex = latex.convertVectorToLatex(v, False, 2)
+expr = '\\bf{v}'
+print(f'{expr} = {v_latex} \n')
 
 # Compute Covariant Derivative in the polar sqrt coordinate system
+
+A_latex = latex.convertMatrixToLatex(A)
+print(f'A = {A_latex} \n')
+B_latex = latex.convertMatrixToLatex(B)
+print(f'B = {B_latex} \n')
 
 # Transfor vector field to the polar sqrt coordinate systtem
 
@@ -179,16 +190,17 @@ v1 = sp.Array(v1)
 v1 = v1.subs(sub_str) 
 v1 = sp.simplify(v1)
 v1_latex = latex.convertVectorToLatex(v1, False, 2)
-expr = '\\overline{\\bf v}'
+expr = '\\overline{\\bf{v}}'
 print( f'{expr} = {v1_latex}\n')
 
 try:
      covar_p_prime = covariantDerivative(mathData, key)
 except KeyError as e:
      print(str(e))
-     sys.exit(-1)
+     sys.exit(0)
 
 covar_p_prime.compute(v1)
+print('Covariant Derivative in the polar sqrt system\n')
 covar_p_prime.printVars()
     
 # Compute Covariant Derivative in Polar Coordinates 
@@ -196,26 +208,74 @@ covar_p_prime.printVars()
 # Declare a vector field in polar coordinates
 
 key = ('polar', 'cartesian')
+
 try:
      covar_p = covariantDerivative(mathData, key)
 except KeyError as e:
      print(str(e))
-     sys.exit(-1)
+     sys.exit(0)
 
 covar_p.compute(v)
+print('Covariant Derivative in the polar system\n')
 covar_p.printVars()
-# Test transform of covariance derivative from polar coordinates to polar sqrt coordinates
+
+# Test matrix transform of covariance derivative from polar coordinates to polar sqrt coordinates
+
+print('Test of matrix transform of the Covariant Derivative from polar to polar sqrt coordinates \n')
 
 covar_p_matrix = covar_p.getCovarMatrix()
+covar_p_matrix_latex = latex.convertMatrixToLatex((covar_p_matrix))
 
 test = A*covar_p_matrix*B
 sub_str = dict(zip(inv_params, vec))
 test = test.subs(sub_str)
 test = sp.simplify(test)
 test_latex = latex.convertMatrixToLatex(test)
-print(f'test = {test_latex}\n')
+expr = 'A [\\nabla_p \\bf{v}] B'
+print(f'{expr} = {test_latex}\n')
 
 
+# Test equation (70)
+
+print('Test equation (70) \n')
+r_prime = symbols('\\overline{r}') #noqa
+theta_prime = symbols('\\overline{\\theta}') #noqa
+
+# r_prime component
+
+print('r_prime compnent\n')
+
+dB_dr_prime = sp.diff(B, r_prime)
+dB_dr_prime_latex = latex.convertMatrixToLatex(dB_dr_prime)
+expr = '\\frac{\\partial{B}}{\\partial{\\overline{r}}}'
+print(f'{expr} = {dB_dr_prime_latex} \n')
+
+dA_dr_prime = sp.diff(A, r_prime)
+dA_dr_prime_latex = latex.convertMatrixToLatex(dA_dr_prime)
+expr = '\\frac{\\partial{A}}{\\partial{\\overline{r}}}'
+print(f'{expr} = {dA_dr_prime_latex} \n')
+
+test_r_prime = dB_dr_prime + np.dot(B, np.dot(dA_dr_prime, B))
+test_r_prime_latex = latex.convertMatrixToLatex(test_r_prime)
+expr = '\\frac{\\partial{B}}{\\partial{\\overline{r}}} + B \\frac{\\partial{A}}{\\partial{\\overline{r}}} B'
+print(f'{expr} = {test_r_prime_latex} \n')
+
+# theta_prime component
+
+print('theta_prime compnent\n')
+
+dB_dTheta_prime = sp.diff(B, theta_prime)
+dB_dTheta_prime_latex = latex.convertMatrixToLatex(dB_dTheta_prime)
+expr = '\\frac{\\partial{B}}{\\partial{\\overline{\\theta}}}'
+print(f'{expr} = {dB_dTheta_prime_latex} \n')
+
+dA_dTheta_prime = sp.diff(A, theta_prime)
+dA_dTheta_prime_latex = latex.convertMatrixToLatex(dA_dTheta_prime)
+expr = '\\frac{\\partial{A}}{\\partial{\\overline{\\theta}}}'
+print(f'{expr} = {dA_dTheta_prime_latex} \n')
 
 
-
+test_theta_prime = dB_dTheta_prime + np.dot(B, np.dot(dA_dTheta_prime, B))
+test_theta_prime_latex = latex.convertMatrixToLatex(test_theta_prime)
+expr = '\\frac{\\partial{B}}{\\partial{\\overline{\\theta}}} + B \\frac{\\partial{A}}{\\partial{\\overline{\\theta}}} B'
+print(f'{expr} = {test_theta_prime_latex} \n')
