@@ -116,7 +116,8 @@ class covariantDerivative:
             print(f'{str(p)} component \n')
             print(f'{expr} = {dv_dp_latex} \n')
             vDotGamma_latex = latex.convertVectorToLatex(self._vDotGamma[str(p)], False, n)
-            print(f'v \. \\Gamma_{p} = {vDotGamma_latex} \n')
+            expr = '\\bf{v} \. \\Gamma_'
+            print(f'{expr}{p} = {vDotGamma_latex} \n')
             covar_p_latex = latex.convertVectorToLatex(self._covar_p[str(p)], False, n)
             print(f'\\nabla_{str(p)} {str(expr1)}  = {covar_p_latex} \n')
             
