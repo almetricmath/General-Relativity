@@ -236,9 +236,9 @@ expr = 'A [\\nabla_p \\bf{v}] B'
 print(f'{expr} = {test_latex}\n')
 
 
-# Test equation (70)
+# Test equation (69)
 
-print('Test equation (70) \n')
+print('Test equation (69) \n')
 r_prime = symbols('\\overline{r}') #noqa
 theta_prime = symbols('\\overline{\\theta}') #noqa
 
