@@ -119,7 +119,8 @@ class covariantDerivative:
             expr = '\\bf{v} \. \\Gamma_'
             print(f'{expr}{p} = {vDotGamma_latex} \n')
             covar_p_latex = latex.convertVectorToLatex(self._covar_p[str(p)], False, n)
-            print(f'\\nabla_{str(p)} {str(expr1)}  = {covar_p_latex} \n')
+            expr3 = '{' + str(p) + '}'
+            print(f'\\nabla_{expr3} {str(expr1)}  = {covar_p_latex} \n')
             
         
         covar_matrix_latex = latex.convertMatrixToLatex(self._covar_matrix)
@@ -171,16 +172,19 @@ theta = symbols('\\theta') #noqa
 v = sp.Array([r**3*theta, r*theta**2])
 v_latex = latex.convertVectorToLatex(v, False, 2)
 expr = '\\bf{v}'
+print('vector field in polar coordinates \n')
 print(f'{expr} = {v_latex} \n')
 
 # Compute Covariant Derivative in the polar sqrt coordinate system
+
+print('Transformation Matrices \n')
 
 A_latex = latex.convertMatrixToLatex(A)
 print(f'A = {A_latex} \n')
 B_latex = latex.convertMatrixToLatex(B)
 print(f'B = {B_latex} \n')
 
-# Transfor vector field to the polar sqrt coordinate systtem
+# Transform vector field to the polar sqrt coordinate systtem
 
 v1 = np.dot(v, B)
 
@@ -192,6 +196,7 @@ v1 = v1.subs(sub_str)
 v1 = sp.simplify(v1)
 v1_latex = latex.convertVectorToLatex(v1, False, 2)
 expr = '\\overline{\\bf{v}}'
+print('vector field in polar sqrt coordinates\n')
 print( f'{expr} = {v1_latex}\n')
 
 try:
@@ -227,7 +232,7 @@ print('Test of matrix transform of the Covariant Derivative from polar to polar 
 covar_p_matrix = covar_p.getCovarMatrix()
 covar_p_matrix_latex = latex.convertMatrixToLatex((covar_p_matrix))
 
-test = A*covar_p_matrix*B
+test = A*covar_p_matrix*B   # Perform transform on matrix representation of covariant derivative
 sub_str = dict(zip(inv_params, vec))
 test = test.subs(sub_str)
 test = sp.simplify(test)
